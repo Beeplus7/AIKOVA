@@ -88,7 +88,8 @@ async function mintSession(email) {
   const tokenHash =
     linkBody?.properties?.hashed_token ||
     linkBody?.hashed_token ||
-    linkBody?.email_otp;
+    linkBody?.data?.properties?.hashed_token ||
+    linkBody?.data?.hashed_token;
 
   if (!tokenHash) {
     const err = new Error('no token hash from generate_link');
@@ -109,32 +110,12 @@ async function mintSession(email) {
     }),
   });
   const sessionBody = await verifyRes.json();
-  if (!verifyRes.ok) {
-    // Fallback type used by some GoTrue versions
-    const verify2 = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
-      method: 'POST',
-      headers: {
-        apikey: ANON_KEY,
-        Authorization: `Bearer ${ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: 'email',
-        token_hash: tokenHash,
-      }),
-    });
-    const session2 = await verify2.json();
-    if (!verify2.ok) {
-      const err = new Error(
-        sessionBody.error_description ||
-          sessionBody.msg ||
-          session2.msg ||
-          'verify failed',
-      );
-      err.status = 500;
-      throw err;
-    }
-    return session2;
+  if (!verifyRes.ok || !sessionBody.access_token) {
+    const err = new Error(
+      sessionBody.error_description || sessionBody.msg || 'verify failed',
+    );
+    err.status = 500;
+    throw err;
   }
   return sessionBody;
 }
