@@ -1,39 +1,47 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
-// This file is web-only and used to configure the root HTML for every
-// web page during static rendering.
-// The contents of this function only run in Node.js environments and
-// do not have access to the DOM or browser APIs.
-export default function Root({ children }: { children: ReactNode }) {
+/** Web document shell — deep void vault, full-bleed root for RN-web. */
+export default function Root({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-
-        {/*
-          Disable body scrolling on web. This makes ScrollView components work closer to how they do on native.
-          However, body scrolling is often nice to have for mobile web. If you want to enable it, remove this line.
-        */}
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta name="theme-color" content="#05070D" />
         <ScrollViewStyleReset />
-
-        {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
-        <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
-        {/* Add any additional <head> elements that you want globally available on web... */}
+        {/* Portfolio OS artefact uses Tailwind utility classes on web */}
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style dangerouslySetInnerHTML={{ __html: responsiveRoot }} />
       </head>
       <body>{children}</body>
     </html>
   );
 }
 
-const responsiveBackground = `
-body {
-  background-color: #fff;
+const responsiveRoot = `
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: #05070D;
+  color: #FFFFFF;
 }
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #000;
-  }
-}`;
+body {
+  overflow-x: hidden;
+}
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  min-width: 100%;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+`;

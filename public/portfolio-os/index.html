@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="theme-color" content="#05070D" />
+    <title>AiKOVA — Portfolio OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      html, body, #root {
+        margin: 0;
+        min-height: 100%;
+        background: #05070D;
+        color: #fff;
+      }
+      body { overflow-x: hidden; }
+    </style>
+  <style id="aikova-hide-artefact-nav">
+  header { display: none !important; }
+</style>
+</head>
+  <body>
+    <div id="root"></div>
+    <script src="./app.js"></script>
+  
+<script>
+(function () {
+  var routes = { 'Services': '/services', 'Solutions': '/solutions', 'Home': '/', 'Portfolio': '/portfolio', 'Contact': '/contact', 'Industries': '/industries' };
+  function go(path) {
+    try {
+      if (window.top && window.top !== window) window.top.location.assign(path);
+      else window.location.assign(path);
+    } catch (e) { window.location.assign(path); }
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest && e.target.closest('a');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    var label = (a.textContent || '').replace(/\s+/g, ' ').trim();
+    if (routes[label]) { e.preventDefault(); go(routes[label]); return; }
+    if (!href) return;
+    if (href.charAt(0) === '#') return;
+    if (href === '/solutions') { e.preventDefault(); go('/services'); return; }
+    if (href.indexOf('mailto:') === 0) return;
+    if (href.indexOf('http') === 0) return;
+    e.preventDefault();
+    go(href);
+  }, true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="theme-color" content="#05070D" />
+    <title>AiKOVA — Solutions + Industry Playbook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      html, body, #root {
+        margin: 0;
+        min-height: 100%;
+        background: #05070D;
+        color: #fff;
+      }
+      body { overflow-x: hidden; }
+      header { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="./app.js"></script>
+<script>
+(function () {
+  var routes = {
+    'Home': '/',
+    'AiKOVA': '/',
+    'Services': '/services',
+    'Solutions': '/solutions',
+    'Industries': '/industries',
+    'Portfolio': '/portfolio',
+    'Contact': '/contact',
+    'Login to OS': '/os/login'
+  };
+  function go(path) {
+    try {
+      if (window.top && window.top !== window) window.top.location.assign(path);
+      else window.location.assign(path);
+    } catch (e) { window.location.assign(path); }
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest && e.target.closest('a,button,[role="link"]');
+    if (!a) return;
+    var label = (a.textContent || '').replace(/\s+/g, ' ').trim();
+    if (routes[label]) { e.preventDefault(); go(routes[label]); return; }
+    var href = a.getAttribute('href');
+    if (!href || href.charAt(0) === '#' || href.indexOf('mailto:') === 0 || href.indexOf('http') === 0) return;
+    var allowed = ['/', '/services', '/solutions', '/industries', '/portfolio', '/contact', '/os', '/os/login'];
+    if (allowed.indexOf(href) !== -1 || href.indexOf('/os/') === 0) { e.preventDefault(); go(href); }
+  }, true);
+})();
+</script>
+  </body>
+</html>
