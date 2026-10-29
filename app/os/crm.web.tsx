@@ -1,8 +1,6 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import AdminCrmApp from '../../src/crm/AdminCrmApp.web';
 import { useAuth } from '../../src/lib/auth/AuthProvider';
-import { colors } from '../../src/theme/colors';
 
 /** Full Admin CRM OS (web). Requires Supabase session. */
 export default function OsCrmScreen() {
@@ -10,9 +8,18 @@ export default function OsCrmScreen() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator color={colors.green} />
-      </View>
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'grid',
+          placeItems: 'center',
+          background: '#05070D',
+          color: '#8B9BB4',
+          fontFamily: 'Inter, system-ui, sans-serif',
+        }}
+      >
+        Loading CRM…
+      </div>
     );
   }
 
@@ -22,12 +29,3 @@ export default function OsCrmScreen() {
 
   return <AdminCrmApp />;
 }
-
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.bg,
-  },
-});

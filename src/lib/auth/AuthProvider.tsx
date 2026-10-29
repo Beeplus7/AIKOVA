@@ -67,9 +67,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithGoogle: async () => {
         const supabase = getSupabase();
         if (!supabase) throw new Error('Supabase not configured');
-        const clientId = env.googleClientId;
+        const clientId =
+          env.googleClientId ||
+          process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
+          '';
         if (!clientId) {
-          throw new Error('EXPO_PUBLIC_GOOGLE_CLIENT_ID missing');
+          throw new Error(
+            'Google Client ID missing. Set EXPO_PUBLIC_GOOGLE_CLIENT_ID and rebuild.',
+          );
         }
 
         const idToken = await obtainGoogleIdToken(clientId);

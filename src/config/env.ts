@@ -30,27 +30,37 @@ type Extra = {
   };
 };
 
-const extra = (Constants.expoConfig?.extra ?? {}) as Extra;
+const extra = (Constants.expoConfig?.extra ??
+  (Constants as { manifest?: { extra?: Extra } }).manifest?.extra ??
+  {}) as Extra;
 
-const readPublic = (key: string, fromExtra: string | undefined): string => {
-  const fromProcess = process.env[key];
-  if (typeof fromProcess === 'string' && fromProcess.trim()) {
-    return fromProcess.trim();
+/** Keep direct process.env reads so Metro inlines EXPO_PUBLIC_* at export time. */
+const PUBLIC_SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
+const PUBLIC_SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
+const PUBLIC_API_BASE = process.env.EXPO_PUBLIC_API_BASE_URL ?? '';
+const PUBLIC_APP_URL = process.env.EXPO_PUBLIC_APP_URL ?? '';
+const PUBLIC_GOOGLE_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? '';
+
+/** Public OAuth web client — safe fallback if export omits env inlining. */
+const GOOGLE_WEB_CLIENT_FALLBACK =
+  '770227496005-mnhg2n37tk2n1o4efmihoj2vlhpijhc8.apps.googleusercontent.com';
+
+const pick = (...values: Array<string | undefined>) => {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) return value.trim();
   }
-  return (fromExtra ?? '').trim();
+  return '';
 };
 
 export const env = {
-  supabaseUrl: readPublic('EXPO_PUBLIC_SUPABASE_URL', extra.supabaseUrl),
-  supabaseAnonKey: readPublic(
-    'EXPO_PUBLIC_SUPABASE_ANON_KEY',
-    extra.supabaseAnonKey,
-  ),
-  apiBaseUrl: readPublic('EXPO_PUBLIC_API_BASE_URL', extra.apiBaseUrl),
-  appUrl: readPublic('EXPO_PUBLIC_APP_URL', extra.appUrl),
-  googleClientId: readPublic(
-    'EXPO_PUBLIC_GOOGLE_CLIENT_ID',
+  supabaseUrl: pick(PUBLIC_SUPABASE_URL, extra.supabaseUrl),
+  supabaseAnonKey: pick(PUBLIC_SUPABASE_ANON, extra.supabaseAnonKey),
+  apiBaseUrl: pick(PUBLIC_API_BASE, extra.apiBaseUrl, 'https://aikova.co.uk'),
+  appUrl: pick(PUBLIC_APP_URL, extra.appUrl, 'https://aikova.co.uk'),
+  googleClientId: pick(
+    PUBLIC_GOOGLE_CLIENT_ID,
     extra.googleClientId,
+    GOOGLE_WEB_CLIENT_FALLBACK,
   ),
   githubOwner: extra.githubOwner ?? '',
   githubRepo: extra.githubRepo ?? '',
