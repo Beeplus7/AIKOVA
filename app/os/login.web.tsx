@@ -189,7 +189,7 @@ export default function OsLoginScreen() {
           <p className="aikova-auth-kicker">PORTAL · DUAL ACCESS</p>
           <h1 className="aikova-auth-title">Sign in.</h1>
           <p className="aikova-auth-lede">
-            One login. Two entrances — Admin CRM (Captain) and Client portal.
+            One login. Two entrances — Admin entrance and Users entrance.
           </p>
 
           {loading ? (
@@ -199,12 +199,12 @@ export default function OsLoginScreen() {
               <p className="aikova-auth-meta">Signed in as {user.email ?? user.id}</p>
               <div className="aikova-auth-doors">
                 <Link href="/os/crm?role=admin" className="aikova-auth-door admin">
-                  <strong>01 · Admin CRM</strong>
-                  <span>Captain vault — leads, pipeline, tickets, DOS7 evidence.</span>
+                  <strong>01 · Admin entrance</strong>
+                  <span>Captain CRM — leads, pipeline, tickets, DOS7 evidence.</span>
                 </Link>
                 <Link href="/os/crm?role=user" className="aikova-auth-door user">
-                  <strong>02 · Client portal</strong>
-                  <span>User view — projects, tickets, chat with Captain.</span>
+                  <strong>02 · Users entrance</strong>
+                  <span>Client portal — projects, tickets, chat with Captain.</span>
                 </Link>
               </div>
               <button type="button" className="aikova-auth-ghost" onClick={() => signOut()}>

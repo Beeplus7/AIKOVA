@@ -197,7 +197,7 @@ export default function OsPortalScreen() {
         <p className="aikova-portal-kicker">PORTAL · DUAL ACCESS</p>
         <h1 className="aikova-portal-title">Open the system.</h1>
         <p className="aikova-portal-lede">
-          Admin CRM and Client portal — same account, two entrances. Pick a door.
+          Same account. Two entrances — Admin entrance and Users entrance.
         </p>
         <div className="aikova-portal-chips">
           {[
@@ -225,16 +225,16 @@ export default function OsPortalScreen() {
 
         <div className="aikova-portal-grid">
           <Link href="/os/crm?role=admin" className="aikova-portal-door admin">
-            <div className="n">01 · CAPTAIN</div>
-            <h2>Admin CRM</h2>
-            <p>Leads, engagements, negotiations, tickets, evidence vault, billing.</p>
-            <span className="cta">Open Admin CRM →</span>
+            <div className="n">01 · ADMIN ENTRANCE</div>
+            <h2>Admin entrance</h2>
+            <p>Captain CRM — leads, engagements, negotiations, tickets, evidence vault, billing.</p>
+            <span className="cta">Enter Admin →</span>
           </Link>
           <Link href="/os/crm?role=user" className="aikova-portal-door user">
-            <div className="n">02 · CLIENT</div>
-            <h2>User portal</h2>
-            <p>Client view — project status, tickets, chat with Captain.</p>
-            <span className="cta">Open Client portal →</span>
+            <div className="n">02 · USERS ENTRANCE</div>
+            <h2>Users entrance</h2>
+            <p>Client portal — project status, tickets, chat with Captain.</p>
+            <span className="cta">Enter Users →</span>
           </Link>
         </div>
       </div>
