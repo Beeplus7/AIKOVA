@@ -1,12 +1,34 @@
-import { Redirect } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
+import { Redirect, useLocalSearchParams } from 'expo-router';
 import AdminCrmApp from '../../src/crm/AdminCrmApp.web';
 import { useAuth } from '../../src/lib/auth/AuthProvider';
 
-/** Full Admin CRM OS (web). Requires Supabase session. */
+/** Full Admin/User CRM OS (web). Requires Supabase session. No OS sidebar. */
 export default function OsCrmScreen() {
   const { user, loading, configured } = useAuth();
+  const params = useLocalSearchParams<{ role?: string }>();
+  const [ready, setReady] = useState(false);
 
-  if (loading) {
+  const initialRole = useMemo<"admin" | "user">(() => {
+    return params.role === 'user' ? 'user' : 'admin';
+  }, [params.role]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setReady(true), 50);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (!document.querySelector('script[data-aikova-crm-tw]')) {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.tailwindcss.com';
+      s.dataset.aikovaCrmTw = '1';
+      document.head.appendChild(s);
+    }
+  }, []);
+
+  if (loading || !ready) {
     return (
       <div
         style={{
@@ -18,7 +40,7 @@ export default function OsCrmScreen() {
           fontFamily: 'Inter, system-ui, sans-serif',
         }}
       >
-        Loading CRM…
+        Opening CRM…
       </div>
     );
   }
@@ -27,5 +49,9 @@ export default function OsCrmScreen() {
     return <Redirect href="/os/login" />;
   }
 
-  return <AdminCrmApp />;
+  return (
+    <div style={{ minHeight: '100vh', background: '#05070D' }}>
+      <AdminCrmApp key={initialRole} initialRole={initialRole} />
+    </div>
+  );
 }

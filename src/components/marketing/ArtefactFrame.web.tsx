@@ -59,9 +59,9 @@ export function ArtefactFrame({
               </Link>
             );
           })}
-          <Link href="/os/login" asChild>
+          <Link href="/os/portal" asChild>
             <Pressable style={styles.cta}>
-              <Text style={styles.ctaText}>Login to OS</Text>
+              <Text style={styles.ctaText}>Open Portal</Text>
             </Pressable>
           </Link>
         </View>

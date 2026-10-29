@@ -10,8 +10,8 @@ export const marketingRoutes = [
 
 export const osRoutes = [
   { href: '/os', label: 'Dashboard' },
+  { href: '/os/portal', label: 'Portal' },
   { href: '/os/crm', label: 'Admin CRM' },
   { href: '/os/pipeline', label: 'Pipeline' },
   { href: '/os/portfolio', label: 'Portfolio CRM' },
-  { href: '/os/login', label: 'Login' },
 ] as const;

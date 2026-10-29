@@ -238,8 +238,12 @@ async function apiDelete(collection: string, id: string) {
   return crmAction<boolean>("records.delete", { collection, id });
 }
 
-export default function App() {
-  const [role, setRole] = useState<"admin" | "user">("admin");
+export default function App({
+  initialRole = "admin",
+}: {
+  initialRole?: "admin" | "user";
+} = {}) {
+  const [role, setRole] = useState<"admin" | "user">(initialRole);
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [leads, setLeads] = useState<{ id: string; value: Lead }[]>([]);
   const [engagements, setEngagements] = useState<{ id: string; value: Engagement }[]>([]);

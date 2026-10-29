@@ -45,11 +45,12 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  // Also unblock after a short timeout so web never sticks on the spinner.
+  // Hide splash immediately on web so /os/crm never sticks on the logo screen.
   useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
     const t = setTimeout(() => {
       SplashScreen.hideAsync().catch(() => {});
-    }, 2500);
+    }, 800);
     return () => clearTimeout(t);
   }, []);
 
