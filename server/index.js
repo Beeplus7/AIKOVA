@@ -8,6 +8,13 @@ import {
   replaceRecord,
 } from './db.js';
 import { exchangeGoogleIdToken } from './googleAuth.js';
+import {
+  claimAdmin,
+  createAdminByAdmin,
+  getAdminStatus,
+  isAdminUser,
+  listAdmins,
+} from './adminUsers.js';
 
 const PORT = Number(process.env.CRM_API_PORT || 3015);
 const SUPABASE_URL = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace(/\/$/, '');
@@ -67,6 +74,15 @@ async function requireUser(req, res, next) {
   } catch (err) {
     return res.status(401).json({ error: 'auth verify failed' });
   }
+}
+
+async function requireAdmin(req, res, next) {
+  await requireUser(req, res, async () => {
+    if (!isAdminUser(req.user)) {
+      return res.status(403).json({ error: 'admin access required' });
+    }
+    return next();
+  });
 }
 
 async function handleActions(req, res) {
@@ -143,6 +159,69 @@ app.post('/auth/google', async (req, res) => {
     });
   } catch (err) {
     return res.status(err.status || 500).json({ error: err.message || 'google auth failed' });
+  }
+});
+
+app.get('/auth/admins/status', async (_req, res) => {
+  try {
+    const data = await getAdminStatus();
+    return res.json({ data });
+  } catch (err) {
+    return res.status(err.status || 500).json({ error: err.message || 'status failed' });
+  }
+});
+
+app.post('/auth/claim-admin', async (req, res) => {
+  try {
+    const { email, password, full_name, claim_secret } = req.body || {};
+    const data = await claimAdmin({
+      email,
+      password,
+      fullName: full_name,
+      claimSecret: claim_secret,
+    });
+    return res.json({
+      data: {
+        created: data.created,
+        email: data.user?.email || email,
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+        expires_in: data.session.expires_in,
+        user: data.session.user,
+        status: data.status,
+      },
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({ error: err.message || 'claim failed' });
+  }
+});
+
+app.get('/auth/admins', requireAdmin, async (_req, res) => {
+  try {
+    const data = await listAdmins();
+    return res.json({ data });
+  } catch (err) {
+    return res.status(err.status || 500).json({ error: err.message || 'list failed' });
+  }
+});
+
+app.post('/auth/admins', requireAdmin, async (req, res) => {
+  try {
+    const { email, password, full_name } = req.body || {};
+    const data = await createAdminByAdmin(req.user, {
+      email,
+      password,
+      fullName: full_name,
+    });
+    return res.json({
+      data: {
+        created: data.created,
+        email: data.user?.email || email,
+        admins: data.admins,
+      },
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({ error: err.message || 'create failed' });
   }
 });
 

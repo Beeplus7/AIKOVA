@@ -6,7 +6,7 @@ export default function HomeScreen() {
     <ArtefactFrame
       activeHref="/"
       title="AiKOVA — Engineered Intelligence. Delivered."
-      src="/aikova-flowless-tech-hero.html"
+      src="/aikova-flowless-tech-hero.html?v=deep-delivered-1"
     />
   );
 }

@@ -1,6 +1,14 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import logoUrl from "./assets/75dfc9f884f0c38d-99630AD0-413D-439B-8A63-79E5B44A9CBA.png";
+import logoAsset from "./assets/75dfc9f884f0c38d-99630AD0-413D-439B-8A63-79E5B44A9CBA.png";
 import { crmAction } from "../lib/crmApi";
+import { useAuth } from "../lib/auth/AuthProvider";
+import UserDashboardApp from "./UserDashboardApp.web";
+
+/** Expo web often exports images as `{ uri }`, not a string — `<img src={object}>` whitescreens. */
+const logoUrl =
+  typeof logoAsset === "string"
+    ? logoAsset
+    : ((logoAsset as { uri?: string } | null)?.uri ?? "");
 import {
   LayoutDashboard,
   Database,
@@ -113,9 +121,14 @@ type Chat = {
   lastMessage: string;
   sentiment: "Positive" | "Neutral" | "Negative";
   jobScore: number;
-  origin: "Floating Widget" | "Contact OS";
-  transcript: { from: "lead" | "ava" | "captain"; text: string; time: string }[];
+  origin: string;
+  transcript: { from: "lead" | "ava" | "captain"; text: string; time: string; msgId?: string }[];
   techAssessment: string;
+  unread?: boolean;
+  unreadCount?: number;
+  lastFrom?: string;
+  updatedAt?: string;
+  threadKey?: string;
 };
 
 // Sample Data
@@ -216,10 +229,14 @@ const PROJECTS = [
 ];
 
 async function apiList(collection: string) {
-  return crmAction<{ records: { id: string; value: any }[] }>("records.list", {
+  const data = await crmAction<
+    { records?: { id: string; value: any }[] } | { id: string; value: any }[]
+  >("records.list", {
     collection,
     limit: 100,
   });
+  if (Array.isArray(data)) return { records: data };
+  return { records: Array.isArray(data?.records) ? data.records : [] };
 }
 
 async function apiCreate(collection: string, value: any, idempotency_key?: string) {
@@ -238,52 +255,190 @@ async function apiDelete(collection: string, id: string) {
   return crmAction<boolean>("records.delete", { collection, id });
 }
 
+function normalizeLead(value: Partial<Lead> | null | undefined): Lead {
+  const v = value || {};
+  return {
+    companyName: v.companyName || "Untitled garage",
+    address: v.address || "",
+    postcode: v.postcode || "",
+    postcodeArea: v.postcodeArea || (v.postcode || "").slice(0, 2).toUpperCase() || "OL",
+    phone: v.phone || "",
+    motClasses: v.motClasses || "Class 4",
+    companiesHouseStatus: v.companiesHouseStatus || "Active",
+    score: typeof v.score === "number" ? v.score : 50,
+    aiIcebreaker: v.aiIcebreaker || `Hi ${v.companyName || "there"} — quick question about MOT bookings?`,
+    status: v.status || "New",
+    source: v.source || "Manual",
+  };
+}
+
+function normalizeChat(value: Partial<Chat> | null | undefined): Chat {
+  const v = value || {};
+  return {
+    leadName: v.leadName || "Unknown lead",
+    lastMessage: v.lastMessage || "",
+    sentiment: v.sentiment || "Neutral",
+    jobScore: typeof v.jobScore === "number" ? v.jobScore : 50,
+    origin: v.origin || "Contact OS",
+    transcript: Array.isArray(v.transcript) ? v.transcript : [],
+    techAssessment: v.techAssessment || "",
+    unread: Boolean(v.unread) || Number(v.unreadCount || 0) > 0,
+    unreadCount: Number(v.unreadCount || 0),
+    lastFrom: v.lastFrom,
+    updatedAt: v.updatedAt,
+    threadKey: v.threadKey,
+  };
+}
+
+function normalizeEngagement(value: Partial<Engagement> | null | undefined): Engagement {
+  const v = value || {};
+  return {
+    leadId: v.leadId || "0",
+    leadName: v.leadName || "Unknown",
+    date: v.date || new Date().toISOString().slice(0, 10),
+    type: v.type || "Call",
+    duration: v.duration || "-",
+    notes: v.notes || "",
+    outcome: v.outcome || "",
+    evidenceFile: v.evidenceFile || "",
+    govStandard: v.govStandard || "Discovery",
+  };
+}
+
+function normalizeTicket(value: Partial<TicketItem> | null | undefined): TicketItem {
+  const v = value || {};
+  return {
+    ticketId: v.ticketId || "TKT-0",
+    title: v.title || "Untitled",
+    project: v.project || "AiKOVA",
+    priority: v.priority || "Medium",
+    assignee: v.assignee || "Captain",
+    due: v.due || "",
+    column: v.column || "To Do",
+    client: v.client || "",
+  };
+}
+
+function normalizeNegotiation(value: Partial<Negotiation> | null | undefined): Negotiation {
+  const v = value || {};
+  return {
+    leadId: v.leadId || "0",
+    leadName: v.leadName || "Unknown",
+    value: typeof v.value === "number" ? v.value : 0,
+    probability: typeof v.probability === "number" ? v.probability : 0,
+    stage: v.stage || "Lead",
+    nextAction: v.nextAction || "",
+    daysInStage: typeof v.daysInStage === "number" ? v.daysInStage : 0,
+    owner: v.owner || "Captain",
+    retainer: v.retainer || "",
+  };
+}
+
 export default function App({
   initialRole = "admin",
+  allowAdminView = true,
 }: {
   initialRole?: "admin" | "user";
+  /** When false, Admin (Captain) view stays locked — user credentials cannot switch in. */
+  allowAdminView?: boolean;
 } = {}) {
-  const [role, setRole] = useState<"admin" | "user">(initialRole);
+  const { user } = useAuth();
+  const clientLabel =
+    (user?.user_metadata as { full_name?: string } | undefined)?.full_name ||
+    user?.email?.split("@")[0] ||
+    "Client";
+  const clientEmail = user?.email || "client@aikova.co.uk";
+
+  const [role, setRole] = useState<"admin" | "user">(
+    allowAdminView ? initialRole : "user",
+  );
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const [userTab, setUserTab] = useState<"overview" | "tickets" | "chat" | "billing">("overview");
   const [leads, setLeads] = useState<{ id: string; value: Lead }[]>([]);
   const [engagements, setEngagements] = useState<{ id: string; value: Engagement }[]>([]);
   const [negotiations, setNegotiations] = useState<{ id: string; value: Negotiation }[]>([]);
   const [tickets, setTickets] = useState<{ id: string; value: TicketItem }[]>([]);
   const [chats, setChats] = useState<{ id: string; value: Chat }[]>([]);
+  const [projectRequests, setProjectRequests] = useState<
+    { id: string; value: any }[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [filterArea, setFilterArea] = useState("All");
   const [search, setSearch] = useState("");
   const [showEngagementModal, setShowEngagementModal] = useState(false);
+  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [showTicketModal, setShowTicketModal] = useState(false);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [chatDraft, setChatDraft] = useState("");
+  const [chatBusy, setChatBusy] = useState(false);
+  const [ticketBusy, setTicketBusy] = useState(false);
   const [dragTicket, setDragTicket] = useState<string | null>(null);
   const [importBusy, setImportBusy] = useState(false);
+  const [leadBusy, setLeadBusy] = useState(false);
   const [importResult, setImportResult] = useState<{ saved: number; remaining: number; error: string | null } | null>(null);
+  const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [vaultProgress] = useState(73);
   const [newEng, setNewEng] = useState<Partial<Engagement>>({ type: "Call", govStandard: "Discovery" });
+  const [newTicket, setNewTicket] = useState({
+    title: "",
+    priority: "Medium" as TicketItem["priority"],
+    project: "Vexo Garage",
+  });
+  const [newLead, setNewLead] = useState<Partial<Lead>>({
+    companyName: "",
+    postcode: "",
+    phone: "",
+    motClasses: "Class 4",
+    status: "New",
+    companiesHouseStatus: "Active",
+    score: 70,
+  });
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  const tabs = ["Dashboard", "Leads", "Engagement", "Negotiations", "Tickets", "Chats", "Projects", "Vault", "Billing"];
+  const tabs = [
+    "Dashboard",
+    "Requests",
+    "Leads",
+    "Engagement",
+    "Negotiations",
+    "Tickets",
+    "Chats",
+    "Projects",
+    "Vault",
+    "Billing",
+  ];
+
+  const mapLeads = (records: { id: string; value: any }[]) =>
+    records.map((r) => ({ id: r.id, value: normalizeLead(r.value) }));
+  const mapEngagements = (records: { id: string; value: any }[]) =>
+    records.map((r) => ({ id: r.id, value: normalizeEngagement(r.value) }));
+  const mapNegotiations = (records: { id: string; value: any }[]) =>
+    records.map((r) => ({ id: r.id, value: normalizeNegotiation(r.value) }));
+  const mapTickets = (records: { id: string; value: any }[]) =>
+    records.map((r) => ({ id: r.id, value: normalizeTicket(r.value) }));
+  const mapChats = (records: { id: string; value: any }[]) =>
+    records.map((r) => ({ id: r.id, value: normalizeChat(r.value) }));
 
   // Load
   const reloadAll = async () => {
     try {
-      const [l, e, n, t, c] = await Promise.all([
+      let [l, e, n, t, c, pr, ur] = await Promise.all([
         apiList("leads"),
         apiList("engagements"),
         apiList("negotiations"),
         apiList("tickets"),
         apiList("chats"),
+        apiList("project_requests"),
+        apiList("user_requests"),
       ]);
-      setLeads(l.records as any);
-      setEngagements(e.records as any);
-      setNegotiations(n.records as any);
-      setTickets(t.records as any);
-      setChats(c.records as any);
 
-      // seed if empty
+      // Seed demo data when collections are empty so Admin UI is usable immediately
+      let seeded = false;
       if (l.records.length === 0) {
         for (let i = 0; i < SAMPLE_LEADS.length; i++) {
           try {
             await apiCreate("leads", SAMPLE_LEADS[i], `lead-seed-${i}-${SAMPLE_LEADS[i].companyName}`);
+            seeded = true;
           } catch {}
         }
       }
@@ -291,6 +446,7 @@ export default function App({
         for (let i = 0; i < SAMPLE_ENGAGEMENTS.length; i++) {
           try {
             await apiCreate("engagements", SAMPLE_ENGAGEMENTS[i], `eng-seed-${i}`);
+            seeded = true;
           } catch {}
         }
       }
@@ -298,6 +454,7 @@ export default function App({
         for (let i = 0; i < SAMPLE_NEGOTIATIONS.length; i++) {
           try {
             await apiCreate("negotiations", SAMPLE_NEGOTIATIONS[i], `nego-seed-${i}`);
+            seeded = true;
           } catch {}
         }
       }
@@ -305,6 +462,7 @@ export default function App({
         for (let i = 0; i < SAMPLE_TICKETS.length; i++) {
           try {
             await apiCreate("tickets", SAMPLE_TICKETS[i], `ticket-seed-${i}`);
+            seeded = true;
           } catch {}
         }
       }
@@ -312,22 +470,49 @@ export default function App({
         for (let i = 0; i < SAMPLE_CHATS.length; i++) {
           try {
             await apiCreate("chats", SAMPLE_CHATS[i], `chat-seed-${i}`);
+            seeded = true;
           } catch {}
         }
       }
-      // reload again after seeding
-      if (l.records.length === 0) {
-        const re = await apiList("leads");
-        setLeads(re.records as any);
+
+      if (seeded) {
+        [l, e, n, t, c, pr, ur] = await Promise.all([
+          apiList("leads"),
+          apiList("engagements"),
+          apiList("negotiations"),
+          apiList("tickets"),
+          apiList("chats"),
+          apiList("project_requests"),
+          apiList("user_requests"),
+        ]);
+      }
+
+      setLeads(mapLeads(l.records));
+      setEngagements(mapEngagements(e.records));
+      setNegotiations(mapNegotiations(n.records));
+      setTickets(mapTickets(t.records));
+      setChats(mapChats(c.records));
+      // Merge project_requests + user_requests (companion filings)
+      const mergedReq = [...(pr.records || []), ...(ur.records || [])];
+      const seen = new Set<string>();
+      const uniq = mergedReq.filter((r) => {
+        const key = r.value?.id || r.id;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      setProjectRequests(uniq);
+      if (!selectedChat && c.records.length > 0) {
+        setSelectedChat(c.records[0].id);
       }
     } catch (err) {
       console.warn("API unavailable, using local sample", err);
-      // fallback to local sample mapped to fake ids
       setLeads(SAMPLE_LEADS.map((v, i) => ({ id: `local-${i}`, value: v })));
       setEngagements(SAMPLE_ENGAGEMENTS.map((v, i) => ({ id: `local-e-${i}`, value: v })));
       setNegotiations(SAMPLE_NEGOTIATIONS.map((v, i) => ({ id: `local-n-${i}`, value: v })));
       setTickets(SAMPLE_TICKETS.map((v, i) => ({ id: `local-t-${i}`, value: v })));
       setChats(SAMPLE_CHATS.map((v, i) => ({ id: `local-c-${i}`, value: v })));
+      setSelectedChat("local-c-0");
     } finally {
       setLoading(false);
     }
@@ -335,7 +520,66 @@ export default function App({
 
   useEffect(() => {
     reloadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Poll chats so user portal messages appear for Captain without full reload
+  useEffect(() => {
+    if (role !== "admin") return;
+    const tick = async () => {
+      try {
+        const data = await apiList("chats");
+        setChats(mapChats(data.records));
+      } catch {}
+    };
+    const id = setInterval(tick, 8000);
+    return () => clearInterval(id);
+  }, [role]);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedChat, chats]);
+
+  const unreadChatCount = useMemo(
+    () =>
+      chats.reduce((n, c) => {
+        if (c.value.unread || (c.value.unreadCount || 0) > 0) {
+          return n + Math.max(1, c.value.unreadCount || 1);
+        }
+        return n;
+      }, 0),
+    [chats],
+  );
+
+  const chatsSorted = useMemo(() => {
+    return [...chats].sort((a, b) => {
+      const au = a.value.unread || (a.value.unreadCount || 0) > 0 ? 1 : 0;
+      const bu = b.value.unread || (b.value.unreadCount || 0) > 0 ? 1 : 0;
+      if (au !== bu) return bu - au;
+      const at = a.value.updatedAt || "";
+      const bt = b.value.updatedAt || "";
+      return bt.localeCompare(at);
+    });
+  }, [chats]);
+
+  const markChatRead = async (chatId: string) => {
+    const row = chats.find((c) => c.id === chatId);
+    if (!row) return;
+    if (!row.value.unread && !(row.value.unreadCount || 0)) {
+      setSelectedChat(chatId);
+      return;
+    }
+    const next = {
+      ...row.value,
+      unread: false,
+      unreadCount: 0,
+    };
+    setSelectedChat(chatId);
+    setChats((prev) => prev.map((c) => (c.id === chatId ? { ...c, value: next } : c)));
+    try {
+      await apiReplace("chats", chatId, next);
+    } catch {}
+  };
 
   // Derived metrics
   const totalLeads = leads.length || 400;
@@ -344,13 +588,26 @@ export default function App({
   const weighted = negotiations.reduce((s, n) => s + (n.value.value * n.value.probability) / 100, 0) || 45000;
 
   const filteredLeads = useMemo(() => {
+    const q = search.trim().toLowerCase();
     return leads.filter((l) => {
       const v = l.value;
-      const matchSearch = !search || v.companyName.toLowerCase().includes(search.toLowerCase()) || v.postcode.toLowerCase().includes(search.toLowerCase());
-      const matchArea = filterArea === "All" || v.postcodeArea === filterArea || (filterArea === "Score>70" && v.score > 70);
+      const matchSearch =
+        !q ||
+        (v.companyName || "").toLowerCase().includes(q) ||
+        (v.postcode || "").toLowerCase().includes(q) ||
+        (v.phone || "").toLowerCase().includes(q);
+      const matchArea =
+        filterArea === "All" ||
+        v.postcodeArea === filterArea ||
+        (filterArea === "Score>70" && v.score > 70);
       return matchSearch && matchArea;
     });
   }, [leads, search, filterArea]);
+
+  const flash = (msg: string) => {
+    setActionMsg(msg);
+    setTimeout(() => setActionMsg(null), 3500);
+  };
 
   // Import DVSA simulation with required control flow pattern
   const handleImportDVSA = async () => {
@@ -377,7 +634,7 @@ export default function App({
     let reloadError: string | null = null;
     try {
       const data = await apiList("leads");
-      setLeads(data.records as any);
+      setLeads(mapLeads(data.records));
     } catch (e) {
       reloadError = e instanceof Error ? e.message : String(e);
     }
@@ -387,14 +644,82 @@ export default function App({
   };
 
   const handleEnrich = async () => {
-    // simulate enrich by increasing scores
     for (const l of filteredLeads.slice(0, 3)) {
       try {
-        await apiReplace("leads", l.id, { ...l.value, score: Math.min(100, l.value.score + 5), companiesHouseStatus: "Active" as const });
+        await apiReplace("leads", l.id, {
+          ...l.value,
+          score: Math.min(100, l.value.score + 5),
+          companiesHouseStatus: "Active" as const,
+        });
       } catch {}
     }
     const data = await apiList("leads").catch(() => null);
-    if (data) setLeads(data.records as any);
+    if (data) setLeads(mapLeads(data.records));
+    flash("Companies House enrich applied to top matches");
+  };
+
+  const handleGenerateIcebreakers = async () => {
+    for (const l of filteredLeads.slice(0, 5)) {
+      const ice = `Hi ${l.value.companyName} — saw your ${l.value.motClasses} MOT bay in ${l.value.postcodeArea || "GM"}. Still handling bookings manually?`;
+      try {
+        await apiReplace("leads", l.id, { ...l.value, aiIcebreaker: ice });
+      } catch {
+        setLeads((prev) =>
+          prev.map((row) =>
+            row.id === l.id ? { ...row, value: { ...row.value, aiIcebreaker: ice } } : row,
+          ),
+        );
+      }
+    }
+    const data = await apiList("leads").catch(() => null);
+    if (data) setLeads(mapLeads(data.records));
+    flash("Generated icebreakers for visible leads");
+  };
+
+  const handleCreateLead = async () => {
+    if (!newLead.companyName?.trim()) {
+      flash("Company name required");
+      return;
+    }
+    setLeadBusy(true);
+    try {
+      const payload = normalizeLead({
+        ...newLead,
+        postcodeArea:
+          newLead.postcodeArea ||
+          (newLead.postcode || "").replace(/\d.*/, "").trim().toUpperCase() ||
+          "OL",
+        aiIcebreaker:
+          newLead.aiIcebreaker ||
+          `Hi ${newLead.companyName} — quick question about MOT bookings?`,
+        source: newLead.source || "Manual · Admin CRM",
+      });
+      await apiCreate("leads", payload, `manual-${payload.companyName}-${Date.now()}`);
+      const data = await apiList("leads");
+      setLeads(mapLeads(data.records));
+      setShowLeadModal(false);
+      setNewLead({
+        companyName: "",
+        postcode: "",
+        phone: "",
+        motClasses: "Class 4",
+        status: "New",
+        companiesHouseStatus: "Active",
+        score: 70,
+      });
+      flash(`Lead created: ${payload.companyName}`);
+      setActiveTab("Leads");
+    } catch (e) {
+      // Local fallback so Admin still works offline
+      const payload = normalizeLead(newLead);
+      setLeads((prev) => [{ id: `local-${Date.now()}`, value: payload }, ...prev]);
+      setShowLeadModal(false);
+      flash(`Lead saved locally: ${payload.companyName}`);
+      setActiveTab("Leads");
+      console.error(e);
+    } finally {
+      setLeadBusy(false);
+    }
   };
 
   const handleCreateEngagement = async () => {
@@ -412,12 +737,191 @@ export default function App({
         govStandard: newEng.govStandard || "Discovery",
       });
       const data = await apiList("engagements");
-      setEngagements(data.records as any);
+      setEngagements(mapEngagements(data.records));
       setShowEngagementModal(false);
       setNewEng({ type: "Call", govStandard: "Discovery" });
+      flash("Engagement saved + vault sync queued");
     } catch (e) {
       console.error(e);
+      flash("Could not save engagement — try again");
     }
+  };
+
+  const handleSendChat = async (as: "captain" | "lead" = role === "user" ? "lead" : "captain") => {
+    const text = chatDraft.trim();
+    if (!text || !selectedChat || chatBusy) return;
+    setChatBusy(true);
+    const chat = chats.find((c) => c.id === selectedChat);
+    if (!chat) {
+      setChatBusy(false);
+      return;
+    }
+    const stamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const next: Chat = {
+      ...chat.value,
+      lastMessage: text,
+      sentiment: chat.value.sentiment,
+      transcript: [
+        ...(chat.value.transcript || []),
+        { from: as, text, time: stamp },
+      ],
+      unread: as === "captain" ? false : true,
+      unreadCount: as === "captain" ? 0 : Number(chat.value.unreadCount || 0) + 1,
+      lastFrom: as,
+      updatedAt: new Date().toISOString(),
+    };
+    try {
+      await apiReplace("chats", chat.id, next);
+      const data = await apiList("chats");
+      setChats(mapChats(data.records));
+    } catch {
+      setChats((prev) =>
+        prev.map((c) => (c.id === selectedChat ? { ...c, value: next } : c)),
+      );
+    }
+    setChatDraft("");
+    setChatBusy(false);
+  };
+
+  const handleRaiseTicket = async () => {
+    if (!newTicket.title.trim()) {
+      flash("Ticket title required");
+      return;
+    }
+    setTicketBusy(true);
+    const payload: TicketItem = {
+      ticketId: `USR-${Date.now().toString().slice(-5)}`,
+      title: newTicket.title.trim(),
+      project: newTicket.project || "Vexo Garage",
+      priority: newTicket.priority,
+      assignee: "Captain",
+      due: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+      column: "To Do",
+      client: clientLabel,
+    };
+    try {
+      await apiCreate("tickets", payload, `user-ticket-${payload.ticketId}`);
+      const data = await apiList("tickets");
+      setTickets(mapTickets(data.records));
+      flash(`Ticket ${payload.ticketId} raised`);
+    } catch {
+      setTickets((prev) => [{ id: `local-t-${Date.now()}`, value: payload }, ...prev]);
+      flash(`Ticket ${payload.ticketId} saved locally`);
+    }
+    setShowTicketModal(false);
+    setNewTicket({ title: "", priority: "Medium", project: "Vexo Garage" });
+    setUserTab("tickets");
+    setTicketBusy(false);
+  };
+
+  const openClientChat = async () => {
+    setUserTab("chat");
+    if (selectedChat) return;
+    if (chats.length > 0) {
+      setSelectedChat(chats[0].id);
+      return;
+    }
+    // Create a client chat thread if none exist
+    const seed: Chat = {
+      leadName: clientLabel,
+      lastMessage: "Chat opened from Users portal",
+      sentiment: "Neutral",
+      jobScore: 70,
+      origin: "Contact OS",
+      transcript: [
+        {
+          from: "ava",
+          text: `Hi ${clientLabel} — AVA here. Ask anything about your project, or Captain can take over.`,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        },
+      ],
+      techAssessment: "Client portal thread",
+    };
+    try {
+      const created = await apiCreate("chats", seed, `client-chat-${clientEmail}`);
+      const data = await apiList("chats");
+      setChats(mapChats(data.records));
+      setSelectedChat(created.id || data.records[0]?.id || null);
+    } catch {
+      const id = `local-c-${Date.now()}`;
+      setChats([{ id, value: seed }]);
+      setSelectedChat(id);
+    }
+  };
+
+  const myTickets = useMemo(() => {
+    const mine = tickets.filter((t) => {
+      const client = (t.value.client || "").toLowerCase();
+      return (
+        !client ||
+        client.includes(clientLabel.toLowerCase()) ||
+        client.includes("oldham") ||
+        client.includes("global") ||
+        client.includes("client")
+      );
+    });
+    return mine.length > 0 ? mine : tickets;
+  }, [tickets, clientLabel]);
+
+  const projectProgress = useMemo(() => {
+    if (myTickets.length === 0) return 76;
+    const done = myTickets.filter((t) => t.value.column === "Done").length;
+    return Math.round((done / myTickets.length) * 100);
+  }, [myTickets]);
+
+  const pendingRequests = useMemo(
+    () =>
+      projectRequests.filter((r) => {
+        const s = String(r.value?.status || "");
+        return s === "Pending" || s === "Submitted" || !s;
+      }),
+    [projectRequests],
+  );
+
+  const handleAcceptProjectRequest = async (row: { id: string; value: any }) => {
+    const next = {
+      ...row.value,
+      status: "Accepted",
+      acceptedAt: new Date().toISOString(),
+      acceptedBy: "Captain",
+    };
+    const bizId = row.value?.id;
+    const targets = projectRequests.filter(
+      (r) => r.id === row.id || (bizId && r.value?.id === bizId),
+    );
+    for (const t of targets.length ? targets : [row]) {
+      for (const coll of ["user_requests", "project_requests"] as const) {
+        try {
+          await apiReplace(coll, t.id, next);
+        } catch {}
+      }
+    }
+    // Promote to active client project
+    try {
+      await apiCreate(
+        "user_projects",
+        {
+          id: `proj-${row.value?.id || row.id}`,
+          name: row.value?.company || row.value?.title || "New project",
+          client: row.value?.client || row.value?.company || "Client",
+          progress: 5,
+          status: "Planning",
+          tech: row.value?.assessment?.stack || ["Next.js", "Postgres"],
+          team: ["Captain"],
+          start: new Date().toLocaleString("en-GB", { month: "short", year: "numeric" }),
+          golive: row.value?.timeline || "TBC",
+          tickets: 0,
+          lastUpdate: "Accepted by Captain — kickoff queued",
+          deliverables: row.value?.workflows || [],
+          scope: row.value?.jobPrescription || row.value?.description || "",
+        },
+        `user_projects-accept-${row.value?.id || row.id}`,
+      );
+    } catch {}
+    setProjectRequests((prev) =>
+      prev.map((r) => (r.id === row.id ? { ...r, value: next } : r)),
+    );
+    flash(`Accepted ${row.value?.title || row.value?.id || "request"}`);
   };
 
   const handleTicketDrop = async (col: TicketItem["column"]) => {
@@ -427,16 +931,69 @@ export default function App({
     try {
       await apiReplace("tickets", t.id, { ...t.value, column: col });
       const data = await apiList("tickets");
-      setTickets(data.records as any);
-    } catch {}
+      setTickets(mapTickets(data.records));
+    } catch {
+      setTickets((prev) =>
+        prev.map((row) =>
+          row.id === dragTicket ? { ...row, value: { ...row.value, column: col } } : row,
+        ),
+      );
+    }
     setDragTicket(null);
   };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          background: "#05070D",
+          color: "#8B9BB4",
+          fontFamily: "Inter, system-ui, sans-serif",
+        }}
+      >
+        Loading Admin CRM…
+      </div>
+    );
+  }
+
+  // Admin "View as User" uses the dedicated client dashboard package
+  if (role === "user") {
+    return (
+      <div style={{ minHeight: "100vh", background: "#05070D" }}>
+        <div className="sticky top-0 z-50 flex items-center justify-between border-b border-white/10 bg-[#05070D]/95 px-4 py-2 backdrop-blur">
+          <span className="text-[11px] font-medium tracking-wide text-zinc-400">
+            Previewing Users entrance
+          </span>
+          {allowAdminView ? (
+            <button
+              type="button"
+              onClick={() => setRole("admin")}
+              className="rounded-full bg-[#0EA5FF] px-3 py-1.5 text-[11px] font-semibold text-black"
+            >
+              Back to Admin
+            </button>
+          ) : null}
+        </div>
+        <UserDashboardApp />
+      </div>
+    );
+  }
 
   return (
     <div
       data-safe-area-inset-root
       className="min-h-screen w-full overflow-x-clip bg-[var(--bg)] text-zinc-100 selection:bg-[#0EA5FF]/30"
-      style={{ boxSizing: "border-box", paddingTop: "var(--safe-area-inset-top)", backgroundColor: "#05070D" }}
+      style={{
+        boxSizing: "border-box",
+        paddingTop: "var(--safe-area-inset-top)",
+        backgroundColor: "#05070D",
+        overflowY: "auto",
+        height: "100%",
+        maxHeight: "100vh",
+      }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -487,7 +1044,11 @@ export default function App({
       >
         <div className="mx-auto flex max-w-[1920px] items-center justify-between gap-4 px-4 py-3 md:px-6">
           <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="AiKOVA" className="h-8 w-auto object-contain md:h-9" />
+            {logoUrl ? (
+              <img src={logoUrl} alt="AiKOVA" className="h-8 w-auto object-contain md:h-9" />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0EA5FF] text-[11px] font-bold text-black">AK</div>
+            )}
             <div className="hidden items-center gap-2 md:flex">
               <span className="sora text-[15px] font-semibold tracking-tight">AiKOVA</span>
               <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium tracking-widest text-zinc-400">DOS7 VAULT</span>
@@ -495,7 +1056,7 @@ export default function App({
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Role Toggle */}
+            {/* Role Toggle — Admin locked unless account has admin metadata */}
             <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] p-1">
               <span className="hidden px-2 text-[11px] font-medium tracking-wide text-zinc-400 md:block">View as:</span>
               <button
@@ -505,81 +1066,187 @@ export default function App({
                 User (Client)
               </button>
               <button
-                onClick={() => setRole("admin")}
-                className={`rounded-full px-3 py-1.5 text-[12px] font-semibold transition-all ${role === "admin" ? "bg-[#0EA5FF] text-black shadow shadow-[#0EA5FF]/20" : "text-zinc-400 hover:text-white"}`}
+                onClick={() => {
+                  if (!allowAdminView) return;
+                  setRole("admin");
+                }}
+                disabled={!allowAdminView}
+                title={allowAdminView ? "Admin entrance" : "Admin entrance locked for this account"}
+                className={`rounded-full px-3 py-1.5 text-[12px] font-semibold transition-all ${
+                  role === "admin"
+                    ? "bg-[#0EA5FF] text-black shadow shadow-[#0EA5FF]/20"
+                    : allowAdminView
+                      ? "text-zinc-400 hover:text-white"
+                      : "cursor-not-allowed text-zinc-600"
+                }`}
               >
-                Admin (Captain)
+                {allowAdminView ? "Admin (Captain)" : "Admin locked"}
               </button>
             </div>
             <div className="hidden h-6 w-px bg-white/10 md:block" />
+            {role === "admin" && (
+              <button
+                type="button"
+                onClick={() => setActiveTab("Chats")}
+                title={unreadChatCount > 0 ? `${unreadChatCount} unread message${unreadChatCount === 1 ? "" : "s"}` : "Chats"}
+                className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:border-[#0EA5FF]/40 hover:text-white"
+              >
+                <MessageSquare className="h-4 w-4" />
+                {unreadChatCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#FF4D6A] px-1 text-[9px] font-bold text-white shadow">
+                    {unreadChatCount > 99 ? "99+" : unreadChatCount}
+                  </span>
+                )}
+              </button>
+            )}
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#0EA5FF] to-[#84FF3D] p-[1px]">
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-[#05070D] text-[11px] font-bold">CP</div>
+                <div className="flex h-full w-full items-center justify-center rounded-full bg-[#05070D] text-[11px] font-bold">
+                  {(role === "user" ? clientLabel : "Captain").slice(0, 2).toUpperCase()}
+                </div>
               </div>
               <div className="hidden md:block">
-                <div className="text-[12px] font-semibold leading-none">Captain</div>
-                <div className="text-[10px] text-zinc-500">Owner • AiKOVA</div>
+                <div className="text-[12px] font-semibold leading-none">
+                  {role === "user" ? clientLabel : "Captain"}
+                </div>
+                <div className="text-[10px] text-zinc-500">
+                  {role === "user" ? `${clientEmail} • Users portal` : "Owner • AiKOVA"}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Metrics Bar */}
-      <div className="border-b border-white/[0.06] bg-[#0B1020]">
-        <div className="mx-auto flex max-w-[1920px] items-center gap-0 overflow-x-auto px-2 py-2 scrollbar-none md:px-6 md:py-2.5">
-          {[
-            { k: "Total Leads", v: `${totalLeads}+`, sub: "23K imported", icon: Database },
-            { k: "Engagements", v: `${totalEngagements}`, sub: "127 target", icon: Activity },
-            { k: "Active Negotiations", v: `£${Math.round(pipelineValue / 1000)}K`, sub: `£${Math.round(weighted / 1000)}K weighted`, icon: TrendingUp },
-            { k: "Tickets", v: `${tickets.length || 23}`, sub: "4 in review", icon: Ticket },
-            { k: "Evidence", v: `${vaultProgress}% → 100%`, sub: "DOS7 vault", icon: ShieldCheck, highlight: true },
-            { k: "Days until DOS7", v: "87", sub: "12-month plan", icon: Timer },
-          ].map((m) => (
-            <div key={m.k} className="flex min-w-[160px] flex-1 items-center gap-3 border-r border-white/[0.06] px-4 last:border-0">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${m.highlight ? "bg-[#FFD700]/10 text-[#FFD700]" : "bg-white/[0.06] text-zinc-400"}`}>
-                <m.icon className="h-4 w-4" />
-              </div>
-              <div>
-                <div className="text-[11px] uppercase tracking-widest text-zinc-500">{m.k}</div>
-                <div className={`sora text-[14px] font-semibold ${m.highlight ? "text-[#FFD700]" : "text-white"}`}>{m.v}</div>
-                <div className="text-[10px] text-zinc-500">{m.sub}</div>
+      {role === "admin" ? (
+        <>
+          {/* Metrics Bar */}
+          <div className="border-b border-white/[0.06] bg-[#0B1020]">
+            <div className="mx-auto flex max-w-[1920px] items-center gap-0 overflow-x-auto px-2 py-2 scrollbar-none md:px-6 md:py-2.5">
+              {[
+                { k: "Total Leads", v: `${totalLeads}+`, sub: "23K imported", icon: Database },
+                { k: "Engagements", v: `${totalEngagements}`, sub: "127 target", icon: Activity },
+                { k: "Active Negotiations", v: `£${Math.round(pipelineValue / 1000)}K`, sub: `£${Math.round(weighted / 1000)}K weighted`, icon: TrendingUp },
+                { k: "Tickets", v: `${tickets.length || 23}`, sub: "4 in review", icon: Ticket },
+                { k: "Evidence", v: `${vaultProgress}% → 100%`, sub: "DOS7 vault", icon: ShieldCheck, highlight: true },
+                { k: "Days until DOS7", v: "87", sub: "12-month plan", icon: Timer },
+              ].map((m) => (
+                <div key={m.k} className="flex min-w-[160px] flex-1 items-center gap-3 border-r border-white/[0.06] px-4 last:border-0">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${m.highlight ? "bg-[#FFD700]/10 text-[#FFD700]" : "bg-white/[0.06] text-zinc-400"}`}>
+                    <m.icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] uppercase tracking-widest text-zinc-500">{m.k}</div>
+                    <div className={`sora text-[14px] font-semibold ${m.highlight ? "text-[#FFD700]" : "text-white"}`}>{m.v}</div>
+                    <div className="text-[10px] text-zinc-500">{m.sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Admin Nav Tabs */}
+          <div className="sticky top-[calc(var(--safe-area-inset-top)+57px)] z-30 border-b border-white/[0.06] bg-[#05070D]/90 backdrop-blur-xl">
+            <div className="mx-auto flex max-w-[1920px] items-center gap-1 overflow-x-auto px-2 py-2 scrollbar-none md:px-6">
+              {tabs.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setActiveTab(t)}
+                  className={`group flex items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all md:px-4 ${
+                    activeTab === t ? "border-[#0EA5FF]/30 bg-[#0EA5FF]/10 text-white" : "border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/10 hover:text-zinc-200"
+                  }`}
+                >
+                  {t === "Dashboard" && <LayoutDashboard className="h-3.5 w-3.5" />}
+                  {t === "Requests" && <Sparkles className="h-3.5 w-3.5" />}
+                  {t === "Leads" && <Database className="h-3.5 w-3.5" />}
+                  {t === "Engagement" && <Activity className="h-3.5 w-3.5" />}
+                  {t === "Negotiations" && <Kanban className="h-3.5 w-3.5" />}
+                  {t === "Tickets" && <Ticket className="h-3.5 w-3.5" />}
+                  {t === "Chats" && <MessageSquare className="h-3.5 w-3.5" />}
+                  {t === "Projects" && <FolderGit2 className="h-3.5 w-3.5" />}
+                  {t === "Vault" && <ShieldCheck className="h-3.5 w-3.5" />}
+                  {t === "Billing" && <CreditCard className="h-3.5 w-3.5" />}
+                  {t}
+                  {t === "Leads" && (
+                    <span className="ml-1 rounded-full bg-[#0EA5FF] px-1.5 py-0.5 text-[10px] font-bold text-black">
+                      {leads.length}
+                    </span>
+                  )}
+                  {t === "Requests" && pendingRequests.length > 0 && (
+                    <span className="ml-1 rounded-full bg-[#FFD700] px-1.5 py-0.5 text-[10px] font-bold text-black">
+                      {pendingRequests.length}
+                    </span>
+                  )}
+                  {t === "Chats" && unreadChatCount > 0 && (
+                    <span className="ml-1 rounded-full bg-[#FF4D6A] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {unreadChatCount > 99 ? "99+" : unreadChatCount}
+                    </span>
+                  )}
+                </button>
+              ))}
+              <div className="ml-auto hidden items-center gap-2 md:flex">
+                <span className="text-[11px] text-zinc-500">Evidence vault sync</span>
+                <div className="h-2 w-2 animate-pulse rounded-full bg-[#84FF3D]" />
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Nav Tabs */}
-      <div className="sticky top-[calc(var(--safe-area-inset-top)+57px)] z-30 border-b border-white/[0.06] bg-[#05070D]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1920px] items-center gap-1 overflow-x-auto px-2 py-2 scrollbar-none md:px-6">
-          {tabs.map((t) => (
-            <button
-              key={t}
-              onClick={() => setActiveTab(t)}
-              className={`group flex items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all md:px-4 ${
-                activeTab === t ? "border-[#0EA5FF]/30 bg-[#0EA5FF]/10 text-white" : "border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/10 hover:text-zinc-200"
-              }`}
-            >
-              {t === "Dashboard" && <LayoutDashboard className="h-3.5 w-3.5" />}
-              {t === "Leads" && <Database className="h-3.5 w-3.5" />}
-              {t === "Engagement" && <Activity className="h-3.5 w-3.5" />}
-              {t === "Negotiations" && <Kanban className="h-3.5 w-3.5" />}
-              {t === "Tickets" && <Ticket className="h-3.5 w-3.5" />}
-              {t === "Chats" && <MessageSquare className="h-3.5 w-3.5" />}
-              {t === "Projects" && <FolderGit2 className="h-3.5 w-3.5" />}
-              {t === "Vault" && <ShieldCheck className="h-3.5 w-3.5" />}
-              {t === "Billing" && <CreditCard className="h-3.5 w-3.5" />}
-              {t}
-              {t === "Leads" && <span className="ml-1 rounded-full bg-[#0EA5FF] px-1.5 py-0.5 text-[10px] font-bold text-black">{leads.length}</span>}
-            </button>
-          ))}
-          <div className="ml-auto hidden items-center gap-2 md:flex">
-            <span className="text-[11px] text-zinc-500">Evidence vault sync</span>
-            <div className="h-2 w-2 animate-pulse rounded-full bg-[#84FF3D]" />
           </div>
-        </div>
-      </div>
+        </>
+      ) : (
+        <>
+          <div className="border-b border-white/[0.06] bg-[#0B1020]">
+            <div className="mx-auto flex max-w-[1920px] items-center gap-0 overflow-x-auto px-2 py-2 scrollbar-none md:px-6 md:py-2.5">
+              {[
+                { k: "Open tickets", v: `${myTickets.filter((t) => t.value.column !== "Done").length}`, sub: "Your requests", icon: Ticket },
+                { k: "Project progress", v: `${projectProgress}%`, sub: "Delivery status", icon: FolderGit2 },
+                { k: "Chats", v: `${chats.length}`, sub: "AVA + Captain", icon: MessageSquare },
+                { k: "Vault evidence", v: `${vaultProgress}%`, sub: "Shared with you", icon: ShieldCheck, highlight: true },
+              ].map((m) => (
+                <div key={m.k} className="flex min-w-[160px] flex-1 items-center gap-3 border-r border-white/[0.06] px-4 last:border-0">
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${m.highlight ? "bg-[#FFD700]/10 text-[#FFD700]" : "bg-white/[0.06] text-zinc-400"}`}>
+                    <m.icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] uppercase tracking-widest text-zinc-500">{m.k}</div>
+                    <div className={`sora text-[14px] font-semibold ${m.highlight ? "text-[#FFD700]" : "text-white"}`}>{m.v}</div>
+                    <div className="text-[10px] text-zinc-500">{m.sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="sticky top-[calc(var(--safe-area-inset-top)+57px)] z-30 border-b border-white/[0.06] bg-[#05070D]/90 backdrop-blur-xl">
+            <div className="mx-auto flex max-w-[1920px] items-center gap-1 overflow-x-auto px-2 py-2 scrollbar-none md:px-6">
+              {(
+                [
+                  { id: "overview", label: "Overview", icon: LayoutDashboard },
+                  { id: "tickets", label: "My tickets", icon: Ticket },
+                  { id: "chat", label: "Chat", icon: MessageSquare },
+                  { id: "billing", label: "Billing", icon: CreditCard },
+                ] as const
+              ).map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setUserTab(t.id)}
+                  className={`group flex items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12px] font-medium transition-all md:px-4 ${
+                    userTab === t.id
+                      ? "border-[#84FF3D]/30 bg-[#84FF3D]/10 text-white"
+                      : "border-white/[0.06] bg-white/[0.02] text-zinc-400 hover:border-white/10 hover:text-zinc-200"
+                  }`}
+                >
+                  <t.icon className="h-3.5 w-3.5" />
+                  {t.label}
+                  {t.id === "tickets" && (
+                    <span className="ml-1 rounded-full bg-[#84FF3D] px-1.5 py-0.5 text-[10px] font-bold text-black">
+                      {myTickets.length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Main */}
       <main className="mx-auto max-w-[1920px] px-3 py-4 md:px-6 md:py-6">
@@ -591,133 +1258,119 @@ export default function App({
             </div>
           </div>
         ) : role === "user" ? (
-          /* USER VIEW */
-          <div className="space-y-6">
-            {/* Client header */}
-            <div className="glass-strong rounded-[20px] p-5 md:p-7">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0EA5FF] to-[#84FF3D] text-black">
-                    <Building2 className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <div className="sora text-[20px] font-semibold">Oldham MOT Centre</div>
-                    <div className="text-[13px] text-zinc-400">Client portal • Vexo Garage onboarding • OL8 1JR</div>
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="rounded-full bg-[#84FF3D]/10 px-2.5 py-1 text-[11px] font-medium text-[#84FF3D]">Project Active</span>
-                      <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] text-zinc-400">£28k • 50% upfront paid</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button className="rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-black">Raise ticket</button>
-                  <button className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[13px] font-medium">Chat with Captain</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              <div className="space-y-6 lg:col-span-2">
-                <div className="glass rounded-[16px] p-5">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h3 className="sora text-[15px] font-semibold">My Projects</h3>
-                    <span className="text-[11px] text-zinc-500">Vexo Garage OS • 76% complete</span>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="h-2 w-2 rounded-full bg-[#0EA5FF]" />
-                          <span className="text-[13px] font-medium">DVSA MOT history API integration</span>
-                          <span className="rounded-full bg-[#0EA5FF]/10 px-2 py-0.5 text-[10px] text-[#0EA5FF]">In Progress</span>
-                        </div>
-                        <span className="mono text-[11px] text-zinc-500">Due Nov 28</span>
-                      </div>
-                      <div className="mt-3 h-1.5 w-full rounded-full bg-white/10">
-                        <div className="h-full w-[68%] rounded-full bg-[#0EA5FF]" />
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="h-2 w-2 rounded-full bg-[#84FF3D]" />
-                          <span className="text-[13px] font-medium">Booking widget - Class 4/7 toggle</span>
-                          <span className="rounded-full bg-[#84FF3D]/10 px-2 py-0.5 text-[10px] text-[#84FF3D]">Review</span>
-                        </div>
-                        <span className="mono text-[11px] text-zinc-500">Due Nov 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="glass rounded-[16px] p-5">
-                  <h3 className="sora mb-4 text-[15px] font-semibold">My Chats with AVA / Captain</h3>
-                  <div className="space-y-3">
-                    {chats.slice(0, 2).map((c) => (
-                      <div key={c.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[13px] font-medium">{c.value.leadName}</span>
-                          <span className={`text-[10px] ${c.value.sentiment === "Positive" ? "text-[#84FF3D]" : "text-amber-400"}`}>{c.value.sentiment} • Score {c.value.jobScore}</span>
-                        </div>
-                        <div className="mt-2 text-[12px] text-zinc-400">{c.value.lastMessage}</div>
-                        <div className="mt-2 flex gap-2">
-                          {c.value.transcript.slice(0, 2).map((t, i) => (
-                            <div key={i} className={`rounded-lg px-2.5 py-1.5 text-[11px] ${t.from === "lead" ? "bg-white/[0.06]" : "bg-[#0EA5FF]/10 text-[#0EA5FF]"}`}>{t.text.slice(0, 60)}...</div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="glass rounded-[16px] p-5">
-                  <h3 className="sora mb-3 text-[14px] font-semibold">Invoices & Evidence</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between rounded-lg bg-white/[0.04] p-3">
-                      <div>
-                        <div className="text-[12px] font-medium">50% Upfront • Vexo Garage</div>
-                        <div className="text-[11px] text-zinc-500">INV-2025-102 • Paid via Stripe</div>
-                      </div>
-                      <span className="text-[12px] font-semibold text-[#84FF3D]">£14,000</span>
-                    </div>
-                    <div className="flex items-center justify-between rounded-lg bg-white/[0.04] p-3">
-                      <div>
-                        <div className="text-[12px] font-medium">Discovery Evidence Bundle</div>
-                        <div className="text-[11px] text-zinc-500">8 files • S3</div>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-zinc-500" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-[16px] bg-gradient-to-br from-[#0EA5FF]/20 to-[#84FF3D]/20 p-[1px]">
-                  <div className="rounded-[15px] bg-[#0B1020] p-5">
-                    <h4 className="sora text-[14px] font-semibold">Timeline until Live</h4>
-                    <div className="mt-4 space-y-3">
-                      {[
-                        { d: "Discovery", done: true },
-                        { d: "Alpha - on-site", done: true },
-                        { d: "Beta - live widget", done: false },
-                        { d: "Live - DOS7", done: false },
-                      ].map((s) => (
-                        <div key={s.d} className="flex items-center gap-3">
-                          <div className={`flex h-6 w-6 items-center justify-center rounded-full ${s.done ? "bg-[#84FF3D] text-black" : "bg-white/10 text-zinc-500"}`}>{s.done ? <Check className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}</div>
-                          <span className={`text-[12px] ${s.done ? "text-white" : "text-zinc-500"}`}>{s.d}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <UserDashboardApp />
         ) : (
           /* ADMIN VIEW */
           <>
+            {activeTab === "Requests" && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h3 className="sora text-[16px] font-semibold">Project Assessment Requests</h3>
+                    <p className="text-[12px] text-zinc-500">
+                      From Users dashboard · Project Assessment Request — stay Pending until you Accept.
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-[#FFD700]/15 px-3 py-1 text-[11px] font-semibold text-[#FFD700]">
+                    {pendingRequests.length} pending
+                  </span>
+                </div>
+                {projectRequests.length === 0 ? (
+                  <div className="glass rounded-[16px] p-8 text-center text-[13px] text-zinc-500">
+                    No companion filings yet. Users submit via Users entrance → AVA Project Companion.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {projectRequests.map((row) => {
+                      const v = row.value || {};
+                      const pending =
+                        v.status === "Pending" || v.status === "Submitted" || !v.status;
+                      return (
+                        <div
+                          key={row.id}
+                          className="glass rounded-[16px] p-4 md:p-5"
+                        >
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="mono text-[10px] text-zinc-500">
+                                  {v.id || row.id}
+                                </span>
+                                <span
+                                  className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                                    pending
+                                      ? "bg-[#FFD700] text-black"
+                                      : v.status === "Accepted"
+                                        ? "bg-[#84FF3D] text-black"
+                                        : "bg-white/10 text-zinc-300"
+                                  }`}
+                                >
+                                  {pending ? "Pending" : v.status}
+                                </span>
+                                <span className="rounded-full bg-[#0EA5FF]/10 px-2 py-0.5 text-[10px] text-[#0EA5FF]">
+                                  Job {v.assessment?.jobScore || "—"}/100
+                                </span>
+                              </div>
+                              <div className="mt-1 text-[15px] font-semibold">{v.title}</div>
+                              <div className="mt-1 text-[12px] text-zinc-400">
+                                {v.client || v.company} · {v.type} · {v.budget} · {v.timeline}
+                              </div>
+                              {v.jobPrescription ? (
+                                <div className="mt-2 rounded-xl bg-white/[0.03] p-3 text-[12px] text-zinc-300">
+                                  <span className="text-[10px] font-mono text-zinc-500">
+                                    JOB PRESCRIPTION
+                                  </span>
+                                  <div className="mt-1">{v.jobPrescription}</div>
+                                </div>
+                              ) : null}
+                              {v.description ? (
+                                <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap rounded-xl bg-black/20 p-3 text-[11px] text-zinc-400">
+                                  {v.description}
+                                </pre>
+                              ) : null}
+                            </div>
+                            {pending ? (
+                              <button
+                                type="button"
+                                onClick={() => handleAcceptProjectRequest(row)}
+                                className="rounded-full bg-[#84FF3D] px-4 py-2 text-[12px] font-semibold text-black"
+                              >
+                                Accept → active project
+                              </button>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
             {activeTab === "Dashboard" && (
               <div className="space-y-6">
+                {pendingRequests.length > 0 ? (
+                  <div className="rounded-[16px] border border-[#FFD700]/25 bg-[#FFD700]/10 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="text-[10px] font-mono tracking-widest text-[#FFD700]">
+                          NEW PROJECT REQUESTS
+                        </div>
+                        <div className="mt-1 text-[13px] font-medium">
+                          {pendingRequests.length} pending companion filing
+                          {pendingRequests.length === 1 ? "" : "s"} awaiting Accept
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("Requests")}
+                        className="rounded-full bg-[#FFD700] px-4 py-2 text-[12px] font-semibold text-black"
+                      >
+                        Review requests →
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
                   <div className="glass-strong rounded-[20px] p-5 lg:col-span-8">
                     <div className="mb-4 flex items-center justify-between">
@@ -826,7 +1479,7 @@ export default function App({
                           </div>
                           <div className="min-w-0 flex-1">
                             <div className="truncate text-[12px] font-medium">{e.value.leadName} • {e.value.type}</div>
-                            <div className="truncate text-[11px] text-zinc-500">{e.value.notes.slice(0, 48)}...</div>
+                            <div className="truncate text-[11px] text-zinc-500">{(e.value.notes || "").slice(0, 48)}...</div>
                           </div>
                           <span className="rounded-full bg-[#0EA5FF]/10 px-2 py-0.5 text-[10px] text-[#0EA5FF]">{e.value.govStandard}</span>
                         </div>
@@ -851,18 +1504,32 @@ export default function App({
                       ))}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowLeadModal(true)}
+                      className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[12px] font-semibold text-black hover:bg-white/90"
+                    >
+                      <Plus className="h-4 w-4" />New Lead
+                    </button>
                     <button onClick={handleImportDVSA} disabled={importBusy} className="flex items-center gap-2 rounded-full bg-[#0EA5FF] px-4 py-2 text-[12px] font-semibold text-black hover:bg-[#0EA5FF]/90 disabled:opacity-50">
                       <Upload className="h-4 w-4" />{importBusy ? "Importing..." : "Import DVSA CSV"}
                     </button>
-                    <button onClick={handleEnrich} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[12px] font-medium hover:bg-white/[0.08]">
+                    <button type="button" onClick={handleEnrich} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[12px] font-medium hover:bg-white/[0.08]">
                       <Zap className="h-4 w-4" />Enrich Companies House
                     </button>
-                    <button className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[12px] font-medium">
+                    <button type="button" onClick={handleGenerateIcebreakers} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[12px] font-medium hover:bg-white/[0.08]">
                       <Sparkles className="h-4 w-4" />Generate Icebreakers
                     </button>
                   </div>
                 </div>
+
+                {actionMsg && (
+                  <div className="flex items-center gap-3 rounded-xl border border-[#0EA5FF]/20 bg-[#0EA5FF]/10 px-4 py-3 text-[12px]">
+                    <Check className="h-4 w-4 text-[#0EA5FF]" />
+                    <span>{actionMsg}</span>
+                  </div>
+                )}
 
                 {importResult && (
                   <div className="flex items-center gap-3 rounded-xl border border-[#84FF3D]/20 bg-[#84FF3D]/10 px-4 py-3 text-[12px]">
@@ -893,7 +1560,7 @@ export default function App({
                           <tr key={l.id} className="group hover:bg-white/[0.03]">
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
-                                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.06] text-[11px] font-bold">{l.value.companyName[0]}</div>
+                                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/[0.06] text-[11px] font-bold">{(l.value.companyName || "?")[0]}</div>
                                 <div>
                                   <div className="text-[13px] font-medium">{l.value.companyName}</div>
                                   <div className="flex items-center gap-1 text-[11px] text-zinc-500"><Phone className="h-3 w-3" />{l.value.phone}</div>
@@ -912,7 +1579,7 @@ export default function App({
                                 <span className="mono text-[12px] font-medium">{l.value.score}</span>
                               </div>
                             </td>
-                            <td className="max-w-[240px] px-4 py-3"><div className="truncate text-[11px] text-zinc-400" title={l.value.aiIcebreaker}>{l.value.aiIcebreaker.slice(0, 70)}...</div></td>
+                            <td className="max-w-[240px] px-4 py-3"><div className="truncate text-[11px] text-zinc-400" title={l.value.aiIcebreaker}>{(l.value.aiIcebreaker || "").slice(0, 70)}...</div></td>
                             <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-[11px] ${l.value.status === "Qualified" ? "bg-[#84FF3D]/10 text-[#84FF3D]" : l.value.status === "Contacted" ? "bg-[#0EA5FF]/10 text-[#0EA5FF]" : "bg-white/[0.06] text-zinc-400"}`}>{l.value.status}</span></td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-1">
@@ -938,7 +1605,7 @@ export default function App({
                         </div>
                         <span className="mono text-[12px] font-bold text-[#0EA5FF]">{l.value.score}</span>
                       </div>
-                      <div className="mt-2 text-[11px] text-zinc-400">{l.value.aiIcebreaker.slice(0, 90)}...</div>
+                      <div className="mt-2 text-[11px] text-zinc-400">{(l.value.aiIcebreaker || "").slice(0, 90)}...</div>
                     </div>
                   ))}
                 </div>
@@ -1095,7 +1762,7 @@ export default function App({
                               </div>
                               <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-600">
                                 <span>Due {t.value.due}</span>
-                                <span className="flex items-center gap-1"><Building2 className="h-3 w-3" />{t.value.client.slice(0, 12)}</span>
+                                <span className="flex items-center gap-1"><Building2 className="h-3 w-3" />{(t.value.client || "").slice(0, 12)}</span>
                               </div>
                             </div>
                           ))}
@@ -1112,31 +1779,50 @@ export default function App({
                   <div className="border-b border-white/[0.06] p-3">
                     <div className="flex items-center justify-between">
                       <h4 className="text-[13px] font-semibold">Chat Hub • AVA + Human</h4>
-                      <span className="rounded-full bg-[#0EA5FF]/10 px-2 py-0.5 text-[10px] text-[#0EA5FF]">{chats.length} active</span>
+                      <div className="flex items-center gap-2">
+                        {unreadChatCount > 0 && (
+                          <span className="rounded-full bg-[#FF4D6A]/15 px-2 py-0.5 text-[10px] font-semibold text-[#FF4D6A]">
+                            {unreadChatCount} waiting
+                          </span>
+                        )}
+                        <span className="rounded-full bg-[#0EA5FF]/10 px-2 py-0.5 text-[10px] text-[#0EA5FF]">{chats.length} active</span>
+                      </div>
                     </div>
                     <div className="mt-3 flex gap-1">
                       <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-black">All</span>
                       <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] text-zinc-400">Widget</span>
-                      <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] text-zinc-400">Contact OS</span>
+                      <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] text-zinc-400">Users portal</span>
                     </div>
                   </div>
-                  <div className="divide-y divide-white/[0.04]">
-                    {chats.map((c) => (
-                      <button key={c.id} onClick={() => setSelectedChat(c.id)} className={`flex w-full items-start gap-3 p-3 text-left transition hover:bg-white/[0.04] ${selectedChat === c.id ? "bg-white/[0.06]" : ""}`}>
-                        <div className="mt-1 h-8 w-8 rounded-full bg-gradient-to-br from-[#0EA5FF] to-[#84FF3D] p-[1px]"><div className="flex h-full w-full items-center justify-center rounded-full bg-[#0B1020] text-[11px] font-bold">{c.value.leadName[0]}</div></div>
+                  <div className="divide-y divide-white/[0.04] overflow-y-auto" style={{ maxHeight: 560 }}>
+                    {chatsSorted.map((c) => {
+                      const isUnread = Boolean(c.value.unread) || Number(c.value.unreadCount || 0) > 0;
+                      return (
+                      <button key={c.id} onClick={() => markChatRead(c.id)} className={`flex w-full items-start gap-3 p-3 text-left transition hover:bg-white/[0.04] ${selectedChat === c.id ? "bg-white/[0.06]" : ""} ${isUnread ? "bg-[#FF4D6A]/[0.06]" : ""}`}>
+                        <div className="relative mt-1 h-8 w-8 rounded-full bg-gradient-to-br from-[#0EA5FF] to-[#84FF3D] p-[1px]">
+                          <div className="flex h-full w-full items-center justify-center rounded-full bg-[#0B1020] text-[11px] font-bold">{(c.value.leadName || "?")[0]}</div>
+                          {isUnread && <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#FF4D6A] ring-2 ring-[#0B1020]" />}
+                        </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[13px] font-medium">{c.value.leadName}</span>
-                            <span className={`text-[10px] ${c.value.sentiment === "Positive" ? "text-[#84FF3D]" : c.value.sentiment === "Negative" ? "text-red-400" : "text-zinc-500"}`}>{c.value.sentiment} • {c.value.jobScore}</span>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`truncate text-[13px] ${isUnread ? "font-semibold text-white" : "font-medium"}`}>{c.value.leadName}</span>
+                            {isUnread ? (
+                              <span className="shrink-0 rounded-full bg-[#FF4D6A] px-1.5 py-0.5 text-[9px] font-bold text-white">
+                                {Math.max(1, c.value.unreadCount || 1)} new
+                              </span>
+                            ) : (
+                              <span className={`shrink-0 text-[10px] ${c.value.sentiment === "Positive" ? "text-[#84FF3D]" : c.value.sentiment === "Negative" ? "text-red-400" : "text-zinc-500"}`}>{c.value.sentiment} • {c.value.jobScore}</span>
+                            )}
                           </div>
-                          <div className="truncate text-[11px] text-zinc-500">{c.value.lastMessage}</div>
+                          <div className={`truncate text-[11px] ${isUnread ? "text-zinc-300" : "text-zinc-500"}`}>{c.value.lastMessage}</div>
                           <div className="mt-1 flex items-center gap-2">
                             <span className="rounded-full bg-white/[0.06] px-1.5 py-0.5 text-[9px]">{c.value.origin}</span>
-                            <span className="text-[9px] text-zinc-600">{c.value.techAssessment.slice(0, 30)}...</span>
+                            <span className="text-[9px] text-zinc-600">{(c.value.techAssessment || "").slice(0, 30)}{(c.value.techAssessment || "").length > 30 ? "..." : ""}</span>
                           </div>
                         </div>
                       </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="flex flex-col bg-[#0B1020]/60 lg:col-span-8">
@@ -1164,9 +1850,28 @@ export default function App({
                       </div>
                       <div className="border-t border-white/[0.06] p-3">
                         <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">
-                          <input placeholder="Type reply as Captain..." className="flex-1 bg-transparent text-[13px] outline-none placeholder:text-zinc-500" />
-                          <button className="rounded-full bg-white p-2 text-black"><Send className="h-4 w-4" /></button>
+                          <input
+                            value={chatDraft}
+                            onChange={(e) => setChatDraft(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSendChat();
+                              }
+                            }}
+                            placeholder="Type reply as Captain..."
+                            className="flex-1 bg-transparent text-[13px] outline-none placeholder:text-zinc-500"
+                          />
+                          <button
+                            type="button"
+                            disabled={chatBusy || !chatDraft.trim()}
+                            onClick={handleSendChat}
+                            className="rounded-full bg-white p-2 text-black disabled:opacity-40"
+                          >
+                            <Send className="h-4 w-4" />
+                          </button>
                         </div>
+                        <div ref={chatEndRef} />
                       </div>
                     </>
                   ) : (
@@ -1331,6 +2036,168 @@ export default function App({
           </>
         )}
       </main>
+
+      {/* Raise Ticket Modal (Users portal) */}
+      {showTicketModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="glass-strong w-full max-w-[520px] rounded-[20px] p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="sora text-[16px] font-semibold">Raise ticket</h3>
+              <button type="button" onClick={() => setShowTicketModal(false)} className="rounded-full bg-white/[0.06] p-2">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-5 space-y-4">
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-zinc-500">Title</label>
+                <input
+                  value={newTicket.title}
+                  onChange={(e) => setNewTicket({ ...newTicket, title: e.target.value })}
+                  placeholder="Booking widget not loading on mobile"
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-zinc-500">Project</label>
+                  <select
+                    value={newTicket.project}
+                    onChange={(e) => setNewTicket({ ...newTicket, project: e.target.value })}
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                  >
+                    {PROJECTS.map((p) => (
+                      <option key={p.name} className="bg-[#0B1020]" value={p.name}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-zinc-500">Priority</label>
+                  <select
+                    value={newTicket.priority}
+                    onChange={(e) =>
+                      setNewTicket({
+                        ...newTicket,
+                        priority: e.target.value as TicketItem["priority"],
+                      })
+                    }
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                  >
+                    {["Low", "Medium", "High", "Critical"].map((p) => (
+                      <option key={p} className="bg-[#0B1020]" value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowTicketModal(false)}
+                  className="rounded-full border border-white/10 px-5 py-2.5 text-[13px]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={ticketBusy}
+                  onClick={handleRaiseTicket}
+                  className="rounded-full bg-white px-6 py-2.5 text-[13px] font-semibold text-black disabled:opacity-50"
+                >
+                  {ticketBusy ? "Sending…" : "Submit ticket"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Lead Modal */}
+      {showLeadModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="glass-strong w-full max-w-[520px] rounded-[20px] p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="sora text-[16px] font-semibold">New Lead</h3>
+              <button type="button" onClick={() => setShowLeadModal(false)} className="rounded-full bg-white/[0.06] p-2"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="mt-5 space-y-4">
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-zinc-500">Company name</label>
+                <input
+                  value={newLead.companyName || ""}
+                  onChange={(e) => setNewLead({ ...newLead, companyName: e.target.value })}
+                  placeholder="Oldham MOT Centre"
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-zinc-500">Postcode</label>
+                  <input
+                    value={newLead.postcode || ""}
+                    onChange={(e) => setNewLead({ ...newLead, postcode: e.target.value })}
+                    placeholder="OL8 1JR"
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-zinc-500">Phone</label>
+                  <input
+                    value={newLead.phone || ""}
+                    onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })}
+                    placeholder="0161 624 1234"
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-zinc-500">MOT classes</label>
+                  <input
+                    value={newLead.motClasses || ""}
+                    onChange={(e) => setNewLead({ ...newLead, motClasses: e.target.value })}
+                    placeholder="Class 4, 7"
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest text-zinc-500">Score</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={newLead.score ?? 70}
+                    onChange={(e) => setNewLead({ ...newLead, score: Number(e.target.value) || 0 })}
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-[11px] uppercase tracking-widest text-zinc-500">Address</label>
+                <input
+                  value={newLead.address || ""}
+                  onChange={(e) => setNewLead({ ...newLead, address: e.target.value })}
+                  placeholder="123 Yorkshire St, Oldham"
+                  className="mt-1 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-[13px] outline-none"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button type="button" onClick={() => setShowLeadModal(false)} className="rounded-full border border-white/10 px-5 py-2.5 text-[13px]">Cancel</button>
+                <button
+                  type="button"
+                  disabled={leadBusy}
+                  onClick={handleCreateLead}
+                  className="rounded-full bg-white px-6 py-2.5 text-[13px] font-semibold text-black disabled:opacity-50"
+                >
+                  {leadBusy ? "Saving…" : "Create lead"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Engagement Modal */}
       {showEngagementModal && (

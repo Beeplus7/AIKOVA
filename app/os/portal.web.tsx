@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, router } from 'expo-router';
 import { useAuth } from '../../src/lib/auth/AuthProvider';
+import { isAdminUser } from '../../src/lib/auth/roles';
 
 const css = `
 .aikova-portal {
@@ -103,10 +104,25 @@ const css = `
   margin-bottom: 6px;
 }
 .aikova-portal-session .email { color: #8B9BB4; font-size: 14px; margin-top: 4px; }
+.aikova-portal-session .role {
+  margin-top: 8px;
+  display: inline-flex;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: #8B9BB4;
+}
+.aikova-portal-session .role.admin { color: #0EA5FF; border-color: rgba(14,165,255,0.35); }
 .aikova-portal-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+@media (max-width: 720px) {
+  .aikova-portal-grid { grid-template-columns: 1fr; }
 }
 .aikova-portal-door {
   display: block;
@@ -126,6 +142,12 @@ const css = `
   background: linear-gradient(180deg, rgba(132,255,61,0.14), rgba(255,255,255,0.03));
   border-color: rgba(132,255,61,0.3);
 }
+.aikova-portal-door.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.08);
+}
 .aikova-portal-door .n {
   font-family: ui-monospace, monospace;
   font-size: 11px;
@@ -133,6 +155,7 @@ const css = `
   color: #84FF3D;
   margin-bottom: 10px;
 }
+.aikova-portal-door.admin .n { color: #0EA5FF; }
 .aikova-portal-door h2 {
   font-family: Sora, system-ui, sans-serif;
   font-size: 24px;
@@ -154,12 +177,18 @@ const css = `
   font-weight: 700;
   font-size: 13px;
   padding: 10px 14px;
+  white-space: nowrap;
 }
 .aikova-portal-door.admin .cta { background: #0EA5FF; }
+.aikova-portal-door.locked .cta {
+  background: rgba(255,255,255,0.08);
+  color: #8B9BB4;
+}
 `;
 
 export default function OsPortalScreen() {
   const { user, loading, configured, signOut } = useAuth();
+  const isAdmin = isAdminUser(user);
 
   useEffect(() => {
     if (!loading && (!configured || !user)) {
@@ -197,7 +226,7 @@ export default function OsPortalScreen() {
         <p className="aikova-portal-kicker">PORTAL · DUAL ACCESS</p>
         <h1 className="aikova-portal-title">Open the system.</h1>
         <p className="aikova-portal-lede">
-          Same account. Two entrances — Admin entrance and Users entrance.
+          Two entrances — Admin entrance (admin accounts only) and Users entrance.
         </p>
         <div className="aikova-portal-chips">
           {[
@@ -221,19 +250,31 @@ export default function OsPortalScreen() {
             {user.email?.split('@')[0] || 'Operator'}
           </p>
           <p className="email">{user.email}</p>
+          <span className={`role ${isAdmin ? 'admin' : ''}`}>
+            {isAdmin ? 'ADMIN ACCOUNT' : 'USER ACCOUNT'}
+          </span>
         </div>
 
         <div className="aikova-portal-grid">
-          <Link href="/os/crm?role=admin" className="aikova-portal-door admin">
-            <div className="n">01 · ADMIN ENTRANCE</div>
-            <h2>Admin entrance</h2>
-            <p>Captain CRM — leads, engagements, negotiations, tickets, evidence vault, billing.</p>
-            <span className="cta">Enter Admin →</span>
-          </Link>
+          {isAdmin ? (
+            <Link href="/os/crm?role=admin" className="aikova-portal-door admin">
+              <div className="n">01 · ADMIN ENTRANCE</div>
+              <h2>Admin entrance</h2>
+              <p>Captain CRM — leads, engagements, negotiations, tickets, evidence vault, billing.</p>
+              <span className="cta">Enter Admin →</span>
+            </Link>
+          ) : (
+            <div className="aikova-portal-door admin locked" aria-disabled="true">
+              <div className="n">01 · ADMIN ENTRANCE</div>
+              <h2>Admin entrance</h2>
+              <p>Locked for user accounts. Sign in with an admin login to open Captain CRM.</p>
+              <span className="cta">Admin only</span>
+            </div>
+          )}
           <Link href="/os/crm?role=user" className="aikova-portal-door user">
             <div className="n">02 · USERS ENTRANCE</div>
             <h2>Users entrance</h2>
-            <p>Client portal — project status, tickets, chat with Captain.</p>
+            <p>Client dashboard — Project Assessment Request, tickets, chat with Captain.</p>
             <span className="cta">Enter Users →</span>
           </Link>
         </div>

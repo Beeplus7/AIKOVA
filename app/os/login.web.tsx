@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import { useAuth } from '../../src/lib/auth/AuthProvider';
+import { isAdminUser } from '../../src/lib/auth/roles';
+import { getSupabase } from '../../src/lib/supabase';
 
 const css = `
 .aikova-auth {
@@ -136,6 +138,7 @@ const css = `
 export default function OsLoginScreen() {
   const { configured, user, loading, signInWithPassword, signInWithGoogle, signOut } =
     useAuth();
+  const isAdmin = isAdminUser(user);
   const [email, setEmail] = useState('admin@aikova.co.uk');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -143,17 +146,29 @@ export default function OsLoginScreen() {
 
   useEffect(() => {
     if (!loading && user) {
-      // Land on dual-entrance portal, not nested OS shell
-      router.replace('/os/portal');
+      // Users → dashboard (scope prompt). Admins → portal chooser.
+      router.replace(isAdminUser(user) ? '/os/portal' : '/os/crm?role=user');
     }
   }, [loading, user]);
+
+  const routeAfterAuth = async () => {
+    const supabase = getSupabase();
+    const { data } = (await supabase?.auth.getUser()) || { data: { user: null } };
+    const u = data.user;
+    if (u && isAdminUser(u)) {
+      router.replace('/os/portal');
+      return;
+    }
+    // New / standard users land on dashboard — system prompts Scope my project
+    router.replace('/os/crm?role=user');
+  };
 
   const onEmailLogin = async () => {
     setBusy(true);
     setError(null);
     try {
       await signInWithPassword(email.trim(), password);
-      router.replace('/os/portal');
+      await routeAfterAuth();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Sign-in failed');
     } finally {
@@ -166,7 +181,7 @@ export default function OsLoginScreen() {
     setError(null);
     try {
       await signInWithGoogle();
-      router.replace('/os/portal');
+      await routeAfterAuth();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Google sign-in failed');
     } finally {
@@ -181,7 +196,10 @@ export default function OsLoginScreen() {
         <Link href="/" className="aikova-auth-brand">
           Ai<span>KOVA</span>
         </Link>
-        <Link href="/">← Marketing</Link>
+        <div style={{ display: 'flex', gap: 14 }}>
+          <Link href="/os/claim-admin">Claim Admin</Link>
+          <Link href="/">← Marketing</Link>
+        </div>
       </nav>
 
       <div className="aikova-auth-body">
@@ -198,13 +216,24 @@ export default function OsLoginScreen() {
             <>
               <p className="aikova-auth-meta">Signed in as {user.email ?? user.id}</p>
               <div className="aikova-auth-doors">
-                <Link href="/os/crm?role=admin" className="aikova-auth-door admin">
-                  <strong>01 · Admin entrance</strong>
-                  <span>Captain CRM — leads, pipeline, tickets, DOS7 evidence.</span>
-                </Link>
+                {isAdmin ? (
+                  <Link href="/os/crm?role=admin" className="aikova-auth-door admin">
+                    <strong>01 · Admin entrance</strong>
+                    <span>Enter Admin → Captain CRM — leads, pipeline, tickets, DOS7 evidence.</span>
+                  </Link>
+                ) : (
+                  <div className="aikova-auth-door admin" style={{ opacity: 0.55 }}>
+                    <strong>01 · Admin entrance</strong>
+                    <span>Locked — admin login required. Use Users entrance or claim an admin account.</span>
+                  </div>
+                )}
                 <Link href="/os/crm?role=user" className="aikova-auth-door user">
                   <strong>02 · Users entrance</strong>
-                  <span>Client portal — projects, tickets, chat with Captain.</span>
+                  <span>Enter Users → dashboard with Project Assessment Request.</span>
+                </Link>
+                <Link href="/os/portal" className="aikova-auth-door">
+                  <strong>Open portal</strong>
+                  <span>Choose Admin or Users entrance from the dual portal.</span>
                 </Link>
               </div>
               <button type="button" className="aikova-auth-ghost" onClick={() => signOut()}>
