@@ -4,7 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#05070D" />
-    <title>AiKOVA — Portfolio OS</title>
+    <title>AiKOVA — Portfolio OS | Engineered Intelligence. Delivered.</title>
+    <meta name="description" content="AiKOVA Portfolio OS — VisaGuide, ReelStorm, Vexo Garage, TradeFlow, Arole Adjo, and Road Angel. Industrial-grade cloud, payments, and AI operating systems from Oldham OL8." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://aikova.co.uk/portfolio" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AiKOVA" />
+    <meta property="og:title" content="AiKOVA — Portfolio OS" />
+    <meta property="og:description" content="Six industrial operating systems: VisaGuide, ReelStorm, Vexo Garage, TradeFlow, Arole Adjo, Road Angel. Engineered Intelligence. Delivered." />
+    <meta property="og:url" content="https://aikova.co.uk/portfolio" />
+    <meta property="og:image" content="https://aikova.co.uk/aikova-portfolio-logo.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AiKOVA — Portfolio OS" />
+    <meta name="twitter:description" content="Industrial stack. One vault. Six OS products shipping from Oldham OL8 → Global." />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       html, body, #root {
@@ -14,14 +26,79 @@
         color: #fff;
       }
       body { overflow-x: hidden; }
+      #aikova-static-portfolio {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+        font-family: Inter, system-ui, sans-serif;
+        line-height: 1.55;
+        color: #E6EAF2;
+      }
+      #aikova-static-portfolio h1 {
+        font-family: Sora, Inter, system-ui, sans-serif;
+        font-size: 2rem;
+        margin: 0 0 8px;
+        color: #fff;
+      }
+      #aikova-static-portfolio h2 {
+        font-size: 1.25rem;
+        margin: 28px 0 8px;
+        color: #0EA5FF;
+      }
+      #aikova-static-portfolio p, #aikova-static-portfolio li { color: #8B9BB4; }
+      #aikova-static-portfolio a { color: #84FF3D; }
+      body.is-app-ready #aikova-static-portfolio { display: none !important; }
     </style>
-  <style id="aikova-hide-artefact-nav">
-  header { display: none !important; }
-</style>
 </head>
   <body>
+    <!-- Crawler / LLM readable content (hidden after React app mounts) -->
+    <main id="aikova-static-portfolio">
+      <p>AiKOVA · Engineering Vault · Oldham OL8</p>
+      <h1>Portfolio OS — Engineered Intelligence. Delivered.</h1>
+      <p>
+        AiKOVA builds industrial-grade operating systems for cloud, payments, AI production,
+        and trade. This portfolio lists six live and shipping OS products.
+      </p>
+      <ul>
+        <li><strong>VisaGuide OS</strong> — property, service apartments, immigration visa guidance + community platform (visaguideos.com)</li>
+        <li><strong>ReelStorm OS</strong> — AI production OS, 18 rooms, text-to-VFX → YouTube automation (reelstorm.uk)</li>
+        <li><strong>Vexo Garage OS</strong> — garage management + MOT booking, DVSA gov-data lead engine</li>
+        <li><strong>TradeFlow OS</strong> — FinTech trading OS with Guardian risk system (tradeflow.finance)</li>
+        <li><strong>Arole Adjo OS</strong> — cultural commerce marketplace + split payments (aroleadjo.com)</li>
+        <li><strong>Road Angel OS</strong> — roadside assistance, fleet tracking, dispatch (roadangel.logistics)</li>
+      </ul>
+      <h2>Industrial stack. One vault. Zero agencies.</h2>
+      <p>
+        Shared patterns: Supabase RLS, Stripe-native payments, Gov-data compliance,
+        FinOps, evidence vault / DOS7. Contact: <a href="https://aikova.co.uk/contact">aikova.co.uk/contact</a>
+        · Portal: <a href="https://aikova.co.uk/os/portal">aikova.co.uk/os/portal</a>
+      </p>
+      <noscript>
+        <p>JavaScript is disabled. You can still read the portfolio summary above. Enable JavaScript for the interactive OS architecture views.</p>
+      </noscript>
+    </main>
+
     <div id="root"></div>
     <script src="./app.js"></script>
+    <script>
+      (function () {
+        function markReady() {
+          var root = document.getElementById('root');
+          if (root && root.childNodes && root.childNodes.length) {
+            document.body.classList.add('is-app-ready');
+            return true;
+          }
+          return false;
+        }
+        if (!markReady()) {
+          var obs = new MutationObserver(function () {
+            if (markReady()) obs.disconnect();
+          });
+          obs.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+          setTimeout(function () { document.body.classList.add('is-app-ready'); }, 4000);
+        }
+      })();
+    </script>
   
 <script>
 (function () {
