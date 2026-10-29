@@ -4,10 +4,10 @@ import { OsShell } from '../../src/components/os/OsShell';
 import { colors, fonts } from '../../src/theme/colors';
 
 const metrics = [
-  { label: 'Open pipeline', value: '—' },
-  { label: 'Active clients', value: '—' },
-  { label: 'Case studies', value: '6' },
-  { label: 'System', value: 'LIVE' },
+  { label: 'API', value: 'LIVE' },
+  { label: 'Auth', value: 'SUPABASE' },
+  { label: 'CRM', value: '/os/crm' },
+  { label: 'Domain', value: 'aikova.co.uk' },
 ];
 
 export default function OsDashboard() {
@@ -15,7 +15,7 @@ export default function OsDashboard() {
     <OsShell
       activeHref="/os"
       title="Dashboard"
-      subtitle="Portfolio CRM vault. Metrics hydrate when Supabase credentials arrive."
+      subtitle="Backend is live on aikova.co.uk — Supabase Auth + CRM API."
     >
       <View style={styles.grid}>
         {metrics.map((m) => (

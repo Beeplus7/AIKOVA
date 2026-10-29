@@ -20,6 +20,7 @@ type Extra = {
   supabaseAnonKey?: string;
   apiBaseUrl?: string;
   appUrl?: string;
+  googleClientId?: string;
   githubOwner?: string;
   githubRepo?: string;
   credentials?: {
@@ -47,6 +48,10 @@ export const env = {
   ),
   apiBaseUrl: readPublic('EXPO_PUBLIC_API_BASE_URL', extra.apiBaseUrl),
   appUrl: readPublic('EXPO_PUBLIC_APP_URL', extra.appUrl),
+  googleClientId: readPublic(
+    'EXPO_PUBLIC_GOOGLE_CLIENT_ID',
+    extra.googleClientId,
+  ),
   githubOwner: extra.githubOwner ?? '',
   githubRepo: extra.githubRepo ?? '',
 } as const;
@@ -72,7 +77,7 @@ export function getCredentialStatuses(): CredentialStatus[] {
       group: 'github',
       label: 'GitHub',
       ready: githubReady,
-      missing: githubReady ? [] : ['GITHUB_OWNER', 'GITHUB_REPO', 'GITHUB_TOKEN'],
+      missing: githubReady ? [] : ['GITHUB_OWNER', 'GITHUB_REPO'],
     },
     {
       group: 'vps',

@@ -54,7 +54,7 @@ export default function OsLoginScreen() {
     <OsShell
       activeHref="/os/login"
       title="Login to OS"
-      subtitle="Supabase Auth · email ready · Google after provider enable"
+      subtitle="Supabase Auth · email + Google (VPS exchange)"
     >
       <View style={styles.panel}>
         <Text style={styles.label}>SESSION</Text>

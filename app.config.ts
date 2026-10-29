@@ -51,14 +51,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '',
     apiBaseUrl: process.env.EXPO_PUBLIC_API_BASE_URL ?? '',
     appUrl: process.env.EXPO_PUBLIC_APP_URL ?? '',
+    googleClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? '',
     githubOwner: process.env.GITHUB_OWNER ?? '',
     githubRepo: process.env.GITHUB_REPO ?? '',
     // Presence flags only — never expose tokens/secrets to the client bundle
     credentials: {
       supabase:
         has('EXPO_PUBLIC_SUPABASE_URL') && has('EXPO_PUBLIC_SUPABASE_ANON_KEY'),
-      github:
-        has('GITHUB_OWNER') && has('GITHUB_REPO') && has('GITHUB_TOKEN'),
+      // Token optional when `gh` / SSH auth is already available locally
+      github: has('GITHUB_OWNER') && has('GITHUB_REPO'),
       vps: has('VPS_HOST') && has('VPS_USER') && has('EXPO_PUBLIC_API_BASE_URL'),
     },
   },

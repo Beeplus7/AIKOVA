@@ -7,6 +7,7 @@ import {
   listRecords,
   replaceRecord,
 } from './db.js';
+import { exchangeGoogleIdToken } from './googleAuth.js';
 
 const PORT = Number(process.env.CRM_API_PORT || 3015);
 const SUPABASE_URL = (process.env.EXPO_PUBLIC_SUPABASE_URL || '').replace(/\/$/, '');
@@ -115,8 +116,34 @@ app.get('/health', (_req, res) => {
     ok: true,
     service: 'aikova-crm-api',
     supabaseUrl: Boolean(SUPABASE_URL),
+    google: Boolean(
+      process.env.GOOGLE_CLIENT_ID || process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+    ),
     time: new Date().toISOString(),
   });
+});
+
+app.post('/auth/google', async (req, res) => {
+  try {
+    const idToken = req.body?.id_token || req.body?.credential;
+    if (!idToken) {
+      return res.status(400).json({ error: 'id_token required' });
+    }
+    const { session, profile } = await exchangeGoogleIdToken(idToken);
+    return res.json({
+      data: {
+        email: profile.email,
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+        expires_in: session.expires_in,
+        expires_at: session.expires_at,
+        token_type: session.token_type || 'bearer',
+        user: session.user,
+      },
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({ error: err.message || 'google auth failed' });
+  }
 });
 
 app.post('/actions', requireUser, handleActions);

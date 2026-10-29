@@ -7,13 +7,9 @@ import {
   type ReactNode,
 } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
-import * as WebBrowser from 'expo-web-browser';
-import { makeRedirectUri } from 'expo-auth-session';
-import { Platform } from 'react-native';
 import { getSupabase } from '../supabase';
 import { env, isSupabaseConfigured } from '../../config/env';
-
-WebBrowser.maybeCompleteAuthSession();
+import { exchangeGoogleCredential, obtainGoogleIdToken } from './googleSignIn';
 
 type AuthContextValue = {
   session: Session | null;
@@ -71,26 +67,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signInWithGoogle: async () => {
         const supabase = getSupabase();
         if (!supabase) throw new Error('Supabase not configured');
+        const clientId = env.googleClientId;
+        if (!clientId) {
+          throw new Error('EXPO_PUBLIC_GOOGLE_CLIENT_ID missing');
+        }
 
-        const redirectTo =
-          Platform.OS === 'web'
-            ? typeof window !== 'undefined'
-              ? `${window.location.origin}/os/login`
-              : env.appUrl || 'https://aikova.co.uk/os/login'
-            : makeRedirectUri({ scheme: 'aikova', path: 'os/login' });
-
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo,
-            skipBrowserRedirect: Platform.OS !== 'web',
-          },
+        const idToken = await obtainGoogleIdToken(clientId);
+        const tokens = await exchangeGoogleCredential(idToken);
+        const { error } = await supabase.auth.setSession({
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
         });
         if (error) throw error;
-
-        if (Platform.OS !== 'web' && data?.url) {
-          await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-        }
       },
       signOut: async () => {
         const supabase = getSupabase();
