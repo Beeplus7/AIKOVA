@@ -8,16 +8,9 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { marketingRoutes } from '../../navigation/routes';
-import { fonts } from '../../theme/colors';
+import { colors, fonts } from '../../theme/colors';
 
 const BAR_HEIGHT = 56;
-/** Snow dim white — marketing page background */
-const PAGE_BG = '#F0F2F5';
-const PAGE_BORDER = 'rgba(11, 18, 32, 0.10)';
-const TEXT = '#0B1220';
-const TEXT_MUTED = '#5B6577';
-const ELECTRIC = '#0EA5FF';
-const NEON = '#84FF3D';
 
 export function ArtefactFrame({
   activeHref,
@@ -34,15 +27,9 @@ export function ArtefactFrame({
   useEffect(() => {
     if (typeof document === 'undefined') return;
     const prevOverflow = document.body.style.overflow;
-    const prevBg = document.body.style.background;
-    const prevHtmlBg = document.documentElement.style.background;
     document.body.style.overflow = 'hidden';
-    document.body.style.background = PAGE_BG;
-    document.documentElement.style.background = PAGE_BG;
     return () => {
       document.body.style.overflow = prevOverflow;
-      document.body.style.background = prevBg;
-      document.documentElement.style.background = prevHtmlBg;
     };
   }, []);
 
@@ -92,7 +79,7 @@ const iframeStyle: CSSProperties = {
   width: '100%',
   height: '100%',
   display: 'block',
-  background: PAGE_BG,
+  background: colors.bg,
 };
 
 const styles = StyleSheet.create({
@@ -101,7 +88,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     minHeight: '100vh' as unknown as number,
-    backgroundColor: PAGE_BG,
+    backgroundColor: colors.bg,
   },
   bar: {
     height: BAR_HEIGHT,
@@ -111,8 +98,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 16,
     borderBottomWidth: 1,
-    borderBottomColor: PAGE_BORDER,
-    backgroundColor: 'rgba(240, 242, 245, 0.94)',
+    borderBottomColor: colors.border,
+    backgroundColor: 'rgba(5, 7, 13, 0.92)',
     zIndex: 20,
   },
   barCompact: {
@@ -131,13 +118,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.displayExtra,
     fontSize: 18,
     letterSpacing: -0.4,
-    color: TEXT,
+    color: colors.text,
   },
   brandMeta: {
     fontFamily: fonts.mono,
     fontSize: 10,
     letterSpacing: 1.4,
-    color: TEXT_MUTED,
+    color: colors.textDim,
   },
   links: {
     flexDirection: 'row',
@@ -156,17 +143,17 @@ const styles = StyleSheet.create({
   linkLabel: {
     fontFamily: fonts.bodyMedium,
     fontSize: 13,
-    color: TEXT_MUTED,
+    color: colors.muted,
   },
   linkActive: {
-    color: ELECTRIC,
+    color: colors.text,
   },
   linkUnderline: {
     marginTop: 4,
     height: 2,
     width: 16,
     borderRadius: 2,
-    backgroundColor: ELECTRIC,
+    backgroundColor: colors.blue,
   },
   cta: {
     marginLeft: 6,
@@ -174,18 +161,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: 'rgba(132, 255, 61, 0.45)',
-    backgroundColor: 'rgba(132, 255, 61, 0.14)',
+    borderColor: 'rgba(132, 255, 61, 0.35)',
+    backgroundColor: 'rgba(132, 255, 61, 0.1)',
   },
   ctaText: {
     fontFamily: fonts.bodySemi,
     fontSize: 12,
-    color: NEON,
+    color: colors.green,
   },
   frame: {
     flex: 1,
     width: '100%',
     minHeight: 0,
-    backgroundColor: PAGE_BG,
   },
 });
