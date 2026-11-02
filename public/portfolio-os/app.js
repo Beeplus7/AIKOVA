@@ -7,7 +7,11 @@
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    try {
+      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    } catch (e) {
+      throw mod = 0, e;
+    }
   };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
@@ -315,19 +319,19 @@
   var require_react_production = __commonJS({
     "node_modules/react/cjs/react.production.js"(exports) {
       "use strict";
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
-      var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-      var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-      var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-      var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-      var REACT_CONSUMER_TYPE = Symbol.for("react.consumer");
-      var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-      var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-      var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-      var REACT_MEMO_TYPE = Symbol.for("react.memo");
-      var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-      var REACT_ACTIVITY_TYPE = Symbol.for("react.activity");
-      var REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition");
+      var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element");
+      var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+      var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
+      var REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode");
+      var REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler");
+      var REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer");
+      var REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context");
+      var REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref");
+      var REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense");
+      var REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo");
+      var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+      var REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity");
+      var REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition");
       var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
       function getIteratorFn(maybeIterable) {
         if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
@@ -808,9 +812,9 @@
         p: 0,
         findDOMNode: null
       };
-      var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-      var REACT_RECOVERABLE_TYPE = Symbol.for("react.recoverable");
-      var REACT_OPTIMISTIC_KEY = Symbol.for("react.optimistic_key");
+      var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+      var REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable");
+      var REACT_OPTIMISTIC_KEY = /* @__PURE__ */ Symbol.for("react.optimistic_key");
       function createPortal$1(children, containerInfo, implementation) {
         var key = 3 < arguments.length && void 0 !== arguments[3] ? arguments[3] : null;
         return {
@@ -1182,33 +1186,31 @@
         return null;
       }
       var assign = Object.assign;
-      var REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element");
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
-      var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-      var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-      var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-      var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-      var REACT_CONSUMER_TYPE = Symbol.for("react.consumer");
-      var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-      var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-      var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-      var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
-      var REACT_MEMO_TYPE = Symbol.for("react.memo");
-      var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-      Symbol.for("react.scope");
-      var REACT_ACTIVITY_TYPE = Symbol.for("react.activity");
-      var REACT_LEGACY_HIDDEN_TYPE = Symbol.for("react.legacy_hidden");
-      Symbol.for("react.tracing_marker");
-      var REACT_MEMO_CACHE_SENTINEL = Symbol.for("react.memo_cache_sentinel");
-      var REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition");
-      var REACT_RECOVERABLE_TYPE = Symbol.for("react.recoverable");
+      var REACT_LEGACY_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element");
+      var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element");
+      var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+      var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
+      var REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode");
+      var REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler");
+      var REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer");
+      var REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context");
+      var REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref");
+      var REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense");
+      var REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list");
+      var REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo");
+      var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+      var REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity");
+      var REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden");
+      var REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel");
+      var REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition");
+      var REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable");
       var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
       function getIteratorFn(maybeIterable) {
         if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
         maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
         return "function" === typeof maybeIterable ? maybeIterable : null;
       }
-      var REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference");
+      var REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference");
       function getComponentNameFromType(type) {
         if (null == type) return null;
         if ("function" === typeof type)
@@ -14534,8 +14536,8 @@
   var require_react_jsx_runtime_production = __commonJS({
     "node_modules/react/cjs/react-jsx-runtime.production.js"(exports) {
       "use strict";
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
-      var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
+      var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element");
+      var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
       function jsxProd(type, config, maybeKey) {
         var key = null;
         void 0 !== maybeKey && (key = "" + maybeKey);
@@ -14705,6 +14707,48 @@
       architecture: ["GPS Ingest", "Fleet Map OS", "Dispatch OS", "Driver App OS", "Job OS", "Evidence OS", "Invoice OS"],
       outcome: "Realtime fleet view <2s latency. Dispatch queue BullMQ. Driver app push via SNS. Beta with 3 fleets in Greater Manchester.",
       diagramType: "track"
+    },
+    {
+      id: "myface",
+      name: "MyFace Profile OS",
+      tagline: "Work Social OS \u2014 SHOW \xB7 CONNECT \xB7 GROW. Your Work Is Your Face. Not Your CV. UPRM \xB7 WorkCut \xB7 Live Studio \xB7 Bot Army \u2014 Oldham OL1 \u2192 Global",
+      status: "BETA",
+      categories: ["Cloud OS", "AI Production OS"],
+      metrics: [
+        { label: "PILLARS", value: "SHOW\xB7CONNECT\xB7GROW" },
+        { label: "WAITLIST", value: "2,417 queued" },
+        { label: "TRUST", value: "4.9 \u2605 verified" }
+      ],
+      tech: ["Vite", "Expo", "Supabase", "Stripe Escrow", "Mux Live", "FFmpeg WorkCut", "MFC Coins", "UPRM Orchestrator", "Bot Army"],
+      domain: "myfaceprofile.aikova.co.uk",
+      accent: "#8FFF4A",
+      accent2: "#00E5C0",
+      challenge: "Tradespeople are invisible online \u2014 CVs and static sites don't show live work, trust, bookings, or gifts. Need never finds the maker.",
+      solution: "Work Social OS: Timeline + Live Studio + WorkCut CapCut-like editor, UPRM need-matching, Pipeline Kanban, Nearby 10mi heatmap, MFC gifts, Stripe escrow, TrustScore.",
+      architecture: ["Onboarding UPRM", "Timeline Feed", "Live Studio", "WorkCut Editor", "Maker Profile", "Pipeline Kanban", "Booking + Escrow", "MFC Gift Economy", "Trust Ledger", "Bot Army"],
+      outcome: "Marketing live at myfaceprofile.aikova.co.uk. Oldham pilot surface (pros, Live Studio, escrow bookings). iOS & Android waitlist open \u2014 SHOW \xB7 CONNECT \xB7 GROW shipping.",
+      diagramType: "market"
+    },
+    {
+      id: "receptionist",
+      name: "AI Receptionist OS",
+      tagline: "Europe's AI Receptionist. Starting with the UK. \u2014 Any Business. Any Language. Any Channel. Voice \xB7 SMS \xB7 WhatsApp \xB7 Social \u2014 live in 10 mins",
+      status: "LIVE",
+      categories: ["Cloud OS", "AI Production OS"],
+      metrics: [
+        { label: "SETUP", value: "10 mins" },
+        { label: "CHANNELS", value: "Voice+Social" },
+        { label: "COVERAGE", value: "24/7" }
+      ],
+      tech: ["Vite", "Twilio Voice +44", "Supabase", "WhatsApp", "SMS", "Stripe SEPA", "Multilingual TTS", "GDPR", "AKC Coins"],
+      domain: "ai-receptionist.aikova.co.uk",
+      accent: "#2962FF",
+      accent2: "#76FF03",
+      challenge: "UK SMEs miss calls and DMs after hours \u2014 Sunday roast rush, 7am caf\xE9 orders, NHS vs private triage, Instagram balayage DMs at 11pm.",
+      solution: "Assess website \u2192 extract services/prices/hours/Bank Holidays \u2192 plug-and-play AI receptionist with British English + Polish + French + Spanish, smart handoff, Stripe deposits.",
+      architecture: ["Assess Engine", "Voice Mesh Twilio", "WhatsApp/SMS", "Social Inbox", "Booking OS", "Sector Playbooks", "Handoff + Transcript", "AKC Prepaid Usage", "GDPR Evidence"],
+      outcome: "Live at ai-receptionist.aikova.co.uk. High Street twins (Restaurant \xB7 Caf\xE9 \xB7 Clinic \xB7 Salon \xB7 Retail \xB7 Pro). UK \u2192 NL/DE/FR/ES/PL rollout. Instant Assess + Twilio voice trial.",
+      diagramType: "pipeline"
     }
   ];
   var FILTERS = ["All", "Cloud OS", "Payment OS", "Industrial OS", "AI Production OS", "FinTech OS"];
@@ -14714,7 +14758,7 @@
       icon: "\u2601",
       color: "#0EA5FF",
       items: [
-        { name: "AWS S3 / SES / SNS / Lambda / EC2 / CloudFront", used: ["VisaGuide", "ReelStorm", "TradeFlow"] },
+        { name: "AWS S3 / SES / SNS / Lambda / EC2 / CloudFront", used: ["VisaGuide", "ReelStorm", "TradeFlow", "Receptionist"] },
         { name: "Azure / GCP Multi-Cloud", used: ["VisaGuide", "ReelStorm"] },
         { name: "IaC Terraform", used: ["All OS"] },
         { name: "FinOps $50K saved pattern \u2014 The Economist case", used: ["VisaGuide", "Vexo"] }
@@ -14725,7 +14769,7 @@
       icon: "\u25CD",
       color: "#FFD700",
       items: [
-        { name: "Stripe + Webhooks + Connect", used: ["VisaGuide", "TradeFlow", "Arole"] },
+        { name: "Stripe + Webhooks + Connect", used: ["VisaGuide", "TradeFlow", "Arole", "MyFace", "Receptionist"] },
         { name: "Worldpay / PayPal / Barclaycard ePDQ / Sage Pay / SmartPay / First Data / Flywire / Amazon Pay", used: ["Arole", "VisaGuide"] },
         { name: "PCI DSS / PSD2 / Open Banking / KYC/AML", used: ["TradeFlow", "VisaGuide"] }
       ]
@@ -14747,7 +14791,8 @@
       items: [
         { name: "Claude 4 + Qwen + MCP Server \u2192 UE5.8", used: ["ReelStorm"] },
         { name: "DashScope WANX 2.1 i2v-plus / Seedance 2.0", used: ["ReelStorm"] },
-        { name: "Pinecone Vector / PostHog / Sentry / BullMQ", used: ["ReelStorm", "VisaGuide", "TradeFlow"] }
+        { name: "Pinecone Vector / PostHog / Sentry / BullMQ", used: ["ReelStorm", "VisaGuide", "TradeFlow"] },
+        { name: "Twilio Voice / Multilingual TTS / WorkCut FFmpeg / Mux Live", used: ["Receptionist", "MyFace"] }
       ]
     },
     {
@@ -14757,7 +14802,8 @@
       items: [
         { name: "CI/CD / Docker / RunPod / BullMQ", used: ["ReelStorm", "TradeFlow"] },
         { name: "Supabase RLS / Row Security", used: ["All OS"] },
-        { name: "Cyber Essentials / ISO 27001 Evidence Chain", used: ["All OS"] }
+        { name: "Cyber Essentials / ISO 27001 Evidence Chain", used: ["All OS"] },
+        { name: "GDPR / NDPR / Twilio UK +44 compliance", used: ["Receptionist", "MyFace"] }
       ]
     }
   ];
@@ -14959,7 +15005,7 @@
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "flex gap-2", children: ["LEAD LIST", "ENGAGEMENT LOG", "NEGOTIATION TRACKER", "EVIDENCE VAULT"].map((k) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "hidden md:inline mono text-[10px] px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] text-white/60", children: k }, k)) })
             ] }),
             /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mt-8 flex flex-wrap justify-between gap-4 mono text-[10px] tracking-[0.12em] text-white/30", children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\xA9 AiKOVA ENGINEERING VAULT // OLDHAM OL8 \u2192 GLOBAL // 6 OS // BUILT FOR DOS7" }),
+              /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\xA9 AiKOVA ENGINEERING VAULT // OLDHAM OL8 \u2192 GLOBAL // 8 OS // BUILT FOR DOS7" }),
               /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "BUILT WITH NEXT.JS 14 / SUPABASE RLS / STRIPE / AWS / RUNPOD / BULLMQ" })
             ] })
           ] }) }),

@@ -149,6 +149,48 @@ const PRODUCTS: Product[] = [
     outcome: "Realtime fleet view <2s latency. Dispatch queue BullMQ. Driver app push via SNS. Beta with 3 fleets in Greater Manchester.",
     diagramType: "track",
   },
+  {
+    id: "myface",
+    name: "MyFace Profile OS",
+    tagline: "Work Social OS — SHOW · CONNECT · GROW. Your Work Is Your Face. Not Your CV. UPRM · WorkCut · Live Studio · Bot Army — Oldham OL1 → Global",
+    status: "BETA",
+    categories: ["Cloud OS", "AI Production OS"],
+    metrics: [
+      { label: "PILLARS", value: "SHOW·CONNECT·GROW" },
+      { label: "WAITLIST", value: "2,417 queued" },
+      { label: "TRUST", value: "4.9 ★ verified" },
+    ],
+    tech: ["Vite", "Expo", "Supabase", "Stripe Escrow", "Mux Live", "FFmpeg WorkCut", "MFC Coins", "UPRM Orchestrator", "Bot Army"],
+    domain: "myfaceprofile.aikova.co.uk",
+    accent: "#8FFF4A",
+    accent2: "#00E5C0",
+    challenge: "Tradespeople are invisible online — CVs and static sites don't show live work, trust, bookings, or gifts. Need never finds the maker.",
+    solution: "Work Social OS: Timeline + Live Studio + WorkCut CapCut-like editor, UPRM need-matching, Pipeline Kanban, Nearby 10mi heatmap, MFC gifts, Stripe escrow, TrustScore.",
+    architecture: ["Onboarding UPRM", "Timeline Feed", "Live Studio", "WorkCut Editor", "Maker Profile", "Pipeline Kanban", "Booking + Escrow", "MFC Gift Economy", "Trust Ledger", "Bot Army"],
+    outcome: "Marketing live at myfaceprofile.aikova.co.uk. Oldham pilot surface (pros, Live Studio, escrow bookings). iOS & Android waitlist open — SHOW · CONNECT · GROW shipping.",
+    diagramType: "market",
+  },
+  {
+    id: "receptionist",
+    name: "AI Receptionist OS",
+    tagline: "Europe's AI Receptionist. Starting with the UK. — Any Business. Any Language. Any Channel. Voice · SMS · WhatsApp · Social — live in 10 mins",
+    status: "LIVE",
+    categories: ["Cloud OS", "AI Production OS"],
+    metrics: [
+      { label: "SETUP", value: "10 mins" },
+      { label: "CHANNELS", value: "Voice+Social" },
+      { label: "COVERAGE", value: "24/7" },
+    ],
+    tech: ["Vite", "Twilio Voice +44", "Supabase", "WhatsApp", "SMS", "Stripe SEPA", "Multilingual TTS", "GDPR", "AKC Coins"],
+    domain: "ai-receptionist.aikova.co.uk",
+    accent: "#2962FF",
+    accent2: "#76FF03",
+    challenge: "UK SMEs miss calls and DMs after hours — Sunday roast rush, 7am café orders, NHS vs private triage, Instagram balayage DMs at 11pm.",
+    solution: "Assess website → extract services/prices/hours/Bank Holidays → plug-and-play AI receptionist with British English + Polish + French + Spanish, smart handoff, Stripe deposits.",
+    architecture: ["Assess Engine", "Voice Mesh Twilio", "WhatsApp/SMS", "Social Inbox", "Booking OS", "Sector Playbooks", "Handoff + Transcript", "AKC Prepaid Usage", "GDPR Evidence"],
+    outcome: "Live at ai-receptionist.aikova.co.uk. High Street twins (Restaurant · Café · Clinic · Salon · Retail · Pro). UK → NL/DE/FR/ES/PL rollout. Instant Assess + Twilio voice trial.",
+    diagramType: "pipeline",
+  },
 ];
 
 const FILTERS: Category[] = ["All", "Cloud OS", "Payment OS", "Industrial OS", "AI Production OS", "FinTech OS"];
@@ -159,7 +201,7 @@ const TECH_WALL = [
     icon: "☁",
     color: "#0EA5FF",
     items: [
-      { name: "AWS S3 / SES / SNS / Lambda / EC2 / CloudFront", used: ["VisaGuide", "ReelStorm", "TradeFlow"] },
+      { name: "AWS S3 / SES / SNS / Lambda / EC2 / CloudFront", used: ["VisaGuide", "ReelStorm", "TradeFlow", "Receptionist"] },
       { name: "Azure / GCP Multi-Cloud", used: ["VisaGuide", "ReelStorm"] },
       { name: "IaC Terraform", used: ["All OS"] },
       { name: "FinOps $50K saved pattern — The Economist case", used: ["VisaGuide", "Vexo"] },
@@ -170,7 +212,7 @@ const TECH_WALL = [
     icon: "◍",
     color: "#FFD700",
     items: [
-      { name: "Stripe + Webhooks + Connect", used: ["VisaGuide", "TradeFlow", "Arole"] },
+      { name: "Stripe + Webhooks + Connect", used: ["VisaGuide", "TradeFlow", "Arole", "MyFace", "Receptionist"] },
       { name: "Worldpay / PayPal / Barclaycard ePDQ / Sage Pay / SmartPay / First Data / Flywire / Amazon Pay", used: ["Arole", "VisaGuide"] },
       { name: "PCI DSS / PSD2 / Open Banking / KYC/AML", used: ["TradeFlow", "VisaGuide"] },
     ],
@@ -193,6 +235,7 @@ const TECH_WALL = [
       { name: "Claude 4 + Qwen + MCP Server → UE5.8", used: ["ReelStorm"] },
       { name: "DashScope WANX 2.1 i2v-plus / Seedance 2.0", used: ["ReelStorm"] },
       { name: "Pinecone Vector / PostHog / Sentry / BullMQ", used: ["ReelStorm", "VisaGuide", "TradeFlow"] },
+      { name: "Twilio Voice / Multilingual TTS / WorkCut FFmpeg / Mux Live", used: ["Receptionist", "MyFace"] },
     ],
   },
   {
@@ -203,6 +246,7 @@ const TECH_WALL = [
       { name: "CI/CD / Docker / RunPod / BullMQ", used: ["ReelStorm", "TradeFlow"] },
       { name: "Supabase RLS / Row Security", used: ["All OS"] },
       { name: "Cyber Essentials / ISO 27001 Evidence Chain", used: ["All OS"] },
+      { name: "GDPR / NDPR / Twilio UK +44 compliance", used: ["Receptionist", "MyFace"] },
     ],
   },
 ];
@@ -493,7 +537,7 @@ export default function App() {
             </div>
           </div>
           <div className="mt-8 flex flex-wrap justify-between gap-4 mono text-[10px] tracking-[0.12em] text-white/30">
-            <span>© AiKOVA ENGINEERING VAULT // OLDHAM OL8 → GLOBAL // 6 OS // BUILT FOR DOS7</span>
+            <span>© AiKOVA ENGINEERING VAULT // OLDHAM OL8 → GLOBAL // 8 OS // BUILT FOR DOS7</span>
             <span>BUILT WITH NEXT.JS 14 / SUPABASE RLS / STRIPE / AWS / RUNPOD / BULLMQ</span>
           </div>
         </div>

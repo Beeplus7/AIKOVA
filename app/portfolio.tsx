@@ -10,6 +10,8 @@ const projects = [
   { title: 'TradeFlow OS', tag: 'FinTech OS' },
   { title: 'Arole Adjo OS', tag: 'Commerce' },
   { title: 'Road Angel OS', tag: 'Industrial OS' },
+  { title: 'MyFace Profile OS', tag: 'Cloud OS' },
+  { title: 'AI Receptionist OS', tag: 'AI Production OS' },
 ];
 
 export default function PortfolioScreen() {

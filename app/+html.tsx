@@ -68,6 +68,8 @@ export default function Root({ children }: PropsWithChildren) {
             <li>TradeFlow OS — tradeflow.finance</li>
             <li>Arole Adjo OS — aroleadjo.com</li>
             <li>Road Angel OS — logistics + fleet</li>
+            <li>MyFace Profile OS — myfaceprofile.aikova.co.uk</li>
+            <li>AI Receptionist OS — ai-receptionist.aikova.co.uk</li>
           </ul>
           <p>
             Pages: <a href="https://aikova.co.uk/portfolio">Portfolio</a>,{' '}

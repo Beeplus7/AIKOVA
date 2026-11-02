@@ -226,6 +226,8 @@ const PROJECTS = [
   { name: "TradeFlow OS", desc: "Guardian 8/15/25%, parts flow", mrr: "£49+10% margin", progress: 71, color: "#A78BFA", tickets: 1, billing: "£32K MRR" },
   { name: "Arole Adjo", desc: "Creator OS - bookings & CRM", mrr: "£3K/mo", progress: 58, color: "#F472B6", tickets: 2, billing: "£18K" },
   { name: "Road Angel", desc: "ADAS calibration logging", mrr: "£4K/mo", progress: 45, color: "#FBBF24", tickets: 1, billing: "£12K" },
+  { name: "MyFace Profile", desc: "Work Social OS — SHOW · CONNECT · GROW", mrr: "Waitlist / MFC", progress: 52, color: "#8FFF4A", tickets: 2, billing: "Pilot OL1" },
+  { name: "AI Receptionist", desc: "Europe AI receptionist — UK High Street", mrr: "AKC prepaid", progress: 78, color: "#2962FF", tickets: 3, billing: "£25–€199/mo" },
 ];
 
 async function apiList(collection: string) {
@@ -1890,7 +1892,7 @@ export default function App({
             {activeTab === "Projects" && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="sora text-[16px] font-semibold">Projects • 6 OS</h3>
+                  <h3 className="sora text-[16px] font-semibold">Projects • 8 OS</h3>
                   <span className="text-[11px] text-zinc-500">Guardian 8/15/25% • £49+10% model</span>
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">

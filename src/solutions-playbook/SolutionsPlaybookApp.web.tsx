@@ -115,6 +115,36 @@ const industries = [
     glow: "rgba(255,215,0,0.12)",
     border: "border-white/10",
   },
+  {
+    id: "G",
+    tag: "Work Social & Trades",
+    name: "MyFace Profile OS",
+    domain: "myfaceprofile.aikova.co.uk",
+    status: "BETA • WAITLIST",
+    problem: "Tradespeople invisible online — CVs don't show live work, trust, or bookings.",
+    solution: "Work Social OS: SHOW · CONNECT · GROW with Live Studio, WorkCut, UPRM, escrow, MFC gifts.",
+    tech: ["Vite", "Expo", "Supabase", "Stripe Escrow", "Mux Live", "WorkCut FFmpeg", "Bot Army"],
+    outcome: "Oldham pilot + 2,417 waitlist. TrustScore + Nearby need-matching.",
+    gradient: "from-[#8FFF4A] to-[#00E5C0]",
+    accent: "#8FFF4A",
+    glow: "rgba(143,255,74,0.15)",
+    border: "border-[#8FFF4A]/20",
+  },
+  {
+    id: "H",
+    tag: "AI Reception & High Street",
+    name: "AI Receptionist OS",
+    domain: "ai-receptionist.aikova.co.uk",
+    status: "LIVE • UK → EU",
+    problem: "SMEs miss calls/DMs after hours — roast rush, café 7am, NHS triage, salon DMs.",
+    solution: "Assess site → 10-min AI receptionist. Voice + WhatsApp + SMS + social. GDPR + Twilio +44.",
+    tech: ["Twilio Voice", "WhatsApp", "SMS", "Stripe SEPA", "Multilingual TTS", "AKC Coins"],
+    outcome: "Live UK High Street twins. 24/7 never miss a call. Europe rollout path.",
+    gradient: "from-[#2962FF] to-[#76FF03]",
+    accent: "#2962FF",
+    glow: "rgba(41,98,255,0.15)",
+    border: "border-[#2962FF]/20",
+  },
 ];
 
 const problemGrid = [
@@ -293,7 +323,7 @@ export default function SolutionsPlaybookApp() {
                   That Can't Fail
                 </h1>
                 <p data-animate className="mt-6 max-w-[620px] text-[18px] md:text-[20px] leading-[1.45] tracking-[-0.015em] text-[#94A3B8]">
-                  We don't sell features. We ship OS that solve <span className="text-white font-[600]">P1 problems</span>. 6 OS built, 23K garages onboarded, £20K MRR per OS.
+                  We don't sell features. We ship OS that solve <span className="text-white font-[600]">P1 problems</span>. 8 OS built, 23K garages onboarded, £20K MRR per OS.
                   <br /><span className="mono text-[12px] tracking-[0.12em] text-[#475569] mt-3 block">// WIRE: Supabase table solutions, evidence_vault, compliance_checks</span>
                 </p>
 
@@ -305,7 +335,7 @@ export default function SolutionsPlaybookApp() {
                 {/* Metrics */}
                 <div data-animate className="mt-12 grid grid-cols-3 max-w-[560px] border border-white/[0.06] rounded-[18px] overflow-hidden">
                   {[
-                    { k:"6 OS", v:"Built & Shipping", sub:"Property → Cultural" },
+                    { k:"8 OS", v:"Built & Shipping", sub:"Property → Reception" },
                     { k:"23K", v:"Garages Onboarded", sub:"DVSA Importer" },
                     { k:"£20K", v:"MRR / OS Target", sub:"£120K Run Rate" },
                   ].map(m=>(
@@ -370,6 +400,8 @@ export default function SolutionsPlaybookApp() {
                     <div className="mt-4 grid grid-cols-2 gap-2">
                       {[
                         { n:"VisaGuide", s:"visaguideos.com", c:"#FFD700" },
+                        { n:"MyFace", s:"myfaceprofile.aikova.co.uk", c:"#8FFF4A" },
+                        { n:"Receptionist", s:"ai-receptionist.aikova.co.uk", c:"#2962FF" },
                         { n:"Vexo Garage", s:"23K Import", c:"#0EA5FF" },
                         { n:"TradeFlow", s:"FLAGSHIP", c:"#FFD700" },
                         { n:"ReelStorm", s:"GPU • UE5.8", c:"#84FF3D" },
@@ -401,7 +433,7 @@ export default function SolutionsPlaybookApp() {
                 {/* floating badge */}
                 <div className="absolute -right-3 -bottom-4 glass rounded-[14px] px-4 py-3 border border-[#FFD700]/20 glow-gold">
                   <div className="mono text-[9px] tracking-[0.14em] text-[#FFD700]">OLDHAM OL8 → GLOBAL</div>
-                  <div className="sora text-[13px] font-[700] mt-1">£120K MRR Run Rate • 6 OS</div>
+                  <div className="sora text-[13px] font-[700] mt-1">£160K MRR Run Rate • 8 OS</div>
                 </div>
               </div>
             </div>
@@ -413,7 +445,7 @@ export default function SolutionsPlaybookApp() {
           <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
             <div>
               <div className="mono text-[11px] tracking-[0.2em] text-[#0EA5FF]">01 • SOLUTIONS BY INDUSTRY</div>
-              <h2 className="sora mt-3 text-[32px] md:text-[44px] font-[700] leading-[0.95] tracking-[-0.03em]">6 OS • Each Solves a P1<br />No Features. Just Outcomes.</h2>
+              <h2 className="sora mt-3 text-[32px] md:text-[44px] font-[700] leading-[0.95] tracking-[-0.03em]">8 OS • Each Solves a P1<br />No Features. Just Outcomes.</h2>
             </div>
             <div className="mono text-[12px] leading-[1.5] text-[#64748B] max-w-[360px]">Every OS ships with DVSA/GOV.UK compliance, Stripe vault, Supabase RLS, and Ultron monitoring. Not MVPs — production OS.</div>
           </div>
@@ -839,7 +871,7 @@ export default function SolutionsPlaybookApp() {
           <div className="mx-auto max-w-[1320px] px-6 md:px-8 h-[64px] flex items-center justify-between mono text-[10px] tracking-[0.14em] text-[#475569]">
             <div className="flex items-center gap-6">
               <span className="flex items-center gap-2"><img src={logoAsset} alt="" className="w-[18px] h-[18px] rounded-[5px]" />AiKOVA • OL8 → GLOBAL</span>
-              <span className="hidden md:inline">6 OS • £20K MRR / OS • £120K RUN RATE</span>
+              <span className="hidden md:inline">8 OS • £20K MRR / OS • £160K RUN RATE</span>
             </div>
             <div className="flex items-center gap-4">
               <span>© 2026 AiKOVA OS</span>
@@ -865,7 +897,7 @@ export default function SolutionsPlaybookApp() {
               </div>
               <div className="mt-4 space-y-2">
                 <div className="rounded-[12px] bg-[#05070D] border border-white/[0.06] p-3 mono text-[11px] leading-[1.5] text-[#CBD5E1]">
-                  Hi, I'm AVA. I match your problem to 6 OS blueprints, estimate cost-to-fix, and assign a Contact OS owner. <span className="text-white">Drop your P1 in the form →</span>
+                  Hi, I'm AVA. I match your problem to 8 OS blueprints, estimate cost-to-fix, and assign a Contact OS owner. <span className="text-white">Drop your P1 in the form →</span>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={()=>{document.getElementById('compliance')?.scrollIntoView({behavior:'smooth'}); setAvaOpen(false)}} className="flex-1 h-[36px] rounded-full glass mono text-[11px] text-[#CBD5E1]">Evidence Vault</button>

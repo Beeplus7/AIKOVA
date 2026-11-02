@@ -7,7 +7,11 @@
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    try {
+      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    } catch (e) {
+      throw mod = 0, e;
+    }
   };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
@@ -315,19 +319,19 @@
   var require_react_production = __commonJS({
     "node_modules/react/cjs/react.production.js"(exports) {
       "use strict";
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
-      var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-      var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-      var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-      var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-      var REACT_CONSUMER_TYPE = Symbol.for("react.consumer");
-      var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-      var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-      var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-      var REACT_MEMO_TYPE = Symbol.for("react.memo");
-      var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-      var REACT_ACTIVITY_TYPE = Symbol.for("react.activity");
-      var REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition");
+      var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element");
+      var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+      var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
+      var REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode");
+      var REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler");
+      var REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer");
+      var REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context");
+      var REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref");
+      var REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense");
+      var REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo");
+      var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+      var REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity");
+      var REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition");
       var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
       function getIteratorFn(maybeIterable) {
         if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
@@ -808,9 +812,9 @@
         p: 0,
         findDOMNode: null
       };
-      var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-      var REACT_RECOVERABLE_TYPE = Symbol.for("react.recoverable");
-      var REACT_OPTIMISTIC_KEY = Symbol.for("react.optimistic_key");
+      var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+      var REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable");
+      var REACT_OPTIMISTIC_KEY = /* @__PURE__ */ Symbol.for("react.optimistic_key");
       function createPortal$1(children, containerInfo, implementation) {
         var key = 3 < arguments.length && void 0 !== arguments[3] ? arguments[3] : null;
         return {
@@ -1182,33 +1186,31 @@
         return null;
       }
       var assign = Object.assign;
-      var REACT_LEGACY_ELEMENT_TYPE = Symbol.for("react.element");
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
-      var REACT_PORTAL_TYPE = Symbol.for("react.portal");
-      var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
-      var REACT_STRICT_MODE_TYPE = Symbol.for("react.strict_mode");
-      var REACT_PROFILER_TYPE = Symbol.for("react.profiler");
-      var REACT_CONSUMER_TYPE = Symbol.for("react.consumer");
-      var REACT_CONTEXT_TYPE = Symbol.for("react.context");
-      var REACT_FORWARD_REF_TYPE = Symbol.for("react.forward_ref");
-      var REACT_SUSPENSE_TYPE = Symbol.for("react.suspense");
-      var REACT_SUSPENSE_LIST_TYPE = Symbol.for("react.suspense_list");
-      var REACT_MEMO_TYPE = Symbol.for("react.memo");
-      var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-      Symbol.for("react.scope");
-      var REACT_ACTIVITY_TYPE = Symbol.for("react.activity");
-      var REACT_LEGACY_HIDDEN_TYPE = Symbol.for("react.legacy_hidden");
-      Symbol.for("react.tracing_marker");
-      var REACT_MEMO_CACHE_SENTINEL = Symbol.for("react.memo_cache_sentinel");
-      var REACT_VIEW_TRANSITION_TYPE = Symbol.for("react.view_transition");
-      var REACT_RECOVERABLE_TYPE = Symbol.for("react.recoverable");
+      var REACT_LEGACY_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.element");
+      var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element");
+      var REACT_PORTAL_TYPE = /* @__PURE__ */ Symbol.for("react.portal");
+      var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
+      var REACT_STRICT_MODE_TYPE = /* @__PURE__ */ Symbol.for("react.strict_mode");
+      var REACT_PROFILER_TYPE = /* @__PURE__ */ Symbol.for("react.profiler");
+      var REACT_CONSUMER_TYPE = /* @__PURE__ */ Symbol.for("react.consumer");
+      var REACT_CONTEXT_TYPE = /* @__PURE__ */ Symbol.for("react.context");
+      var REACT_FORWARD_REF_TYPE = /* @__PURE__ */ Symbol.for("react.forward_ref");
+      var REACT_SUSPENSE_TYPE = /* @__PURE__ */ Symbol.for("react.suspense");
+      var REACT_SUSPENSE_LIST_TYPE = /* @__PURE__ */ Symbol.for("react.suspense_list");
+      var REACT_MEMO_TYPE = /* @__PURE__ */ Symbol.for("react.memo");
+      var REACT_LAZY_TYPE = /* @__PURE__ */ Symbol.for("react.lazy");
+      var REACT_ACTIVITY_TYPE = /* @__PURE__ */ Symbol.for("react.activity");
+      var REACT_LEGACY_HIDDEN_TYPE = /* @__PURE__ */ Symbol.for("react.legacy_hidden");
+      var REACT_MEMO_CACHE_SENTINEL = /* @__PURE__ */ Symbol.for("react.memo_cache_sentinel");
+      var REACT_VIEW_TRANSITION_TYPE = /* @__PURE__ */ Symbol.for("react.view_transition");
+      var REACT_RECOVERABLE_TYPE = /* @__PURE__ */ Symbol.for("react.recoverable");
       var MAYBE_ITERATOR_SYMBOL = Symbol.iterator;
       function getIteratorFn(maybeIterable) {
         if (null === maybeIterable || "object" !== typeof maybeIterable) return null;
         maybeIterable = MAYBE_ITERATOR_SYMBOL && maybeIterable[MAYBE_ITERATOR_SYMBOL] || maybeIterable["@@iterator"];
         return "function" === typeof maybeIterable ? maybeIterable : null;
       }
-      var REACT_CLIENT_REFERENCE = Symbol.for("react.client.reference");
+      var REACT_CLIENT_REFERENCE = /* @__PURE__ */ Symbol.for("react.client.reference");
       function getComponentNameFromType(type) {
         if (null == type) return null;
         if ("function" === typeof type)
@@ -14534,8 +14536,8 @@
   var require_react_jsx_runtime_production = __commonJS({
     "node_modules/react/cjs/react-jsx-runtime.production.js"(exports) {
       "use strict";
-      var REACT_ELEMENT_TYPE = Symbol.for("react.transitional.element");
-      var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
+      var REACT_ELEMENT_TYPE = /* @__PURE__ */ Symbol.for("react.transitional.element");
+      var REACT_FRAGMENT_TYPE = /* @__PURE__ */ Symbol.for("react.fragment");
       function jsxProd(type, config, maybeKey) {
         var key = null;
         void 0 !== maybeKey && (key = "" + maybeKey);
@@ -14670,6 +14672,36 @@
       accent: "#FFD700",
       glow: "rgba(255,215,0,0.12)",
       border: "border-white/10"
+    },
+    {
+      id: "G",
+      tag: "Work Social & Trades",
+      name: "MyFace Profile OS",
+      domain: "myfaceprofile.aikova.co.uk",
+      status: "BETA \u2022 WAITLIST",
+      problem: "Tradespeople invisible online \u2014 CVs don't show live work, trust, or bookings.",
+      solution: "Work Social OS: SHOW \xB7 CONNECT \xB7 GROW with Live Studio, WorkCut, UPRM, escrow, MFC gifts.",
+      tech: ["Vite", "Expo", "Supabase", "Stripe Escrow", "Mux Live", "WorkCut FFmpeg", "Bot Army"],
+      outcome: "Oldham pilot + 2,417 waitlist. TrustScore + Nearby need-matching.",
+      gradient: "from-[#8FFF4A] to-[#00E5C0]",
+      accent: "#8FFF4A",
+      glow: "rgba(143,255,74,0.15)",
+      border: "border-[#8FFF4A]/20"
+    },
+    {
+      id: "H",
+      tag: "AI Reception & High Street",
+      name: "AI Receptionist OS",
+      domain: "ai-receptionist.aikova.co.uk",
+      status: "LIVE \u2022 UK \u2192 EU",
+      problem: "SMEs miss calls/DMs after hours \u2014 roast rush, caf\xE9 7am, NHS triage, salon DMs.",
+      solution: "Assess site \u2192 10-min AI receptionist. Voice + WhatsApp + SMS + social. GDPR + Twilio +44.",
+      tech: ["Twilio Voice", "WhatsApp", "SMS", "Stripe SEPA", "Multilingual TTS", "AKC Coins"],
+      outcome: "Live UK High Street twins. 24/7 never miss a call. Europe rollout path.",
+      gradient: "from-[#2962FF] to-[#76FF03]",
+      accent: "#2962FF",
+      glow: "rgba(41,98,255,0.15)",
+      border: "border-[#2962FF]/20"
     }
   ];
   var problemGrid = [
@@ -14838,7 +14870,7 @@
                     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { "data-animate": true, className: "mt-6 max-w-[620px] text-[18px] md:text-[20px] leading-[1.45] tracking-[-0.015em] text-[#94A3B8]", children: [
                       "We don't sell features. We ship OS that solve ",
                       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "text-white font-[600]", children: "P1 problems" }),
-                      ". 6 OS built, 23K garages onboarded, \xA320K MRR per OS.",
+                      ". 8 OS built, 23K garages onboarded, \xA320K MRR per OS.",
                       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
                       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "mono text-[12px] tracking-[0.12em] text-[#475569] mt-3 block", children: "// WIRE: Supabase table solutions, evidence_vault, compliance_checks" })
                     ] }),
@@ -14850,7 +14882,7 @@
                       ] })
                     ] }),
                     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { "data-animate": true, className: "mt-12 grid grid-cols-3 max-w-[560px] border border-white/[0.06] rounded-[18px] overflow-hidden", children: [
-                      { k: "6 OS", v: "Built & Shipping", sub: "Property \u2192 Cultural" },
+                      { k: "8 OS", v: "Built & Shipping", sub: "Property \u2192 Reception" },
                       { k: "23K", v: "Garages Onboarded", sub: "DVSA Importer" },
                       { k: "\xA320K", v: "MRR / OS Target", sub: "\xA3120K Run Rate" }
                     ].map((m) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "p-5 md:p-6 bg-[rgba(255,255,255,0.02)] border-r last:border-r-0 border-white/[0.06]", children: [
@@ -14895,6 +14927,8 @@
                       ] }),
                       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "mt-4 grid grid-cols-2 gap-2", children: [
                         { n: "VisaGuide", s: "visaguideos.com", c: "#FFD700" },
+                        { n: "MyFace", s: "myfaceprofile.aikova.co.uk", c: "#8FFF4A" },
+                        { n: "Receptionist", s: "ai-receptionist.aikova.co.uk", c: "#2962FF" },
                         { n: "Vexo Garage", s: "23K Import", c: "#0EA5FF" },
                         { n: "TradeFlow", s: "FLAGSHIP", c: "#FFD700" },
                         { n: "ReelStorm", s: "GPU \u2022 UE5.8", c: "#84FF3D" }
@@ -14919,7 +14953,7 @@
                     ] }) }),
                     /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "absolute -right-3 -bottom-4 glass rounded-[14px] px-4 py-3 border border-[#FFD700]/20 glow-gold", children: [
                       /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "mono text-[9px] tracking-[0.14em] text-[#FFD700]", children: "OLDHAM OL8 \u2192 GLOBAL" }),
-                      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "sora text-[13px] font-[700] mt-1", children: "\xA3120K MRR Run Rate \u2022 6 OS" })
+                      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "sora text-[13px] font-[700] mt-1", children: "\xA3160K MRR Run Rate \u2022 8 OS" })
                     ] })
                   ] })
                 ] })
@@ -14930,7 +14964,7 @@
                 /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
                   /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "mono text-[11px] tracking-[0.2em] text-[#0EA5FF]", children: "01 \u2022 SOLUTIONS BY INDUSTRY" }),
                   /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", { className: "sora mt-3 text-[32px] md:text-[44px] font-[700] leading-[0.95] tracking-[-0.03em]", children: [
-                    "6 OS \u2022 Each Solves a P1",
+                    "8 OS \u2022 Each Solves a P1",
                     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {}),
                     "No Features. Just Outcomes."
                   ] })
@@ -15306,7 +15340,7 @@
                   /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", { src: logoAsset, alt: "", className: "w-[18px] h-[18px] rounded-[5px]" }),
                   "AiKOVA \u2022 OL8 \u2192 GLOBAL"
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "hidden md:inline", children: "6 OS \u2022 \xA320K MRR / OS \u2022 \xA3120K RUN RATE" })
+                /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "hidden md:inline", children: "8 OS \u2022 \xA320K MRR / OS \u2022 \xA3160K RUN RATE" })
               ] }),
               /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex items-center gap-4", children: [
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "\xA9 2026 AiKOVA OS" }),
@@ -15331,7 +15365,7 @@
                 ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mt-4 space-y-2", children: [
                   /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "rounded-[12px] bg-[#05070D] border border-white/[0.06] p-3 mono text-[11px] leading-[1.5] text-[#CBD5E1]", children: [
-                    "Hi, I'm AVA. I match your problem to 6 OS blueprints, estimate cost-to-fix, and assign a Contact OS owner. ",
+                    "Hi, I'm AVA. I match your problem to 8 OS blueprints, estimate cost-to-fix, and assign a Contact OS owner. ",
                     /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "text-white", children: "Drop your P1 in the form \u2192" })
                   ] }),
                   /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "flex gap-2", children: [
