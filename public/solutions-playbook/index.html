@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#05070D" />
     <title>AiKOVA — Solutions + Industry Playbook</title>
+    <meta name="description" content="AiKOVA Solutions Playbook — 8 OS blueprints matching P1 problems across property, garage, FinTech, media, logistics, cultural commerce, work social, and AI reception." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://aikova.co.uk/solutions" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       html, body, #root {
@@ -15,11 +18,58 @@
       }
       body { overflow-x: hidden; }
       header { display: none !important; }
+      #aikova-static-solutions {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+        font-family: Inter, system-ui, sans-serif;
+        line-height: 1.55;
+        color: #E6EAF2;
+      }
+      #aikova-static-solutions h1 { font-family: Sora, Inter, system-ui, sans-serif; font-size: 2rem; color: #fff; margin: 0 0 8px; }
+      #aikova-static-solutions h2 { font-size: 1.25rem; margin: 28px 0 8px; color: #0EA5FF; }
+      #aikova-static-solutions a { color: #84FF3D; }
+      #aikova-static-solutions li { color: #8B9BB4; }
+      body.is-app-ready #aikova-static-solutions { display: none !important; }
     </style>
   </head>
   <body>
+    <main id="aikova-static-solutions">
+      <p>AiKOVA · Solutions Playbook · Oldham OL8</p>
+      <h1>8 OS · Each Solves a P1</h1>
+      <p>We don't sell features. We ship OS that solve P1 problems. Full interactive playbook loads with JavaScript; this summary is readable without it.</p>
+      <ul>
+        <li><strong>VisaGuide OS</strong> — property + immigration community OS (visaguideos.com)</li>
+        <li><strong>Vexo Garage OS</strong> — DVSA MOT / garage onboarding OS</li>
+        <li><strong>TradeFlow OS</strong> — Guardian risk FinTech OS (tradeflow.finance)</li>
+        <li><strong>ReelStorm OS</strong> — AI production / UE5.8 media OS (reelstorm.uk)</li>
+        <li><strong>Road Angel OS</strong> — fleet + roadside dispatch OS</li>
+        <li><strong>Arole Adjo OS</strong> — cultural commerce + split pay</li>
+        <li><strong>MyFace Profile OS</strong> — Work Social OS (myfaceprofile.aikova.co.uk)</li>
+        <li><strong>AI Receptionist OS</strong> — UK/EU voice + social receptionist (ai-receptionist.aikova.co.uk)</li>
+      </ul>
+      <h2>Also read</h2>
+      <p><a href="https://aikova.co.uk/llms.txt">llms.txt</a> · <a href="https://aikova.co.uk/aikova-ai-readable.html">AI-readable home</a> · <a href="https://aikova.co.uk/portfolio">Portfolio</a> · <a href="https://aikova.co.uk/contact">Contact</a></p>
+    </main>
     <div id="root"></div>
     <script src="./app.js"></script>
+    <script>
+      (function () {
+        function markReady() {
+          var root = document.getElementById('root');
+          if (root && root.childNodes && root.childNodes.length) {
+            document.body.classList.add('is-app-ready');
+            return true;
+          }
+          return false;
+        }
+        if (!markReady()) {
+          var obs = new MutationObserver(function () { if (markReady()) obs.disconnect(); });
+          obs.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+          setTimeout(function () { document.body.classList.add('is-app-ready'); }, 4000);
+        }
+      })();
+    </script>
 <script>
 (function () {
   var routes = {

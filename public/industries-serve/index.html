@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#05070D" />
     <title>AiKOVA — Industries We Serve</title>
+    <meta name="description" content="AiKOVA industries: property &amp; immigration, garage &amp; automotive, FinTech, media production, logistics, cultural commerce, work social trades, and UK High Street AI reception." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://aikova.co.uk/industries" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       html, body, #root {
@@ -15,11 +18,58 @@
       }
       body { overflow-x: hidden; }
       header { display: none !important; }
+      #aikova-static-industries {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+        font-family: Inter, system-ui, sans-serif;
+        line-height: 1.55;
+        color: #E6EAF2;
+      }
+      #aikova-static-industries h1 { font-family: Sora, Inter, system-ui, sans-serif; font-size: 2rem; color: #fff; margin: 0 0 8px; }
+      #aikova-static-industries h2 { font-size: 1.25rem; margin: 28px 0 8px; color: #0EA5FF; }
+      #aikova-static-industries a { color: #84FF3D; }
+      #aikova-static-industries li { color: #8B9BB4; }
+      body.is-app-ready #aikova-static-industries { display: none !important; }
     </style>
   </head>
   <body>
+    <main id="aikova-static-industries">
+      <p>AiKOVA · Industries We Serve · Oldham OL8 → Global</p>
+      <h1>Industries with shipping OS</h1>
+      <p>Interactive industry map loads with JavaScript. This crawler-readable summary does not require it.</p>
+      <ul>
+        <li>Property &amp; Immigration — VisaGuide OS</li>
+        <li>Garage &amp; Automotive — Vexo Garage OS</li>
+        <li>FinTech &amp; Trading — TradeFlow OS</li>
+        <li>Media &amp; Production — ReelStorm OS</li>
+        <li>Logistics &amp; Roadside — Road Angel OS</li>
+        <li>Cultural Commerce — Arole Adjo OS</li>
+        <li>Work Social &amp; Trades — MyFace Profile OS</li>
+        <li>AI Reception &amp; High Street — AI Receptionist OS</li>
+      </ul>
+      <h2>Also read</h2>
+      <p><a href="https://aikova.co.uk/llms.txt">llms.txt</a> · <a href="https://aikova.co.uk/aikova-ai-readable.html">AI-readable home</a> · <a href="https://aikova.co.uk/portfolio">Portfolio</a></p>
+    </main>
     <div id="root"></div>
     <script src="./app.js"></script>
+    <script>
+      (function () {
+        function markReady() {
+          var root = document.getElementById('root');
+          if (root && root.childNodes && root.childNodes.length) {
+            document.body.classList.add('is-app-ready');
+            return true;
+          }
+          return false;
+        }
+        if (!markReady()) {
+          var obs = new MutationObserver(function () { if (markReady()) obs.disconnect(); });
+          obs.observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
+          setTimeout(function () { document.body.classList.add('is-app-ready'); }, 4000);
+        }
+      })();
+    </script>
 <script>
 (function () {
   var routes = {

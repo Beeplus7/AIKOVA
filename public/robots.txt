@@ -1,16 +1,77 @@
+# AiKOVA — open to search engines and AI platforms
 User-agent: *
 Allow: /
+Disallow: /os/crm
+Disallow: /actions
+Disallow: /api/
+Disallow: /auth/
 
+# OpenAI
 User-agent: GPTBot
 Allow: /
-
 User-agent: ChatGPT-User
 Allow: /
-
-User-agent: ClaudeBot
+User-agent: OAI-SearchBot
 Allow: /
 
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
 User-agent: anthropic-ai
+Allow: /
+User-agent: Claude-Web
+Allow: /
+
+# Google AI / Search
+User-agent: Googlebot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: GoogleOther
+Allow: /
+
+# Microsoft
+User-agent: bingbot
+Allow: /
+User-agent: BingPreview
+Allow: /
+
+# Others commonly used by AI products / indexes
+User-agent: PerplexityBot
+Allow: /
+User-agent: Bytespider
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: Diffbot
+Allow: /
+User-agent: Applebot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+User-agent: Amazonbot
+Allow: /
+User-agent: DuckAssistBot
+Allow: /
+User-agent: meta-externalagent
+Allow: /
+User-agent: FacebookExternalHit
+Allow: /
+User-agent: LinkedInBot
+Allow: /
+User-agent: Slackbot
+Allow: /
+User-agent: Twitterbot
+Allow: /
+User-agent: Discordbot
+Allow: /
+User-agent: cohere-ai
+Allow: /
+User-agent: YouBot
 Allow: /
 
 Sitemap: https://aikova.co.uk/sitemap.xml
+# Machine-readable company summary for LLMs
+# https://aikova.co.uk/llms.txt
+# No-JS HTML mirror
+# https://aikova.co.uk/aikova-ai-readable.html

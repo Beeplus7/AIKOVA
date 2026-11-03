@@ -37,6 +37,13 @@ cp -f public/portfolio-os/app.js public/portfolio-os/index.html dist/portfolio-o
 cp -f public/solutions-playbook/app.js dist/solutions-playbook/ 2>/dev/null || true
 [[ -f public/solutions-playbook/index.html ]] && cp -f public/solutions-playbook/index.html dist/solutions-playbook/ || true
 
+# Ensure AI-readable surfaces always ship even if expo export omits them
+cp -f public/llms.txt public/robots.txt public/sitemap.xml dist/ 2>/dev/null || true
+cp -f public/aikova-ai-readable.html public/aikova-static-services.html public/aikova-static-contact.html dist/ 2>/dev/null || true
+cp -f public/solutions-playbook/index.html dist/solutions-playbook/ 2>/dev/null || true
+cp -f public/industries-serve/index.html dist/industries-serve/ 2>/dev/null || true
+python3 "$ROOT/scripts/inject-ai-readable-index.py" "$ROOT/dist/index.html"
+
 echo "==> Syncing to ${USER}@${HOST}:${REMOTE}"
 "${SSH[@]}" "${USER}@${HOST}" "mkdir -p '${REMOTE}/web' '${REMOTE}/server' '${REMOTE}/shared'"
 
@@ -51,8 +58,13 @@ rsync -az -e "$RSYNC_SSH" \
 # Env for API only (never publish service role to web)
 "${SCP[@]}" "$ROOT/.env" "${USER}@${HOST}:${REMOTE}/server/.env"
 
+# Install / reload nginx site config so bot → AI-readable HTML stays in sync
+"${SCP[@]}" "$ROOT/deploy/nginx-aikova.conf" "${USER}@${HOST}:/etc/nginx/sites-available/aikova"
 "${SSH[@]}" "${USER}@${HOST}" bash -s <<EOF
 set -euo pipefail
+ln -sfn /etc/nginx/sites-available/aikova /etc/nginx/sites-enabled/aikova
+nginx -t
+systemctl reload nginx
 cd ${REMOTE}/server
 npm install --omit=dev
 pm2 delete aikova-crm-api >/dev/null 2>&1 || true
@@ -60,4 +72,4 @@ CRM_ALLOW_ANON=0 pm2 start index.js --name aikova-crm-api --cwd ${REMOTE}/server
 pm2 save
 EOF
 
-echo "==> Deployed. Configure nginx + certbot if needed."
+echo "==> Deployed (web + nginx AI-readable routes + CRM API)."

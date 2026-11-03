@@ -15,11 +15,13 @@ export default function Root({ children }: PropsWithChildren) {
         <title>AiKOVA — Engineered Intelligence. Delivered.</title>
         <meta
           name="description"
-          content="AiKOVA is a boutique digital engineering consultancy building industrial-grade Cloud, Payments, AI, and Industrial OS. Oldham OL8 → Global. Portfolio: VisaGuide, ReelStorm, Vexo, TradeFlow, Arole Adjo, Road Angel."
+          content="AiKOVA is a boutique digital engineering consultancy building industrial-grade Cloud, Payments, AI, and Industrial OS. Oldham OL8 → Global. Portfolio: VisaGuide, ReelStorm, Vexo, TradeFlow, Arole Adjo, Road Angel, MyFace Profile, AI Receptionist."
         />
         <meta name="robots" content="index,follow,max-image-preview:large" />
         <meta name="theme-color" content="#05070D" />
         <link rel="canonical" href="https://aikova.co.uk/" />
+        <link rel="alternate" type="text/plain" href="https://aikova.co.uk/llms.txt" title="llms.txt" />
+        <link rel="alternate" href="https://aikova.co.uk/aikova-ai-readable.html" title="AI-readable HTML" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="AiKOVA" />
         <meta property="og:title" content="AiKOVA — Engineered Intelligence. Delivered." />
