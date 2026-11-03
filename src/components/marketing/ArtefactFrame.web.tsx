@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { marketingRoutes } from '../../navigation/routes';
 import { colors, fonts } from '../../theme/colors';
+import { MCLBotWidget } from '../../marketing/MCLBotWidget.web';
 
 const BAR_HEIGHT = 56;
 
@@ -70,6 +71,9 @@ export function ArtefactFrame({
       <View style={styles.frame}>
         <iframe title={title} src={src} style={iframeStyle} allow="fullscreen" />
       </View>
+
+      {/* MCL Marketing Capture Lead bot — floats above marketing artefacts */}
+      <MCLBotWidget />
     </View>
   );
 }

@@ -79,6 +79,12 @@ type Lead = {
   aiIcebreaker: string;
   status: "New" | "Contacted" | "Qualified";
   source: string;
+  /** MCL Bot / inbound marketing fields */
+  email?: string;
+  contactName?: string;
+  interest?: string;
+  urgency?: string;
+  source_page?: string;
 };
 
 type Engagement = {
@@ -260,17 +266,22 @@ async function apiDelete(collection: string, id: string) {
 function normalizeLead(value: Partial<Lead> | null | undefined): Lead {
   const v = value || {};
   return {
-    companyName: v.companyName || "Untitled garage",
+    companyName: v.companyName || v.contactName || "Untitled lead",
     address: v.address || "",
     postcode: v.postcode || "",
     postcodeArea: v.postcodeArea || (v.postcode || "").slice(0, 2).toUpperCase() || "OL",
-    phone: v.phone || "",
-    motClasses: v.motClasses || "Class 4",
+    phone: v.phone || v.email || "",
+    motClasses: v.motClasses || v.interest || "Class 4",
     companiesHouseStatus: v.companiesHouseStatus || "Active",
     score: typeof v.score === "number" ? v.score : 50,
-    aiIcebreaker: v.aiIcebreaker || `Hi ${v.companyName || "there"} — quick question about MOT bookings?`,
+    aiIcebreaker: v.aiIcebreaker || `Hi ${v.companyName || v.contactName || "there"} — quick question about MOT bookings?`,
     status: v.status || "New",
     source: v.source || "Manual",
+    email: v.email || "",
+    contactName: v.contactName || "",
+    interest: v.interest || "",
+    urgency: v.urgency || "",
+    source_page: v.source_page || "",
   };
 }
 

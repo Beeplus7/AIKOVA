@@ -228,6 +228,166 @@ app.post('/auth/admins', requireAdmin, async (req, res) => {
 app.post('/actions', requireUser, handleActions);
 app.post('/api/actions', requireUser, handleActions);
 
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const MCL_INTERESTS = new Set([
+  'cloud',
+  'payments',
+  'industrial',
+  'ai-production',
+  'receptionist',
+  'myface',
+  'fintech',
+  'other',
+]);
+const MCL_URGENCY = new Set(['p1', 'p2', 'explore']);
+const mclRate = new Map(); // ip -> { count, resetAt }
+
+function mclClientIp(req) {
+  const xf = String(req.headers['x-forwarded-for'] || '')
+    .split(',')[0]
+    .trim();
+  return xf || req.socket?.remoteAddress || 'unknown';
+}
+
+function mclRateLimit(ip) {
+  const now = Date.now();
+  const row = mclRate.get(ip);
+  if (!row || row.resetAt < now) {
+    mclRate.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 });
+    return true;
+  }
+  if (row.count >= 12) return false;
+  row.count += 1;
+  return true;
+}
+
+async function sendMclEmails({ name, email, interest, urgency, sourcePage, leadId }) {
+  const key = process.env.RESEND_API_KEY || '';
+  if (!key) return { skipped: true };
+  const from = process.env.FROM_EMAIL || 'AiKOVA <hello@aikova.co.uk>';
+  const notifyTo = process.env.MCL_NOTIFY_EMAIL || 'hello@aikova.co.uk';
+  const first = (name.split(/\s+/)[0] || 'there');
+  const interestLabel = interest || 'general enquiry';
+  const confirmHtml = `<p>Hi ${first},</p><p>Thanks for reaching out to AiKOVA about <strong>${interestLabel}</strong>. A senior engineer will follow up shortly.</p><p>Meanwhile: <a href="https://aikova.co.uk/portfolio">Portfolio OS</a> · <a href="https://aikova.co.uk/llms.txt">llms.txt</a></p><p>— AiKOVA Engineering Vault · Oldham OL8</p>`;
+  const notifyHtml = `<p>New MCL Bot lead</p><ul><li>Name: ${name}</li><li>Email: ${email}</li><li>Interest: ${interestLabel}</li><li>Urgency: ${urgency || 'n/a'}</li><li>Page: ${sourcePage || '/'}</li><li>ID: ${leadId}</li></ul>`;
+
+  async function send(to, subject, html) {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from, to: [to], subject, html }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`resend ${res.status}: ${text}`);
+    }
+  }
+
+  await send(email, 'We got your details — AiKOVA', confirmHtml);
+  try {
+    await send(notifyTo, `MCL lead: ${name} · ${interestLabel}`, notifyHtml);
+  } catch (err) {
+    console.error('[mcl-capture-lead] notify email failed', err.message || err);
+  }
+  return { skipped: false };
+}
+
+/** Public Marketing Capture Lead endpoint (no auth). Honeypot + light rate limit. */
+app.post('/api/mcl-capture-lead', async (req, res) => {
+  try {
+    const ip = mclClientIp(req);
+    if (!mclRateLimit(ip)) {
+      return res.status(429).json({ success: false, error: 'Too many requests. Try again later.' });
+    }
+
+    const body = req.body || {};
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+    const company = typeof body.company === 'string' ? body.company.trim().slice(0, 200) : '';
+    const interestRaw = typeof body.interest === 'string' ? body.interest.trim() : '';
+    const interest = MCL_INTERESTS.has(interestRaw) ? interestRaw : 'other';
+    const urgencyRaw = typeof body.urgency === 'string' ? body.urgency.trim() : '';
+    const urgency = MCL_URGENCY.has(urgencyRaw) ? urgencyRaw : 'explore';
+    const sourcePage =
+      typeof body.source_page === 'string' ? body.source_page.trim().slice(0, 300) : '/';
+    const honeypot = typeof body.website === 'string' ? body.website.trim() : '';
+
+    if (!name || name.length > 200) {
+      return res.status(400).json({ success: false, error: 'Please enter your name.' });
+    }
+    if (!email || !EMAIL_RE.test(email) || email.length > 320) {
+      return res
+        .status(400)
+        .json({ success: false, error: 'Please enter a valid email address.' });
+    }
+
+    if (honeypot) {
+      console.log(`[mcl-capture-lead] honeypot drop email=${email}`);
+      return res.json({ success: true });
+    }
+
+    const interestLabels = {
+      cloud: 'Cloud OS',
+      payments: 'Payment OS',
+      industrial: 'Industrial / Garage OS',
+      'ai-production': 'AI Production (ReelStorm)',
+      receptionist: 'AI Receptionist',
+      myface: 'MyFace Profile',
+      fintech: 'TradeFlow FinTech',
+      other: 'Other / not sure',
+    };
+
+    const leadValue = {
+      companyName: company || name,
+      contactName: name,
+      email,
+      address: company ? `${company}` : '',
+      postcode: '',
+      postcodeArea: 'MCL',
+      phone: '',
+      motClasses: interestLabels[interest] || interest,
+      companiesHouseStatus: 'Active',
+      score: urgency === 'p1' ? 92 : urgency === 'p2' ? 78 : 65,
+      aiIcebreaker: `MCL Bot · ${name} interested in ${interestLabels[interest] || interest} (${urgency}). Reply to ${email}.`,
+      status: 'New',
+      source: 'MCL Bot',
+      interest,
+      urgency,
+      source_page: sourcePage,
+      capturedAt: new Date().toISOString(),
+    };
+
+    const record = createRecord(
+      'leads',
+      leadValue,
+      `mcl:${email}:${interest}:${sourcePage}`.slice(0, 180),
+    );
+
+    try {
+      await sendMclEmails({
+        name,
+        email,
+        interest: interestLabels[interest] || interest,
+        urgency,
+        sourcePage,
+        leadId: record.id,
+      });
+    } catch (emailErr) {
+      console.error('[mcl-capture-lead] email failed', emailErr.message || emailErr);
+    }
+
+    return res.json({ success: true, id: record.id });
+  } catch (err) {
+    console.error('[mcl-capture-lead]', err);
+    return res
+      .status(500)
+      .json({ success: false, error: err.message || 'Could not save your details.' });
+  }
+});
+
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`AiKOVA CRM API on 127.0.0.1:${PORT}`);
 });

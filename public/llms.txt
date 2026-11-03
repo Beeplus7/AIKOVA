@@ -39,6 +39,12 @@ dedicated senior teams.
 ## Compliance posture
 ISO 27001 patterns · PCI DSS · Cyber Essentials Ready · GDPR · GOV.UK Service Standard aligned · DOS7 evidence vault.
 
+## MCL Marketing Capture Lead bot
+Floating rule-based lead bot on marketing pages (not a live LLM chat).
+Public API: POST https://aikova.co.uk/api/mcl-capture-lead
+Fields: name, email, company?, interest, urgency, source_page (honeypot: website).
+Leads land in Admin CRM collection `leads` with source `MCL Bot`.
+
 ## LinkedIn / social link previews
 Open Graph image (1200×627): https://aikova.co.uk/aikova-og-linkedin.jpg
 Canonical home: https://aikova.co.uk/
