@@ -22,21 +22,31 @@ export default function Root({ children }: PropsWithChildren) {
         <link rel="canonical" href="https://aikova.co.uk/" />
         <link rel="alternate" type="text/plain" href="https://aikova.co.uk/llms.txt" title="llms.txt" />
         <link rel="alternate" href="https://aikova.co.uk/aikova-ai-readable.html" title="AI-readable HTML" />
+        <meta property="og:locale" content="en_GB" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="AiKOVA" />
         <meta property="og:title" content="AiKOVA — Engineered Intelligence. Delivered." />
         <meta
           property="og:description"
-          content="Industrial-grade OS engineering: cloud, payments, AI production, garage/MOT, FinTech, and logistics. Portfolio and portal live at aikova.co.uk."
+          content="Boutique digital engineering. Industrial Cloud, Payments, AI & Industrial OS from Oldham OL8 → Global. Eight shipping OS including MyFace Profile and AI Receptionist."
         />
         <meta property="og:url" content="https://aikova.co.uk/" />
-        <meta property="og:image" content="https://aikova.co.uk/aikova-portfolio-logo.png" />
+        <meta property="og:image" content="https://aikova.co.uk/aikova-og-linkedin.jpg" />
+        <meta property="og:image:secure_url" content="https://aikova.co.uk/aikova-og-linkedin.jpg" />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="627" />
+        <meta
+          property="og:image:alt"
+          content="AiKOVA — Engineered Intelligence. Delivered. Oldham OL8 to Global."
+        />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="AiKOVA — Engineered Intelligence. Delivered." />
         <meta
           name="twitter:description"
           content="Boutique senior engineering. Industrial OS. ISO 27001 · PCI DSS · DOS7-ready patterns."
         />
+        <meta name="twitter:image" content="https://aikova.co.uk/aikova-og-linkedin.jpg" />
         <ScrollViewStyleReset />
         <script src="https://cdn.tailwindcss.com"></script>
         <style dangerouslySetInnerHTML={{ __html: responsiveRoot }} />

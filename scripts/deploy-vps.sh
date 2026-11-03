@@ -39,7 +39,7 @@ cp -f public/solutions-playbook/app.js dist/solutions-playbook/ 2>/dev/null || t
 
 # Ensure AI-readable surfaces always ship even if expo export omits them
 cp -f public/llms.txt public/robots.txt public/sitemap.xml dist/ 2>/dev/null || true
-cp -f public/aikova-ai-readable.html public/aikova-static-services.html public/aikova-static-contact.html dist/ 2>/dev/null || true
+cp -f public/aikova-ai-readable.html public/aikova-static-services.html public/aikova-static-contact.html public/aikova-og-linkedin.jpg dist/ 2>/dev/null || true
 cp -f public/solutions-playbook/index.html dist/solutions-playbook/ 2>/dev/null || true
 cp -f public/industries-serve/index.html dist/industries-serve/ 2>/dev/null || true
 python3 "$ROOT/scripts/inject-ai-readable-index.py" "$ROOT/dist/index.html"
