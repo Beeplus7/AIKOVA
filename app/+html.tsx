@@ -52,63 +52,7 @@ export default function Root({ children }: PropsWithChildren) {
         <style dangerouslySetInnerHTML={{ __html: responsiveRoot }} />
       </head>
       <body>
-        {/* Always in HTML for crawlers/LLMs that skip noscript and do not run JS */}
-        <div
-          id="aikova-crawler-content"
-          style={{
-            position: 'absolute',
-            width: 1,
-            height: 1,
-            padding: 0,
-            margin: -1,
-            overflow: 'hidden',
-            clip: 'rect(0, 0, 0, 0)',
-            whiteSpace: 'nowrap',
-            border: 0,
-          }}
-        >
-          <h1>AiKOVA — Engineered Intelligence. Delivered.</h1>
-          <p>
-            Boutique digital engineering consultancy. Industrial-grade Cloud, Payments, AI and
-            Industrial OS from Oldham OL8 to global edge.
-          </p>
-          <h2>Portfolio OS</h2>
-          <ul>
-            <li>VisaGuide OS — visaguideos.com</li>
-            <li>ReelStorm OS — reelstorm.uk</li>
-            <li>Vexo Garage OS — DVSA MOT + garage management</li>
-            <li>TradeFlow OS — tradeflow.finance</li>
-            <li>Arole Adjo OS — aroleadjo.com</li>
-            <li>Road Angel OS — logistics + fleet</li>
-            <li>MyFace Profile OS — myfaceprofile.aikova.co.uk</li>
-            <li>AI Receptionist OS — ai-receptionist.aikova.co.uk</li>
-          </ul>
-          <p>
-            Pages: <a href="https://aikova.co.uk/portfolio">Portfolio</a>,{' '}
-            <a href="https://aikova.co.uk/services">Services</a>,{' '}
-            <a href="https://aikova.co.uk/solutions">Solutions</a>,{' '}
-            <a href="https://aikova.co.uk/industries">Industries</a>,{' '}
-            <a href="https://aikova.co.uk/contact">Contact</a>,{' '}
-            <a href="https://aikova.co.uk/os/portal">Portal</a>.
-          </p>
-        </div>
-        <noscript>
-          <main style={{ maxWidth: 720, margin: '40px auto', padding: 24, fontFamily: 'system-ui', color: '#E6EAF2', background: '#05070D' }}>
-            <h1>AiKOVA — Engineered Intelligence. Delivered.</h1>
-            <p>
-              Boutique software engineering consultancy building Cloud, Payments &amp; Industrial OS.
-              Open these pages directly:
-            </p>
-            <ul>
-              <li><a href="/portfolio" style={{ color: '#84FF3D' }}>Portfolio OS</a></li>
-              <li><a href="/services" style={{ color: '#84FF3D' }}>Services</a></li>
-              <li><a href="/solutions" style={{ color: '#84FF3D' }}>Solutions</a></li>
-              <li><a href="/industries" style={{ color: '#84FF3D' }}>Industries</a></li>
-              <li><a href="/contact" style={{ color: '#84FF3D' }}>Contact</a></li>
-              <li><a href="/os/portal" style={{ color: '#84FF3D' }}>Client / Admin Portal</a></li>
-            </ul>
-          </main>
-        </noscript>
+        {/* AI readability is via /llms.txt + nginx bot → /aikova-ai-readable.html — no visible page text. */}
         {children}
       </body>
     </html>
