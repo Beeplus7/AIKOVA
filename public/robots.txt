@@ -53,7 +53,16 @@ User-agent: Amazonbot
 Allow: /
 User-agent: DuckAssistBot
 Allow: /
+# Meta AI / Facebook (training, user fetch, previews, indexer)
 User-agent: meta-externalagent
+Allow: /
+User-agent: meta-externalfetcher
+Allow: /
+User-agent: Meta-WebIndexer
+Allow: /
+User-agent: FacebookBot
+Allow: /
+User-agent: Facebot
 Allow: /
 User-agent: FacebookExternalHit
 Allow: /
