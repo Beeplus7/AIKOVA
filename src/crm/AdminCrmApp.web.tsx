@@ -3,6 +3,7 @@ import logoAsset from "./assets/75dfc9f884f0c38d-99630AD0-413D-439B-8A63-79E5B44
 import { crmAction } from "../lib/crmApi";
 import { useAuth } from "../lib/auth/AuthProvider";
 import UserDashboardApp from "./UserDashboardApp.web";
+import ProjectReadinessDrawer from "./ProjectReadinessDrawer.web";
 
 /** Expo web often exports images as `{ uri }`, not a string — `<img src={object}>` whitescreens. */
 const logoUrl =
@@ -423,6 +424,7 @@ export default function App({
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [ticketReply, setTicketReply] = useState("");
   const [ticketReplyBusy, setTicketReplyBusy] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<(typeof PROJECTS)[number] | null>(null);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [chatDraft, setChatDraft] = useState("");
   const [chatBusy, setChatBusy] = useState(false);
@@ -2159,11 +2161,16 @@ export default function App({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="sora text-[16px] font-semibold">Projects • 8 OS</h3>
-                  <span className="text-[11px] text-zinc-500">Guardian 8/15/25% • £49+10% model</span>
+                  <span className="text-[11px] text-zinc-500">Click a card → Project readiness pop-out</span>
                 </div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {PROJECTS.map((p) => (
-                    <div key={p.name} className="group glass rounded-[16px] p-5 transition hover:border-white/15">
+                    <button
+                      key={p.name}
+                      type="button"
+                      onClick={() => setSelectedProject(p)}
+                      className="group glass rounded-[16px] p-5 text-left transition hover:border-[#0EA5FF]/40"
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: `${p.color}18` }}><FolderGit2 className="h-5 w-5" style={{ color: p.color }} /></div>
                         <span className="rounded-full bg-white/[0.06] px-2.5 py-1 text-[10px]">{p.mrr}</span>
@@ -2176,9 +2183,11 @@ export default function App({
                       </div>
                       <div className="mt-4 flex items-center justify-between text-[11px]">
                         <span className="text-zinc-500">{p.tickets} tickets linked</span>
-                        <span className="flex items-center gap-1 font-medium" style={{ color: p.color }}>{p.billing}<ArrowUpRight className="h-3 w-3" /></span>
+                        <span className="flex items-center gap-1 font-medium" style={{ color: p.color }}>
+                          Readiness <ArrowUpRight className="h-3 w-3" />
+                        </span>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -2518,6 +2527,19 @@ export default function App({
           </div>
         </div>
       )}
+
+      {selectedProject ? (
+        <ProjectReadinessDrawer
+          projectName={selectedProject.name}
+          progress={selectedProject.progress}
+          color={selectedProject.color}
+          desc={selectedProject.desc}
+          mrr={selectedProject.mrr}
+          billing={selectedProject.billing}
+          tickets={selectedProject.tickets}
+          onClose={() => setSelectedProject(null)}
+        />
+      ) : null}
 
       {/* Lead detail drawer */}
       {selectedLead ? (

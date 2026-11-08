@@ -139,6 +139,28 @@ app.get('/health', (_req, res) => {
   });
 });
 
+/** Proxy live AI Receptionist readiness (avoids browser CORS from Admin CRM). */
+app.get('/api/receptionist-readiness', async (_req, res) => {
+  try {
+    const upstream =
+      process.env.RECEPTIONIST_READINESS_URL ||
+      'https://ai-receptionist.aikova.co.uk/api/readiness';
+    const r = await fetch(upstream, { headers: { Accept: 'application/json' } });
+    const text = await r.text();
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      return res.status(502).json({ hint: 'Upstream readiness returned non-JSON' });
+    }
+    return res.status(r.ok ? 200 : r.status).json(json);
+  } catch (err) {
+    return res.status(502).json({
+      hint: err?.message || 'Could not reach receptionist readiness',
+    });
+  }
+});
+
 app.post('/auth/google', async (req, res) => {
   try {
     const idToken = req.body?.id_token || req.body?.credential;
