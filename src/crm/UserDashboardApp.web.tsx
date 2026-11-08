@@ -28,6 +28,13 @@ type Project = {
   scope: string;
 };
 
+type TicketMsg = {
+  from: 'client' | 'captain' | 'system';
+  text: string;
+  time: string;
+  msgId?: string;
+};
+
 type Ticket = {
   id: string;
   title: string;
@@ -37,6 +44,12 @@ type Ticket = {
   assignee: string;
   due: string;
   description: string;
+  accepted?: boolean;
+  acceptedAt?: string;
+  eta?: string;
+  progress?: number;
+  slaHours?: number;
+  messages?: TicketMsg[];
 };
 
 type ProjectRequest = {
@@ -104,10 +117,63 @@ const MOCK_PROJECTS: Project[] = [
   }
 ];
 
+function etaForPriority(p: Ticket['priority']): { eta: string; slaHours: number } {
+  if (p === 'P1') return { eta: 'Within 4 hours (P1 SLA)', slaHours: 4 };
+  if (p === 'P2') return { eta: 'Within 1 business day', slaHours: 24 };
+  return { eta: 'Within 3 business days', slaHours: 72 };
+}
+
 const MOCK_TICKETS: Ticket[] = [
-  { id: 'VEXO-014', title: 'Fix DVSA CSV import timeout on 10k+ rows', project: 'Vexo Garage OS', priority: 'P1', status: 'Review', assignee: 'Captain', due: 'Today', description: 'Timeout occurs when importing full Oldham dataset. Needs chunked processing + retry.' },
-  { id: 'VEXO-015', title: 'WhatsApp MOT reminder template approval', project: 'Vexo Garage OS', priority: 'P2', status: 'In Progress', assignee: 'Captain', due: 'Tomorrow', description: 'Meta approval pending for 3 reminder templates.' },
-  { id: 'VEXO-016', title: 'Stripe webhook for Phase 2 invoice', project: 'Vexo Garage OS', priority: 'P2', status: 'To Do', assignee: 'Senior Dev — Platform', due: 'Mar 02', description: 'Handle invoice.paid for AK-2026-014' },
+  {
+    id: 'VEXO-014',
+    title: 'Fix DVSA CSV import timeout on 10k+ rows',
+    project: 'Vexo Garage OS',
+    priority: 'P1',
+    status: 'Review',
+    assignee: 'Captain',
+    due: 'Today',
+    description: 'Timeout occurs when importing full Oldham dataset. Needs chunked processing + retry.',
+    accepted: true,
+    acceptedAt: new Date().toISOString(),
+    progress: 85,
+    ...etaForPriority('P1'),
+    messages: [
+      { from: 'system', text: 'Ticket received. Professional SLA 4hr.', time: '08:10', msgId: 'm1' },
+      { from: 'captain', text: 'Accepted — chunked processor is in review. Staging link shortly.', time: '08:40', msgId: 'm2' },
+    ],
+  },
+  {
+    id: 'VEXO-015',
+    title: 'WhatsApp MOT reminder template approval',
+    project: 'Vexo Garage OS',
+    priority: 'P2',
+    status: 'In Progress',
+    assignee: 'Captain',
+    due: 'Tomorrow',
+    description: 'Meta approval pending for 3 reminder templates.',
+    accepted: true,
+    progress: 45,
+    ...etaForPriority('P2'),
+    messages: [
+      { from: 'system', text: 'Ticket accepted. Work window: 1 business day.', time: '09:00', msgId: 'm3' },
+    ],
+  },
+  {
+    id: 'VEXO-016',
+    title: 'Stripe webhook for Phase 2 invoice',
+    project: 'Vexo Garage OS',
+    priority: 'P2',
+    status: 'To Do',
+    assignee: 'Senior Dev — Platform',
+    due: 'Mar 02',
+    description: 'Handle invoice.paid for AK-2026-014',
+    accepted: false,
+    progress: 0,
+    ...etaForPriority('P2'),
+    messages: [
+      { from: 'system', text: 'Ticket received. Awaiting Captain accept.', time: '10:02', msgId: 'm4' },
+    ],
+  },
 ];
 
 const MOCK_INVOICES = [
@@ -137,25 +203,77 @@ function priorityToAdmin(p: 'P1' | 'P2' | 'P3'): 'Critical' | 'High' | 'Medium' 
   return 'Medium';
 }
 
+function mergeTicketsWithAdmin(userRows: Ticket[], adminRows: any[]): Ticket[] {
+  const byId = new Map(
+    (adminRows || []).map((r: any) => [String(r.value?.ticketId || ''), r.value || {}]),
+  );
+  return userRows.map((t) => {
+    const a = byId.get(String(t.id));
+    if (!a) return t;
+    const adminMsgs: TicketMsg[] = Array.isArray(a.messages) ? a.messages : [];
+    const localMsgs = t.messages || [];
+    const seen = new Set(localMsgs.map((m) => m.msgId || `${m.from}:${m.time}:${m.text}`));
+    const merged = [...localMsgs];
+    for (const m of adminMsgs) {
+      const key = m.msgId || `${m.from}:${m.time}:${m.text}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        merged.push(m);
+      }
+    }
+    return {
+      ...t,
+      status: (a.column as Ticket['status']) || t.status,
+      assignee: a.assignee || t.assignee,
+      accepted: a.accepted != null ? Boolean(a.accepted) : t.accepted,
+      acceptedAt: a.acceptedAt || t.acceptedAt,
+      eta: a.eta || t.eta,
+      progress: typeof a.progress === 'number' ? a.progress : t.progress ?? 0,
+      slaHours: a.slaHours || t.slaHours,
+      messages: merged,
+      description: a.description || t.description,
+    };
+  });
+}
+
 /** Mirror user actions into Admin CRM collections so Captain sees them. */
 async function mirrorToAdmin(kind: 'ticket' | 'chat' | 'request', value: any, clientLabel: string) {
   try {
     if (kind === 'ticket') {
-      await crmAction('records.create', {
-        collection: 'tickets',
-        value: {
-          ticketId: value.id,
-          title: value.title,
-          project: value.project,
-          priority: priorityToAdmin(value.priority),
-          assignee: value.assignee || 'Captain',
-          due: value.due || '',
-          column: value.status || 'To Do',
-          client: clientLabel,
-          description: value.description || '',
-        },
-        idempotency_key: `admin-mirror-ticket-${value.id}`,
-      });
+      const payload = {
+        ticketId: value.id,
+        title: value.title,
+        project: value.project,
+        priority: priorityToAdmin(value.priority),
+        assignee: value.assignee || 'Captain',
+        due: value.due || '',
+        column: value.status || 'To Do',
+        client: clientLabel,
+        description: value.description || '',
+        accepted: Boolean(value.accepted),
+        acceptedAt: value.acceptedAt || '',
+        eta: value.eta || '',
+        progress: value.progress ?? 0,
+        slaHours: value.slaHours,
+        messages: value.messages || [],
+      };
+      const listed = await api('records.list', { collection: 'tickets', limit: 200 });
+      const existing = (listed.records || []).find(
+        (r: any) => String(r.value?.ticketId || '') === String(value.id),
+      );
+      if (existing) {
+        await crmAction('records.replace', {
+          collection: 'tickets',
+          id: existing.id,
+          value: { ...(existing.value || {}), ...payload },
+        });
+      } else {
+        await crmAction('records.create', {
+          collection: 'tickets',
+          value: payload,
+          idempotency_key: `admin-mirror-ticket-${value.id}`,
+        });
+      }
     }
     if (kind === 'request') {
       await crmAction('records.create', {
@@ -314,9 +432,13 @@ export default function UserDashboardApp() {
   const [showProjectDetail, setShowProjectDetail] = useState(false);
   const [ticketView, setTicketView] = useState<'table'|'kanban'>('kanban');
   const [newTicketOpen, setNewTicketOpen] = useState(false);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [ticketMsg, setTicketMsg] = useState('');
+  const [ticketMsgBusy, setTicketMsgBusy] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [busy, setBusy] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const ticketThreadRef = useRef<HTMLDivElement>(null);
 
   // Request form state
   const [reqForm, setReqForm] = useState({
@@ -344,9 +466,18 @@ export default function UserDashboardApp() {
           api('records.list', { collection: 'user_chats' }),
         ]);
         if (p.records?.length) setProjects(p.records.map((x:any)=>x.value));
-        if (t.records?.length) setTickets(t.records.map((x:any)=>x.value));
         if (r.records?.length) setRequests(r.records.map((x:any)=>x.value));
         if (c.records?.length) setChats(c.records.map((x:any)=>x.value));
+        try {
+          const adminT = await api('records.list', { collection: 'tickets', limit: 200 });
+          const raw: Ticket[] = t.records?.length
+            ? t.records.map((x: any) => x.value)
+            : [];
+          if (raw.length) setTickets(mergeTicketsWithAdmin(raw, adminT.records || []));
+          else if (t.records?.length) setTickets(t.records.map((x: any) => x.value));
+        } catch {
+          if (t.records?.length) setTickets(t.records.map((x: any) => x.value));
+        }
 
         // After signup / first dashboard entry — prompt to Scope a project
         const filed = (r.records || []).map((x: any) => x.value).filter(Boolean);
@@ -413,20 +544,48 @@ export default function UserDashboardApp() {
   useEffect(()=>{ chatEndRef.current?.scrollIntoView({behavior:'smooth'}); }, [chats]);
 
   const reloadRecords = async () => {
-    const [p,t,r,c] = await Promise.all([
+    const [p,t,r,c,adminT] = await Promise.all([
       api('records.list', { collection: 'user_projects' }),
       api('records.list', { collection: 'user_tickets' }),
       api('records.list', { collection: 'user_requests' }),
       api('records.list', { collection: 'user_chats' }),
+      api('records.list', { collection: 'tickets', limit: 200 }).catch(() => ({ records: [] })),
     ]);
     setProjects(p.records?.length ? p.records.map((x:any)=>x.value) : MOCK_PROJECTS);
-    setTickets(t.records?.length ? t.records.map((x:any)=>x.value) : MOCK_TICKETS);
+    const rawTickets: Ticket[] = t.records?.length
+      ? t.records.map((x: any) => x.value)
+      : MOCK_TICKETS;
+    setTickets(mergeTicketsWithAdmin(rawTickets, adminT.records || []));
     setRequests(r.records?.map((x:any)=>x.value) || []);
     setChats(c.records?.length ? c.records.map((x:any)=>x.value) : MOCK_CHATS);
   };
 
   const createRow = async (collection: string, value: any) => {
     await api('records.create', { collection, value, idempotency_key: `${collection}-${value.id}-${Date.now()}` });
+  };
+
+  useEffect(() => {
+    if (!selectedTicketId) return;
+    const id = setInterval(() => {
+      reloadRecords().catch(() => {});
+    }, 12000);
+    return () => clearInterval(id);
+  }, [selectedTicketId]);
+
+  const replaceUserTicket = async (ticket: Ticket) => {
+    const listed = await api('records.list', { collection: 'user_tickets', limit: 200 });
+    const existing = (listed.records || []).find(
+      (r: any) => String(r.value?.id || '') === String(ticket.id),
+    );
+    if (existing) {
+      await crmAction('records.replace', {
+        collection: 'user_tickets',
+        id: existing.id,
+        value: ticket,
+      });
+    } else {
+      await createRow('user_tickets', ticket);
+    }
   };
 
   const handleRequestSubmit = async (e: React.FormEvent) => {
@@ -465,6 +624,8 @@ export default function UserDashboardApp() {
   const handleTicketCreate = async () => {
     if (!ticketForm.title.trim()) return;
     setBusy(true);
+    const sla = etaForPriority(ticketForm.priority);
+    const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const newT: Ticket = {
       id: `VEXO-${Math.floor(100+Math.random()*900)}`,
       title: ticketForm.title,
@@ -473,7 +634,19 @@ export default function UserDashboardApp() {
       priority: ticketForm.priority,
       status: 'To Do',
       assignee: 'Captain',
-      due: 'Today'
+      due: 'Today',
+      accepted: false,
+      progress: 0,
+      eta: sla.eta,
+      slaHours: sla.slaHours,
+      messages: [
+        {
+          from: 'system',
+          text: `Ticket received. Captain will accept shortly. Work window target: ${sla.eta}.`,
+          time: stamp,
+          msgId: `sys-${Date.now()}`,
+        },
+      ],
     };
     try {
       await createRow('user_tickets', newT);
@@ -481,10 +654,43 @@ export default function UserDashboardApp() {
       await reloadRecords();
       setTickets(prev=>[newT,...prev]);
       setNewTicketOpen(false);
+      setSelectedTicketId(newT.id);
       setTicketForm({ title:'', description:'', project:'Vexo Garage OS', priority:'P2'});
-    } catch { setTickets(prev=>[newT,...prev]); setNewTicketOpen(false); }
+    } catch { setTickets(prev=>[newT,...prev]); setNewTicketOpen(false); setSelectedTicketId(newT.id); }
     setBusy(false);
   };
+
+  const sendTicketFollowUp = async () => {
+    if (!selectedTicketId || !ticketMsg.trim() || ticketMsgBusy) return;
+    const ticket = tickets.find((t) => t.id === selectedTicketId);
+    if (!ticket) return;
+    setTicketMsgBusy(true);
+    const stamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const entry: TicketMsg = {
+      from: 'client',
+      text: ticketMsg.trim(),
+      time: stamp,
+      msgId: `cli-${Date.now()}`,
+    };
+    const next: Ticket = {
+      ...ticket,
+      messages: [...(ticket.messages || []), entry],
+    };
+    setTickets((prev) => prev.map((t) => (t.id === ticket.id ? next : t)));
+    setTicketMsg('');
+    try {
+      await replaceUserTicket(next);
+      await mirrorToAdmin('ticket', next, clientLabel);
+    } catch (e) {
+      console.warn('ticket follow-up sync failed', e);
+    }
+    setTicketMsgBusy(false);
+    setTimeout(() => ticketThreadRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+  };
+
+  const selectedTicket = selectedTicketId
+    ? tickets.find((t) => t.id === selectedTicketId) || null
+    : null;
 
   const handleChatSend = async () => {
     if (!chatInput.trim()) return;
@@ -1045,7 +1251,12 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
                       </div>
                       <div className="space-y-2.5">
                         {tickets.filter(t=>t.status===col).map(t=>(
-                          <div key={t.id} className="p-3 rounded-xl bg-[#121826] border border-white/10 hover:border-white/15 transition">
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => setSelectedTicketId(t.id)}
+                            className="w-full text-left p-3 rounded-xl bg-[#121826] border border-white/10 hover:border-[#0EA5FF]/40 transition"
+                          >
                             <div className="flex items-center gap-2">
                               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full border ${t.priority==='P1'?'bg-[#FF4D6D]/15 text-[#FF4D6D] border-[#FF4D6D]/30': t.priority==='P2'?'bg-[#FFD700]/15 text-[#FFD700] border-[#FFD700]/30':'bg-white/5 text-white/50 border-white/10'}`}>{t.priority}</span>
                               <span className="text-[10px] font-mono text-white/30">{t.id}</span>
@@ -1054,9 +1265,11 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
                             <div className="text-[11px] text-white/40 mt-1">{t.project} • {t.assignee}</div>
                             <div className="mt-2 flex justify-between items-center">
                               <span className="text-[10px] font-mono text-white/30">Due {t.due}</span>
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 border border-white/10">Comment</span>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${t.accepted ? 'bg-[#84FF3D]/15 text-[#84FF3D] border-[#84FF3D]/30' : 'bg-[#FFD700]/15 text-[#FFD700] border-[#FFD700]/30'}`}>
+                                {t.accepted ? `${t.progress ?? 0}% · Open` : 'Awaiting · Open'}
+                              </span>
                             </div>
-                          </div>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -1071,7 +1284,11 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
                       </thead>
                       <tbody>
                         {tickets.map(t=>(
-                          <tr key={t.id} className="border-b border-white/[0.04] hover:bg-white/[0.03]">
+                          <tr
+                            key={t.id}
+                            className="border-b border-white/[0.04] hover:bg-white/[0.03] cursor-pointer"
+                            onClick={() => setSelectedTicketId(t.id)}
+                          >
                             <td className="px-4 py-3 font-mono text-[#0EA5FF]">{t.id}</td>
                             <td className="px-4 py-3 font-medium max-w-[280px] truncate">{t.title}</td>
                             <td className="px-4 py-3 text-white/60">{t.project}</td>
@@ -1106,6 +1323,113 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
                     <div className="mt-4 flex gap-2">
                       <button disabled={busy} onClick={handleTicketCreate} className="flex-1 py-2.5 rounded-xl bg-[#FFD700] text-black font-semibold text-[12px] disabled:opacity-50">Create Ticket</button>
                       <button onClick={()=>setNewTicketOpen(false)} className="px-4 py-2.5 rounded-xl bg-white/10 text-[12px]">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedTicket && (
+                <div
+                  className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
+                  onClick={() => setSelectedTicketId(null)}
+                >
+                  <div
+                    className="w-full max-w-[480px] h-full bg-[#080B14] border-l border-white/10 flex flex-col"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="p-5 border-b border-white/10 flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-[10px] font-mono text-white/40">{selectedTicket.id}</div>
+                        <h3 className="font-display text-[16px] font-semibold mt-1 leading-snug">{selectedTicket.title}</h3>
+                        <div className="mt-2 flex flex-wrap gap-1.5 text-[10px]">
+                          <span className="px-2 py-0.5 rounded-full bg-[#0EA5FF]/15 text-[#0EA5FF]">{selectedTicket.project}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10">{selectedTicket.status}</span>
+                          <span className={`px-2 py-0.5 rounded-full ${selectedTicket.accepted ? 'bg-[#84FF3D]/15 text-[#84FF3D]' : 'bg-[#FFD700]/15 text-[#FFD700]'}`}>
+                            {selectedTicket.accepted ? 'Accepted by Captain' : 'Awaiting accept'}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTicketId(null)}
+                        className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 text-white/60"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="p-5 border-b border-white/10 space-y-3">
+                      <div className="flex items-center justify-between text-[12px]">
+                        <span className="text-white/50">Progress</span>
+                        <span className="font-mono text-[#0EA5FF]">{selectedTicket.progress ?? 0}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-[#0EA5FF] to-[#84FF3D]"
+                          style={{ width: `${selectedTicket.progress ?? 0}%` }}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-[12px]">
+                        <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3">
+                          <div className="text-[10px] font-mono text-white/40 tracking-widest">WORK WINDOW</div>
+                          <div className="mt-1 font-medium">{selectedTicket.eta || etaForPriority(selectedTicket.priority).eta}</div>
+                        </div>
+                        <div className="rounded-xl bg-white/[0.03] border border-white/10 p-3">
+                          <div className="text-[10px] font-mono text-white/40 tracking-widest">ASSIGNEE</div>
+                          <div className="mt-1 font-medium">{selectedTicket.assignee}</div>
+                        </div>
+                      </div>
+                      {selectedTicket.description ? (
+                        <p className="text-[12px] text-white/60 leading-relaxed">{selectedTicket.description}</p>
+                      ) : null}
+                      <div className="rounded-xl bg-[#0EA5FF]/10 border border-[#0EA5FF]/20 p-3 text-[11px] text-[#0EA5FF]">
+                        {selectedTicket.accepted
+                          ? `Captain accepted this ticket${selectedTicket.acceptedAt ? ` · ${new Date(selectedTicket.acceptedAt).toLocaleString()}` : ''}. Updates and inbound replies appear below.`
+                          : 'We have your ticket. Captain will accept it and confirm the work window here.'}
+                      </div>
+                    </div>
+
+                    <div className="flex-1 min-h-0 flex flex-col">
+                      <div className="px-5 pt-4 text-[10px] font-mono tracking-widest text-white/40">CONVERSATION</div>
+                      <div className="flex-1 overflow-auto px-5 py-3 space-y-2">
+                        {(selectedTicket.messages || []).map((m, i) => (
+                          <div
+                            key={m.msgId || i}
+                            className={`rounded-2xl px-3 py-2 text-[12px] border ${
+                              m.from === 'client'
+                                ? 'ml-6 bg-[#0EA5FF] text-black border-[#0EA5FF]'
+                                : m.from === 'captain'
+                                  ? 'mr-6 bg-[#FFD700]/10 text-[#FFD700] border-[#FFD700]/20'
+                                  : 'bg-white/[0.04] text-white/70 border-white/10'
+                            }`}
+                          >
+                            <div className="text-[9px] font-mono opacity-70 mb-1">{m.from.toUpperCase()} · {m.time}</div>
+                            {m.text}
+                          </div>
+                        ))}
+                        <div ref={ticketThreadRef} />
+                      </div>
+                      <div className="p-4 border-t border-white/10">
+                        <div className="flex gap-2">
+                          <input
+                            value={ticketMsg}
+                            onChange={(e) => setTicketMsg(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') sendTicketFollowUp();
+                            }}
+                            placeholder="Ask about status or add detail…"
+                            className="flex-1 px-3 py-2.5 rounded-xl bg-[#05070D] border border-white/15 text-[13px] outline-none"
+                          />
+                          <button
+                            type="button"
+                            disabled={ticketMsgBusy || !ticketMsg.trim()}
+                            onClick={sendTicketFollowUp}
+                            className="px-4 py-2.5 rounded-xl bg-white text-black font-semibold text-[12px] disabled:opacity-40"
+                          >
+                            Send
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

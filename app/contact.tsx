@@ -11,7 +11,7 @@ export default function ContactScreen() {
       <Text style={styles.support}>
         Instant tech assessment with DOS7 evidence logging. On web, AVA (AiKOVA
         Virtual Assistant) handles intake — Open Calendly, copy assessment, or
-        send to hello@aikova.co.uk.
+        send to info@aikova.co.uk.
       </Text>
       <View style={styles.panel}>
         <Text style={styles.panelLabel}>HQ</Text>

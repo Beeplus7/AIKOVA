@@ -231,12 +231,26 @@ app.post('/api/actions', requireUser, handleActions);
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const MCL_INTERESTS = new Set([
   'cloud',
+  'claude',
+  'openai',
+  'ai-agents',
+  'receptionist',
   'payments',
+  'ecommerce',
+  'fintech',
+  'saas',
+  'mobile',
+  'webapp',
+  'api',
+  'devops',
   'industrial',
   'ai-production',
-  'receptionist',
   'myface',
-  'fintech',
+  'automation',
+  'data',
+  'security',
+  'integration',
+  'mvp',
   'other',
 ]);
 const MCL_URGENCY = new Set(['p1', 'p2', 'explore']);
@@ -264,8 +278,8 @@ function mclRateLimit(ip) {
 async function sendMclEmails({ name, email, interest, urgency, sourcePage, leadId }) {
   const key = process.env.RESEND_API_KEY || '';
   if (!key) return { skipped: true };
-  const from = process.env.FROM_EMAIL || 'AiKOVA <hello@aikova.co.uk>';
-  const notifyTo = process.env.MCL_NOTIFY_EMAIL || 'hello@aikova.co.uk';
+  const from = process.env.FROM_EMAIL || 'AiKOVA <info@aikova.co.uk>';
+  const notifyTo = process.env.MCL_NOTIFY_EMAIL || 'info@aikova.co.uk';
   const first = (name.split(/\s+/)[0] || 'there');
   const interestLabel = interest || 'general enquiry';
   const confirmHtml = `<p>Hi ${first},</p><p>Thanks for reaching out to AiKOVA about <strong>${interestLabel}</strong>. A senior engineer will follow up shortly.</p><p>Meanwhile: <a href="https://aikova.co.uk/portfolio">Portfolio OS</a> · <a href="https://aikova.co.uk/llms.txt">llms.txt</a></p><p>— AiKOVA Engineering Vault · Oldham OL8</p>`;
@@ -330,13 +344,27 @@ app.post('/api/mcl-capture-lead', async (req, res) => {
     }
 
     const interestLabels = {
-      cloud: 'Cloud OS',
-      payments: 'Payment OS',
+      cloud: 'Cloud / AWS / Azure / GCP',
+      claude: 'Claude / Anthropic agents',
+      openai: 'OpenAI / GPT agents',
+      'ai-agents': 'Custom AI agents & RAG',
+      receptionist: 'AI Receptionist (voice)',
+      payments: 'Payment integration (Stripe / PayPal)',
+      ecommerce: 'E-commerce / checkout OS',
+      fintech: 'FinTech / banking rails',
+      saas: 'SaaS product build',
+      mobile: 'Mobile app (iOS / Android)',
+      webapp: 'Web app / dashboard',
+      api: 'API / backend / microservices',
+      devops: 'DevOps / CI-CD / infra',
       industrial: 'Industrial / Garage OS',
       'ai-production': 'AI Production (ReelStorm)',
-      receptionist: 'AI Receptionist',
       myface: 'MyFace Profile',
-      fintech: 'TradeFlow FinTech',
+      automation: 'Workflow automation',
+      data: 'Data pipelines / analytics',
+      security: 'Security / compliance hardening',
+      integration: 'Third-party system integration',
+      mvp: 'MVP / startup build',
       other: 'Other / not sure',
     };
 

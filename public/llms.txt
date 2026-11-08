@@ -3,7 +3,7 @@
 > Oldham OL8 → Global. Industrial-grade Cloud, Payments, AI Production, and Industrial OS.
 
 Site: https://aikova.co.uk/
-Contact: hello@aikova.co.uk
+Contact: info@aikova.co.uk
 Portal: https://aikova.co.uk/os/portal
 
 ## What AiKOVA is
@@ -28,7 +28,7 @@ FinOps, evidence vault / DOS7, AWS, multilingual voice where required.
 4. TradeFlow OS — FinTech trading OS with Guardian risk system (https://tradeflow.finance)
 5. Arole Adjo OS — cultural commerce marketplace + split payments (https://aroleadjo.com)
 6. Road Angel OS — roadside assistance, fleet tracking, dispatch (roadangel.logistics)
-7. MyFace Profile OS — Work Social OS — SHOW · CONNECT · GROW (https://myfaceprofile.aikova.co.uk)
+7. MyFace Profile OS — Work Social OS — SHOW · CONNECT · GROW (https://myfaceprofile.aikova.co.uk · https://myfaceprofile.aikova.co.uk/llms.txt · https://myfaceprofile.aikova.co.uk/myface-ai-readable.html)
 8. AI Receptionist OS — Europe's AI receptionist starting with the UK; voice + WhatsApp + SMS; 10-min Assess (https://ai-receptionist.aikova.co.uk)
 
 ## Capabilities

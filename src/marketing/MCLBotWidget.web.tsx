@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -17,13 +18,27 @@ import { colors, fonts } from '../theme/colors';
 type Step = 'interest' | 'urgency' | 'contact' | 'submitting' | 'done' | 'error';
 
 const INTERESTS: { id: string; label: string }[] = [
-  { id: 'cloud', label: 'Cloud OS' },
-  { id: 'payments', label: 'Payment OS' },
+  { id: 'cloud', label: 'Cloud / AWS / Azure / GCP' },
+  { id: 'claude', label: 'Claude / Anthropic agents' },
+  { id: 'openai', label: 'OpenAI / GPT agents' },
+  { id: 'ai-agents', label: 'Custom AI agents & RAG' },
+  { id: 'receptionist', label: 'AI Receptionist (voice)' },
+  { id: 'payments', label: 'Payment integration (Stripe / PayPal)' },
+  { id: 'ecommerce', label: 'E-commerce / checkout OS' },
+  { id: 'fintech', label: 'FinTech / banking rails' },
+  { id: 'saas', label: 'SaaS product build' },
+  { id: 'mobile', label: 'Mobile app (iOS / Android)' },
+  { id: 'webapp', label: 'Web app / dashboard' },
+  { id: 'api', label: 'API / backend / microservices' },
+  { id: 'devops', label: 'DevOps / CI-CD / infra' },
   { id: 'industrial', label: 'Industrial / Garage OS' },
   { id: 'ai-production', label: 'AI Production (ReelStorm)' },
-  { id: 'receptionist', label: 'AI Receptionist' },
   { id: 'myface', label: 'MyFace Profile' },
-  { id: 'fintech', label: 'TradeFlow FinTech' },
+  { id: 'automation', label: 'Workflow automation' },
+  { id: 'data', label: 'Data pipelines / analytics' },
+  { id: 'security', label: 'Security / compliance hardening' },
+  { id: 'integration', label: 'Third-party system integration' },
+  { id: 'mvp', label: 'MVP / startup build' },
   { id: 'other', label: 'Something else' },
 ];
 
@@ -133,19 +148,26 @@ export function MCLBotWidget() {
 
             {step === 'interest' ? (
               <View style={styles.stack}>
-                <Text style={styles.prompt}>Pick the closest OS line</Text>
-                {INTERESTS.map((item) => (
-                  <Pressable
-                    key={item.id}
-                    onPress={() => {
-                      setInterest(item.id);
-                      setStep('urgency');
-                    }}
-                    style={styles.choice}
-                  >
-                    <Text style={styles.choiceText}>{item.label}</Text>
-                  </Pressable>
-                ))}
+                <Text style={styles.prompt}>Pick the closest engineering line</Text>
+                <ScrollView
+                  style={styles.interestScroll}
+                  contentContainerStyle={styles.interestScrollContent}
+                  nestedScrollEnabled
+                  showsVerticalScrollIndicator
+                >
+                  {INTERESTS.map((item) => (
+                    <Pressable
+                      key={item.id}
+                      onPress={() => {
+                        setInterest(item.id);
+                        setStep('urgency');
+                      }}
+                      style={styles.choice}
+                    >
+                      <Text style={styles.choiceText}>{item.label}</Text>
+                    </Pressable>
+                  ))}
+                </ScrollView>
               </View>
             ) : null}
 
@@ -322,6 +344,8 @@ const styles = StyleSheet.create({
     width: 0,
   },
   stack: { gap: 8 },
+  interestScroll: { maxHeight: 340 },
+  interestScrollContent: { gap: 8, paddingBottom: 4 },
   prompt: {
     color: colors.muted,
     fontFamily: fonts.body,

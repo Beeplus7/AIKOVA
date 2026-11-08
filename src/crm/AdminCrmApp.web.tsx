@@ -111,6 +111,13 @@ type Negotiation = {
   retainer: string;
 };
 
+type TicketMessage = {
+  from: "client" | "captain" | "system";
+  text: string;
+  time: string;
+  msgId?: string;
+};
+
 type TicketItem = {
   ticketId: string;
   title: string;
@@ -120,6 +127,13 @@ type TicketItem = {
   due: string;
   column: "To Do" | "In Progress" | "Review" | "Done";
   client: string;
+  description?: string;
+  accepted?: boolean;
+  acceptedAt?: string;
+  eta?: string;
+  progress?: number;
+  slaHours?: number;
+  messages?: TicketMessage[];
 };
 
 type Chat = {
@@ -318,17 +332,40 @@ function normalizeEngagement(value: Partial<Engagement> | null | undefined): Eng
   };
 }
 
+function ticketSlaHours(priority: TicketItem["priority"]): number {
+  if (priority === "Critical") return 4;
+  if (priority === "High") return 24;
+  if (priority === "Medium") return 72;
+  return 120;
+}
+
+function ticketEtaLabel(priority: TicketItem["priority"]): string {
+  const h = ticketSlaHours(priority);
+  if (h <= 4) return "Within 4 hours (P1 SLA)";
+  if (h <= 24) return "Within 1 business day";
+  if (h <= 72) return "Within 3 business days";
+  return "Within 5 business days";
+}
+
 function normalizeTicket(value: Partial<TicketItem> | null | undefined): TicketItem {
   const v = value || {};
+  const priority = v.priority || "Medium";
   return {
     ticketId: v.ticketId || "TKT-0",
     title: v.title || "Untitled",
     project: v.project || "AiKOVA",
-    priority: v.priority || "Medium",
+    priority,
     assignee: v.assignee || "Captain",
     due: v.due || "",
     column: v.column || "To Do",
     client: v.client || "",
+    description: v.description || "",
+    accepted: Boolean(v.accepted),
+    acceptedAt: v.acceptedAt || "",
+    eta: v.eta || ticketEtaLabel(priority),
+    progress: typeof v.progress === "number" ? v.progress : v.column === "Done" ? 100 : v.column === "Review" ? 85 : v.column === "In Progress" ? 45 : 0,
+    slaHours: typeof v.slaHours === "number" ? v.slaHours : ticketSlaHours(priority),
+    messages: Array.isArray(v.messages) ? v.messages : [],
   };
 }
 
@@ -381,6 +418,11 @@ export default function App({
   const [showEngagementModal, setShowEngagementModal] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
   const [showTicketModal, setShowTicketModal] = useState(false);
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [leadMenuId, setLeadMenuId] = useState<string | null>(null);
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [ticketReply, setTicketReply] = useState("");
+  const [ticketReplyBusy, setTicketReplyBusy] = useState(false);
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [chatDraft, setChatDraft] = useState("");
   const [chatBusy, setChatBusy] = useState(false);
@@ -802,6 +844,7 @@ export default function App({
       return;
     }
     setTicketBusy(true);
+    const stamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     const payload: TicketItem = {
       ticketId: `USR-${Date.now().toString().slice(-5)}`,
       title: newTicket.title.trim(),
@@ -811,6 +854,18 @@ export default function App({
       due: new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
       column: "To Do",
       client: clientLabel,
+      accepted: false,
+      progress: 0,
+      eta: ticketEtaLabel(newTicket.priority),
+      slaHours: ticketSlaHours(newTicket.priority),
+      messages: [
+        {
+          from: "system",
+          text: `Ticket raised. Work window target: ${ticketEtaLabel(newTicket.priority)}.`,
+          time: stamp,
+          msgId: `sys-${Date.now()}`,
+        },
+      ],
     };
     try {
       await apiCreate("tickets", payload, `user-ticket-${payload.ticketId}`);
@@ -937,23 +992,171 @@ export default function App({
     flash(`Accepted ${row.value?.title || row.value?.id || "request"}`);
   };
 
-  const handleTicketDrop = async (col: TicketItem["column"]) => {
-    if (!dragTicket) return;
-    const t = tickets.find((x) => x.id === dragTicket);
-    if (!t) return;
+  const syncUserTicketMirror = async (ticket: TicketItem) => {
     try {
-      await apiReplace("tickets", t.id, { ...t.value, column: col });
+      const listed = await apiList("user_tickets");
+      const match = (listed.records || []).find(
+        (r) => String(r.value?.id || "") === String(ticket.ticketId),
+      );
+      if (!match) return;
+      const next = {
+        ...(match.value || {}),
+        id: ticket.ticketId,
+        title: ticket.title,
+        project: ticket.project,
+        priority:
+          ticket.priority === "Critical"
+            ? "P1"
+            : ticket.priority === "High"
+              ? "P2"
+              : "P3",
+        status: ticket.column,
+        assignee: ticket.assignee,
+        due: ticket.due,
+        description: ticket.description || match.value?.description || "",
+        accepted: Boolean(ticket.accepted),
+        acceptedAt: ticket.acceptedAt || "",
+        eta: ticket.eta || "",
+        progress: ticket.progress ?? 0,
+        slaHours: ticket.slaHours,
+        messages: ticket.messages || [],
+      };
+      await apiReplace("user_tickets", match.id, next);
+    } catch {
+      /* user mirror optional */
+    }
+  };
+
+  const persistTicket = async (recordId: string, next: TicketItem) => {
+    try {
+      await apiReplace("tickets", recordId, next);
+      await syncUserTicketMirror(next);
       const data = await apiList("tickets");
       setTickets(mapTickets(data.records));
     } catch {
       setTickets((prev) =>
-        prev.map((row) =>
-          row.id === dragTicket ? { ...row, value: { ...row.value, column: col } } : row,
-        ),
+        prev.map((row) => (row.id === recordId ? { ...row, value: next } : row)),
       );
     }
+  };
+
+  const handleTicketDrop = async (col: TicketItem["column"]) => {
+    if (!dragTicket) return;
+    const t = tickets.find((x) => x.id === dragTicket);
+    if (!t) return;
+    const progress =
+      col === "Done" ? 100 : col === "Review" ? 85 : col === "In Progress" ? Math.max(t.value.progress || 0, 45) : t.value.progress || 0;
+    const accepted = col !== "To Do" ? true : Boolean(t.value.accepted);
+    const now = new Date();
+    const stamp = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const messages = [...(t.value.messages || [])];
+    if (accepted && !t.value.accepted) {
+      messages.push({
+        from: "system",
+        text: `Captain accepted this ticket. Status → ${col}. ETA: ${t.value.eta || ticketEtaLabel(t.value.priority)}.`,
+        time: stamp,
+        msgId: `sys-accept-${Date.now()}`,
+      });
+    } else if (col !== t.value.column) {
+      messages.push({
+        from: "system",
+        text: `Status updated to ${col}. Progress ${progress}%.`,
+        time: stamp,
+        msgId: `sys-col-${Date.now()}`,
+      });
+    }
+    const next: TicketItem = {
+      ...t.value,
+      column: col,
+      progress,
+      accepted,
+      acceptedAt: accepted ? t.value.acceptedAt || now.toISOString() : t.value.acceptedAt,
+      messages,
+    };
+    await persistTicket(t.id, next);
     setDragTicket(null);
   };
+
+  const updateLeadStatus = async (
+    leadId: string,
+    status: Lead["status"],
+  ) => {
+    const lead = leads.find((l) => l.id === leadId);
+    if (!lead) return;
+    const next = { ...lead.value, status };
+    try {
+      await apiReplace("leads", leadId, next);
+      const data = await apiList("leads");
+      setLeads(mapLeads(data.records));
+    } catch {
+      setLeads((prev) =>
+        prev.map((l) => (l.id === leadId ? { ...l, value: next } : l)),
+      );
+    }
+    setLeadMenuId(null);
+    flash(`Lead marked ${status}`);
+  };
+
+  const acceptSelectedTicket = async () => {
+    if (!selectedTicketId) return;
+    const t = tickets.find((x) => x.id === selectedTicketId);
+    if (!t) return;
+    const now = new Date();
+    const stamp = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const messages = [...(t.value.messages || [])];
+    messages.push({
+      from: "system",
+      text: `Ticket accepted by Captain. Work window: ${t.value.eta || ticketEtaLabel(t.value.priority)}. We'll post progress updates here.`,
+      time: stamp,
+      msgId: `sys-accept-${Date.now()}`,
+    });
+    const next: TicketItem = {
+      ...t.value,
+      accepted: true,
+      acceptedAt: now.toISOString(),
+      column: t.value.column === "To Do" ? "In Progress" : t.value.column,
+      progress: Math.max(t.value.progress || 0, 15),
+      messages,
+    };
+    await persistTicket(t.id, next);
+    flash(`Accepted ${t.value.ticketId}`);
+  };
+
+  const sendTicketReply = async () => {
+    if (!selectedTicketId || !ticketReply.trim() || ticketReplyBusy) return;
+    const t = tickets.find((x) => x.id === selectedTicketId);
+    if (!t) return;
+    setTicketReplyBusy(true);
+    const stamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const messages = [
+      ...(t.value.messages || []),
+      {
+        from: "captain" as const,
+        text: ticketReply.trim(),
+        time: stamp,
+        msgId: `cap-${Date.now()}`,
+      },
+    ];
+    const next: TicketItem = {
+      ...t.value,
+      accepted: true,
+      acceptedAt: t.value.acceptedAt || new Date().toISOString(),
+      column: t.value.column === "To Do" ? "In Progress" : t.value.column,
+      progress: Math.max(t.value.progress || 0, 20),
+      messages,
+    };
+    await persistTicket(t.id, next);
+    setTicketReply("");
+    setTicketReplyBusy(false);
+    flash("Reply sent to client ticket thread");
+  };
+
+  const selectedLead = selectedLeadId
+    ? leads.find((l) => l.id === selectedLeadId) || null
+    : null;
+  const selectedTicket = selectedTicketId
+    ? tickets.find((t) => t.id === selectedTicketId) || null
+    : null;
 
   if (loading) {
     return (
@@ -1595,9 +1798,49 @@ export default function App({
                             <td className="max-w-[240px] px-4 py-3"><div className="truncate text-[11px] text-zinc-400" title={l.value.aiIcebreaker}>{(l.value.aiIcebreaker || "").slice(0, 70)}...</div></td>
                             <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-[11px] ${l.value.status === "Qualified" ? "bg-[#84FF3D]/10 text-[#84FF3D]" : l.value.status === "Contacted" ? "bg-[#0EA5FF]/10 text-[#0EA5FF]" : "bg-white/[0.06] text-zinc-400"}`}>{l.value.status}</span></td>
                             <td className="px-4 py-3">
-                              <div className="flex items-center gap-1">
-                                <button className="rounded-full bg-white p-1.5 text-black"><ArrowUpRight className="h-3.5 w-3.5" /></button>
-                                <button className="rounded-full bg-white/[0.06] p-1.5"><MoreHorizontal className="h-3.5 w-3.5" /></button>
+                              <div className="relative flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  title="View lead"
+                                  onClick={() => setSelectedLeadId(l.id)}
+                                  className="rounded-full bg-white p-1.5 text-black hover:bg-[#0EA5FF]"
+                                >
+                                  <ArrowUpRight className="h-3.5 w-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  title="Lead options"
+                                  onClick={() =>
+                                    setLeadMenuId((cur) => (cur === l.id ? null : l.id))
+                                  }
+                                  className="rounded-full bg-white/[0.06] p-1.5 hover:bg-white/10"
+                                >
+                                  <MoreHorizontal className="h-3.5 w-3.5" />
+                                </button>
+                                {leadMenuId === l.id ? (
+                                  <div className="absolute right-0 top-9 z-20 min-w-[160px] rounded-xl border border-white/10 bg-[#0B1020] p-1 shadow-xl">
+                                    {(["New", "Contacted", "Qualified"] as const).map((s) => (
+                                      <button
+                                        key={s}
+                                        type="button"
+                                        onClick={() => updateLeadStatus(l.id, s)}
+                                        className="block w-full rounded-lg px-3 py-2 text-left text-[12px] hover:bg-white/[0.06]"
+                                      >
+                                        Mark {s}
+                                      </button>
+                                    ))}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedLeadId(l.id);
+                                        setLeadMenuId(null);
+                                      }}
+                                      className="block w-full rounded-lg px-3 py-2 text-left text-[12px] hover:bg-white/[0.06]"
+                                    >
+                                      Open details
+                                    </button>
+                                  </div>
+                                ) : null}
                               </div>
                             </td>
                           </tr>
@@ -1610,7 +1853,12 @@ export default function App({
                 {/* Mobile cards */}
                 <div className="grid grid-cols-1 gap-3 md:hidden">
                   {filteredLeads.map((l) => (
-                    <div key={l.id} className="glass rounded-[14px] p-4">
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => setSelectedLeadId(l.id)}
+                      className="glass rounded-[14px] p-4 text-left"
+                    >
                       <div className="flex items-start justify-between">
                         <div>
                           <div className="text-[14px] font-semibold">{l.value.companyName}</div>
@@ -1619,7 +1867,7 @@ export default function App({
                         <span className="mono text-[12px] font-bold text-[#0EA5FF]">{l.value.score}</span>
                       </div>
                       <div className="mt-2 text-[11px] text-zinc-400">{(l.value.aiIcebreaker || "").slice(0, 90)}...</div>
-                    </div>
+                    </button>
                   ))}
                 </div>
 
@@ -1762,7 +2010,8 @@ export default function App({
                               key={t.id}
                               draggable
                               onDragStart={() => setDragTicket(t.id)}
-                              className="group cursor-grab rounded-xl border border-white/[0.06] bg-[#121A2E] p-3 shadow-sm transition hover:border-white/15 active:cursor-grabbing"
+                              onClick={() => setSelectedTicketId(t.id)}
+                              className="group cursor-pointer rounded-xl border border-white/[0.06] bg-[#121A2E] p-3 shadow-sm transition hover:border-[#0EA5FF]/40 active:cursor-grabbing"
                             >
                               <div className="flex items-center justify-between">
                                 <span className="mono text-[10px] text-zinc-500">{t.value.ticketId}</span>
@@ -1776,6 +2025,12 @@ export default function App({
                               <div className="mt-2 flex items-center justify-between text-[10px] text-zinc-600">
                                 <span>Due {t.value.due}</span>
                                 <span className="flex items-center gap-1"><Building2 className="h-3 w-3" />{(t.value.client || "").slice(0, 12)}</span>
+                              </div>
+                              <div className="mt-2 flex items-center justify-between">
+                                <span className={`text-[9px] font-medium ${t.value.accepted ? "text-[#84FF3D]" : "text-amber-400"}`}>
+                                  {t.value.accepted ? "Accepted" : "Awaiting accept"}
+                                </span>
+                                <span className="text-[9px] text-[#0EA5FF]">View / respond →</span>
                               </div>
                             </div>
                           ))}
@@ -2263,6 +2518,269 @@ export default function App({
           </div>
         </div>
       )}
+
+      {/* Lead detail drawer */}
+      {selectedLead ? (
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
+          onClick={() => setSelectedLeadId(null)}
+        >
+          <div
+            className="glass-strong flex h-full w-full max-w-[480px] flex-col border-l border-white/10 bg-[#080B14]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-white/[0.06] p-5">
+              <div>
+                <div className="text-[11px] uppercase tracking-widest text-zinc-500">Lead detail</div>
+                <h3 className="sora mt-1 text-[18px] font-semibold">{selectedLead.value.companyName}</h3>
+                <div className="mt-1 text-[12px] text-zinc-500">
+                  {selectedLead.value.source || "Manual"}
+                  {selectedLead.value.source_page ? ` · ${selectedLead.value.source_page}` : ""}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedLeadId(null)}
+                className="rounded-full bg-white/[0.06] p-2"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 space-y-4 overflow-y-auto p-5">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-500">Status</div>
+                  <div className="mt-1 text-[13px] font-medium">{selectedLead.value.status}</div>
+                </div>
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-500">Score</div>
+                  <div className="mt-1 text-[13px] font-medium text-[#0EA5FF]">{selectedLead.value.score}</div>
+                </div>
+              </div>
+              <div className="space-y-2 rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-[13px]">
+                {selectedLead.value.contactName ? (
+                  <div><span className="text-zinc-500">Contact · </span>{selectedLead.value.contactName}</div>
+                ) : null}
+                {selectedLead.value.email ? (
+                  <div>
+                    <span className="text-zinc-500">Email · </span>
+                    <a className="text-[#0EA5FF]" href={`mailto:${selectedLead.value.email}`}>
+                      {selectedLead.value.email}
+                    </a>
+                  </div>
+                ) : null}
+                {selectedLead.value.phone ? (
+                  <div><span className="text-zinc-500">Phone · </span>{selectedLead.value.phone}</div>
+                ) : null}
+                <div><span className="text-zinc-500">Interest · </span>{selectedLead.value.motClasses || selectedLead.value.interest || "—"}</div>
+                {selectedLead.value.urgency ? (
+                  <div><span className="text-zinc-500">Urgency · </span>{selectedLead.value.urgency}</div>
+                ) : null}
+                <div><span className="text-zinc-500">Address · </span>{selectedLead.value.address || "—"}</div>
+                <div><span className="text-zinc-500">Postcode · </span>{selectedLead.value.postcode || "—"} ({selectedLead.value.postcodeArea})</div>
+                <div><span className="text-zinc-500">CH · </span>{selectedLead.value.companiesHouseStatus}</div>
+              </div>
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4">
+                <div className="text-[10px] uppercase tracking-widest text-zinc-500">AI icebreaker</div>
+                <p className="mt-2 text-[13px] leading-relaxed text-zinc-300">{selectedLead.value.aiIcebreaker}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(["New", "Contacted", "Qualified"] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => updateLeadStatus(selectedLead.id, s)}
+                    className={`rounded-full px-3 py-1.5 text-[11px] font-medium ${
+                      selectedLead.value.status === s
+                        ? "bg-white text-black"
+                        : "border border-white/10 bg-white/[0.04] text-zinc-300"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              {selectedLead.value.email ? (
+                <a
+                  href={`mailto:${selectedLead.value.email}?subject=${encodeURIComponent(
+                    `AiKOVA — ${selectedLead.value.motClasses || "your enquiry"}`,
+                  )}&body=${encodeURIComponent(selectedLead.value.aiIcebreaker || "")}`}
+                  className="flex items-center justify-center gap-2 rounded-full bg-[#0EA5FF] px-4 py-2.5 text-[13px] font-semibold text-black"
+                >
+                  Email lead <ArrowUpRight className="h-4 w-4" />
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Ticket detail / respond drawer */}
+      {selectedTicket ? (
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
+          onClick={() => setSelectedTicketId(null)}
+        >
+          <div
+            className="glass-strong flex h-full w-full max-w-[520px] flex-col border-l border-white/10 bg-[#080B14]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between border-b border-white/[0.06] p-5">
+              <div>
+                <div className="mono text-[11px] text-zinc-500">{selectedTicket.value.ticketId}</div>
+                <h3 className="sora mt-1 text-[16px] font-semibold leading-snug">
+                  {selectedTicket.value.title}
+                </h3>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                  <span className="rounded-full bg-[#0EA5FF]/10 px-2 py-0.5 text-[#0EA5FF]">
+                    {selectedTicket.value.project}
+                  </span>
+                  <span className="rounded-full bg-white/[0.06] px-2 py-0.5">{selectedTicket.value.priority}</span>
+                  <span className={`rounded-full px-2 py-0.5 ${selectedTicket.value.accepted ? "bg-[#84FF3D]/15 text-[#84FF3D]" : "bg-amber-400/15 text-amber-400"}`}>
+                    {selectedTicket.value.accepted ? "Accepted" : "Awaiting accept"}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedTicketId(null)}
+                className="rounded-full bg-white/[0.06] p-2"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 border-b border-white/[0.06] p-5">
+              <div className="flex items-center justify-between text-[12px]">
+                <span className="text-zinc-500">Progress</span>
+                <span className="mono font-medium text-[#0EA5FF]">{selectedTicket.value.progress ?? 0}%</span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#0EA5FF] to-[#84FF3D]"
+                  style={{ width: `${selectedTicket.value.progress ?? 0}%` }}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[12px]">
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-500">ETA / SLA</div>
+                  <div className="mt-1 font-medium">{selectedTicket.value.eta || ticketEtaLabel(selectedTicket.value.priority)}</div>
+                </div>
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-zinc-500">Assignee</div>
+                  <div className="mt-1 font-medium">{selectedTicket.value.assignee} · {selectedTicket.value.client || "—"}</div>
+                </div>
+              </div>
+              {selectedTicket.value.description ? (
+                <p className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3 text-[12px] text-zinc-300">
+                  {selectedTicket.value.description}
+                </p>
+              ) : null}
+              <div className="flex flex-wrap gap-2">
+                {(["To Do", "In Progress", "Review", "Done"] as const).map((col) => (
+                  <button
+                    key={col}
+                    type="button"
+                    onClick={async () => {
+                      setDragTicket(selectedTicket.id);
+                      // reuse drop logic via direct persist
+                      const progress =
+                        col === "Done" ? 100 : col === "Review" ? 85 : col === "In Progress" ? Math.max(selectedTicket.value.progress || 0, 45) : selectedTicket.value.progress || 0;
+                      const accepted = col !== "To Do" ? true : Boolean(selectedTicket.value.accepted);
+                      const stamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                      const messages = [...(selectedTicket.value.messages || [])];
+                      messages.push({
+                        from: "system",
+                        text: `Status → ${col}. Progress ${progress}%.`,
+                        time: stamp,
+                        msgId: `sys-col-${Date.now()}`,
+                      });
+                      await persistTicket(selectedTicket.id, {
+                        ...selectedTicket.value,
+                        column: col,
+                        progress,
+                        accepted,
+                        acceptedAt: accepted
+                          ? selectedTicket.value.acceptedAt || new Date().toISOString()
+                          : selectedTicket.value.acceptedAt,
+                        messages,
+                      });
+                    }}
+                    className={`rounded-full px-3 py-1.5 text-[11px] font-medium ${
+                      selectedTicket.value.column === col
+                        ? "bg-white text-black"
+                        : "border border-white/10 bg-white/[0.04]"
+                    }`}
+                  >
+                    {col}
+                  </button>
+                ))}
+              </div>
+              {!selectedTicket.value.accepted ? (
+                <button
+                  type="button"
+                  onClick={acceptSelectedTicket}
+                  className="w-full rounded-full bg-[#84FF3D] py-2.5 text-[13px] font-semibold text-black"
+                >
+                  Accept ticket + start work window
+                </button>
+              ) : null}
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="px-5 pt-4 text-[10px] uppercase tracking-widest text-zinc-500">
+                Conversation / updates
+              </div>
+              <div className="flex-1 space-y-2 overflow-y-auto px-5 py-3">
+                {(selectedTicket.value.messages || []).length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-white/10 p-4 text-[12px] text-zinc-500">
+                    No messages yet. Accept the ticket or reply below — the client sees this thread in their portal.
+                  </div>
+                ) : (
+                  (selectedTicket.value.messages || []).map((m, i) => (
+                    <div
+                      key={m.msgId || i}
+                      className={`rounded-2xl px-3 py-2 text-[12px] ${
+                        m.from === "captain"
+                          ? "ml-6 bg-[#84FF3D]/15 text-[#84FF3D]"
+                          : m.from === "client"
+                            ? "mr-6 bg-white/[0.06] text-white"
+                            : "bg-[#0EA5FF]/10 text-[#0EA5FF]"
+                      }`}
+                    >
+                      <div className="mb-1 text-[9px] uppercase tracking-widest opacity-70">
+                        {m.from} · {m.time}
+                      </div>
+                      {m.text}
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="border-t border-white/[0.06] p-4">
+                <div className="flex gap-2">
+                  <input
+                    value={ticketReply}
+                    onChange={(e) => setTicketReply(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") sendTicketReply();
+                    }}
+                    placeholder="Reply to client on this ticket…"
+                    className="flex-1 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-[13px] outline-none"
+                  />
+                  <button
+                    type="button"
+                    disabled={ticketReplyBusy || !ticketReply.trim()}
+                    onClick={sendTicketReply}
+                    className="rounded-xl bg-white px-4 py-2.5 text-[12px] font-semibold text-black disabled:opacity-40"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <footer className="border-t border-white/[0.06] py-4 text-center text-[11px] text-zinc-600">
         <span className="mono">AiKOVA DOS7 Evidence Vault • app.aikova.co.uk • Wire: Supabase (leads, engagements, tickets, chats, compliance_vault) • S3 • SES/SNS • Companies House • DVSA CSV • Linear + Stripe + Intercom grade</span>
