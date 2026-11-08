@@ -307,11 +307,47 @@ export const PROJECT_READINESS: Record<string, ProjectReadiness> = {
   ),
 };
 
+const NAME_ALIASES: Record<string, string> = {
+  'Vexo Garage OS': 'Vexo Garage',
+  'Vexo Garage OS — Phase 1': 'Vexo Garage',
+  'Vexo Garage OS — Phase 2': 'Vexo Garage',
+  'AI Receptionist OS': 'AI Receptionist',
+  'AiKOVA Receptionist': 'AI Receptionist',
+  'MyFace': 'MyFace Profile',
+  'TradeFlow': 'TradeFlow OS',
+  'VisaGuide': 'VisaGuide OS',
+};
+
+export function resolveReadinessName(name: string): string {
+  const trimmed = String(name || '').trim();
+  if (PROJECT_READINESS[trimmed]) return trimmed;
+  if (NAME_ALIASES[trimmed]) return NAME_ALIASES[trimmed];
+  // soft match: "Vexo Garage OS" contains key
+  const hit = Object.keys(PROJECT_READINESS).find(
+    (k) =>
+      trimmed.toLowerCase().includes(k.toLowerCase()) ||
+      k.toLowerCase().includes(trimmed.toLowerCase()),
+  );
+  return hit || trimmed;
+}
+
 export function getProjectReadiness(
   name: string,
   fallback?: { progress: number; color: string; desc: string },
 ): ProjectReadiness {
-  if (PROJECT_READINESS[name]) return PROJECT_READINESS[name];
+  const key = resolveReadinessName(name);
+  if (PROJECT_READINESS[key]) {
+    const base = PROJECT_READINESS[key];
+    // Prefer live client progress when provided (portal may be ahead/behind catalog)
+    if (typeof fallback?.progress === 'number' && Math.abs(fallback.progress - base.overall) > 2) {
+      return pack(key, fallback.color || base.color, fallback.progress, fallback.desc || base.summary, {
+        liveUrl: base.liveUrl,
+        left: base.leftNow,
+        modules: base.phases.find((p) => p.title.includes('Build'))?.items.map((i) => i.label),
+      });
+    }
+    return base;
+  }
   return pack(
     name,
     fallback?.color || '#0EA5FF',

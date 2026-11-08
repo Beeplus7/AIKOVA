@@ -5,6 +5,7 @@ import { crmAction } from '../lib/crmApi';
 import { useAuth } from '../lib/auth/AuthProvider';
 import ProjectCompanionOnboarding from './ProjectCompanionOnboarding.web';
 import { firstNameFrom } from './projectCompanion';
+import ProjectReadinessDrawer from './ProjectReadinessDrawer.web';
 
 const logoUrl =
   typeof logoAsset === 'string'
@@ -430,6 +431,7 @@ export default function UserDashboardApp() {
   const [chats, setChats] = useState<ChatMsg[]>(MOCK_CHATS);
   const [selectedProject, setSelectedProject] = useState<Project | null>(MOCK_PROJECTS[0]);
   const [showProjectDetail, setShowProjectDetail] = useState(false);
+  const [showProjectReadiness, setShowProjectReadiness] = useState(false);
   const [ticketView, setTicketView] = useState<'table'|'kanban'>('kanban');
   const [newTicketOpen, setNewTicketOpen] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
@@ -876,16 +878,26 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
               ))}
             </nav>
 
-            <div className="mt-6 p-3 rounded-2xl bg-gradient-to-br from-[#0EA5FF]/15 via-[#0B0F1A] to-[#84FF3D]/10 border border-[#0EA5FF]/20">
-              <div className="text-[11px] font-mono text-[#0EA5FF] tracking-widest mb-1">ACTIVE PROJECT</div>
-              <div className="text-[13px] font-semibold">Vexo Garage OS</div>
+            <button
+              type="button"
+              onClick={() => {
+                const p = projects[0] || MOCK_PROJECTS[0];
+                setSelectedProject(p);
+                setShowProjectReadiness(true);
+                setMobileNav(false);
+              }}
+              className="mt-6 w-full text-left p-3 rounded-2xl bg-gradient-to-br from-[#0EA5FF]/15 via-[#0B0F1A] to-[#84FF3D]/10 border border-[#0EA5FF]/20 hover:border-[#0EA5FF]/40 transition"
+            >
+              <div className="text-[11px] font-mono text-[#0EA5FF] tracking-widest mb-1">ACTIVE PROJECT · READINESS</div>
+              <div className="text-[13px] font-semibold">{(projects[0] || MOCK_PROJECTS[0]).name}</div>
               <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-[#0EA5FF] to-[#84FF3D]" style={{ width:`${MOCK_PROJECTS[0].progress}%` }} />
+                <div className="h-full bg-gradient-to-r from-[#0EA5FF] to-[#84FF3D]" style={{ width:`${(projects[0] || MOCK_PROJECTS[0]).progress}%` }} />
               </div>
               <div className="mt-1.5 flex justify-between text-[10px] font-mono text-white/50">
-                <span>{MOCK_PROJECTS[0].progress}% complete</span><span>Mar 2026 go-live</span>
+                <span>{(projects[0] || MOCK_PROJECTS[0]).progress}% complete</span>
+                <span className="text-[#0EA5FF]">Open readiness →</span>
               </div>
-            </div>
+            </button>
 
             <div className="mt-6 px-2">
               <div className="text-[10px] font-mono text-white/30 tracking-widest mb-2">COMPLIANCE</div>
@@ -991,12 +1003,23 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                  { title:'Project Progress', value: projects[0]?.name || 'No active project', sub: projects[0] ? `${projects[0].progress}% — delivery` : 'Awaiting accept', bar: projects[0]?.progress || 0, accent:'#0EA5FF' },
-                  { title:'Tickets', value:'3 Open', sub:'2 In Progress, 1 Review', bar:66, accent:'#FFD700' },
-                  { title:'Next Meeting', value:'Tomorrow 10am', sub:'With Captain — VEXO Phase 2.5 scoping', bar:100, accent:'#84FF3D' },
-                  { title:'Billing', value:'£4,500 due', sub:'Invoice #AK-2026-014 — 5 days', bar:50, accent:'#FF4D6D' },
+                  { title:'Project Progress', value: projects[0]?.name || 'No active project', sub: projects[0] ? `${projects[0].progress}% — tap for readiness` : 'Awaiting accept', bar: projects[0]?.progress || 0, accent:'#0EA5FF', action: 'readiness' as const },
+                  { title:'Tickets', value:'3 Open', sub:'2 In Progress, 1 Review', bar:66, accent:'#FFD700', action: 'tickets' as const },
+                  { title:'Next Meeting', value:'Tomorrow 10am', sub:'With Captain — VEXO Phase 2.5 scoping', bar:100, accent:'#84FF3D', action: null },
+                  { title:'Billing', value:'£4,500 due', sub:'Invoice #AK-2026-014 — 5 days', bar:50, accent:'#FF4D6D', action: 'invoices' as const },
                 ].map(card=>(
-                  <div key={card.title} className="glass rounded-[16px] p-4">
+                  <button
+                    key={card.title}
+                    type="button"
+                    onClick={() => {
+                      if (card.action === 'readiness' && projects[0]) {
+                        setSelectedProject(projects[0]);
+                        setShowProjectReadiness(true);
+                      } else if (card.action === 'tickets') setActiveTab('tickets');
+                      else if (card.action === 'invoices') setActiveTab('invoices');
+                    }}
+                    className="glass rounded-[16px] p-4 text-left hover:border-white/15 transition"
+                  >
                     <div className="flex justify-between items-start">
                       <span className="text-[10px] font-mono tracking-widest text-white/40">{card.title.toUpperCase()}</span>
                       <span className="w-1.5 h-1.5 rounded-full" style={{ background:card.accent }} />
@@ -1004,7 +1027,7 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
                     <div className="mt-3 text-[18px] font-semibold font-display">{card.value}</div>
                     <div className="text-[12px] text-white/50 mt-1">{card.sub}</div>
                     <div className="mt-3 h-1 rounded-full bg-white/10 overflow-hidden"><div className="h-full rounded-full" style={{ width:`${card.bar}%`, background:card.accent }} /></div>
-                  </div>
+                  </button>
                 ))}
               </div>
 
@@ -1076,39 +1099,64 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
           {/* MY PROJECTS */}
           {activeTab==='projects' && (
             <div className="p-4 md:p-6 lg:p-8 space-y-5 animate-in">
-              <div className="flex items-center justify-between">
-                <h2 className="font-display text-[22px] font-semibold">My Projects — {projects.length}</h2>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-display text-[22px] font-semibold">My Projects — {projects.length}</h2>
+                  <p className="mt-1 text-[12px] text-white/50">Open a project to see ongoing readiness — phases, what’s left, and live status.</p>
+                </div>
                 <button onClick={()=>{ setCompanionOpen(true); setActiveTab('assessment'); }} className="px-3 py-2 rounded-xl bg-[#0EA5FF] text-black text-[12px] font-semibold">✦ Scope my project</button>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {projects.map(proj=>(
-                  <div key={proj.id} className="glass rounded-[20px] p-5 hover:border-white/15 transition cursor-pointer" onClick={()=>{ setSelectedProject(proj); setShowProjectDetail(true); }}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[12px] font-bold px-2 py-0.5 rounded-full bg-[#0EA5FF]/15 text-[#0EA5FF] border border-[#0EA5FF]/25">{proj.status}</span>
-                          <span className="text-[10px] font-mono text-white/30">{proj.id}</span>
+                  <div key={proj.id} className="glass rounded-[20px] p-5 hover:border-[#0EA5FF]/40 transition">
+                    <button
+                      type="button"
+                      className="w-full text-left"
+                      onClick={()=>{ setSelectedProject(proj); setShowProjectReadiness(true); }}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] font-bold px-2 py-0.5 rounded-full bg-[#0EA5FF]/15 text-[#0EA5FF] border border-[#0EA5FF]/25">{proj.status}</span>
+                            <span className="text-[10px] font-mono text-white/30">{proj.id}</span>
+                          </div>
+                          <h3 className="font-display font-semibold text-[18px] mt-2">{proj.name}</h3>
+                          <p className="text-[12px] text-white/50 mt-1 leading-snug">{proj.scope.slice(0,120)}...</p>
                         </div>
-                        <h3 className="font-display font-semibold text-[18px] mt-2">{proj.name}</h3>
-                        <p className="text-[12px] text-white/50 mt-1 leading-snug">{proj.scope.slice(0,120)}...</p>
+                        <div className="text-right">
+                          <div className="text-[24px] font-bold font-display leading-none">{proj.progress}%</div>
+                          <div className="text-[10px] font-mono text-[#0EA5FF] mt-1">Readiness →</div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-[24px] font-bold font-display leading-none">{proj.progress}%</div>
-                        <div className="text-[10px] font-mono text-white/40 mt-1">{proj.tickets} tickets linked</div>
+                      <div className="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#0EA5FF] to-[#84FF3D]" style={{ width:`${proj.progress}%` }} />
                       </div>
-                    </div>
-                    <div className="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-[#0EA5FF] to-[#84FF3D]" style={{ width:`${proj.progress}%` }} />
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {proj.tech.slice(0,5).map(t=>(
-                        <span key={t} className="text-[10px] font-mono px-2 py-1 rounded-full bg-white/[0.05] border border-white/10 text-white/60">{t}</span>
-                      ))}
-                      {proj.tech.length>5 && <span className="text-[10px] font-mono px-2 py-1 rounded-full bg-white/5 text-white/30">+{proj.tech.length-5}</span>}
-                    </div>
-                    <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-white/40">
-                      <span>{proj.start} → {proj.golive}</span>
-                      <span>{proj.lastUpdate}</span>
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {proj.tech.slice(0,5).map(t=>(
+                          <span key={t} className="text-[10px] font-mono px-2 py-1 rounded-full bg-white/[0.05] border border-white/10 text-white/60">{t}</span>
+                        ))}
+                        {proj.tech.length>5 && <span className="text-[10px] font-mono px-2 py-1 rounded-full bg-white/5 text-white/30">+{proj.tech.length-5}</span>}
+                      </div>
+                      <div className="mt-4 flex items-center justify-between text-[11px] font-mono text-white/40">
+                        <span>{proj.start} → {proj.golive}</span>
+                        <span>{proj.lastUpdate}</span>
+                      </div>
+                    </button>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={()=>{ setSelectedProject(proj); setShowProjectReadiness(true); }}
+                        className="flex-1 py-2 rounded-xl bg-[#0EA5FF] text-black text-[12px] font-semibold"
+                      >
+                        View readiness
+                      </button>
+                      <button
+                        type="button"
+                        onClick={()=>{ setSelectedProject(proj); setShowProjectDetail(true); }}
+                        className="px-3 py-2 rounded-xl bg-white/10 border border-white/10 text-[12px]"
+                      >
+                        Details
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -1146,7 +1194,8 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
                       <h4 className="text-[11px] font-mono tracking-widest text-white/40">TIMELINE & TEAM</h4>
                       <div className="mt-2 text-[12px] text-white/70 leading-relaxed">Start {selectedProject.start}, Go-live {selectedProject.golive}. Team: {selectedProject.team.join(', ')}. Last update: {selectedProject.lastUpdate}</div>
                     </div>
-                    <div className="mt-5 flex gap-2">
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      <button onClick={()=>{ setShowProjectDetail(false); setShowProjectReadiness(true); }} className="px-4 py-2 rounded-xl bg-[#84FF3D] text-black font-semibold text-[12px]">Open readiness</button>
                       <button onClick={()=>{ setShowProjectDetail(false); setCompanionOpen(true); setActiveTab('assessment'); }} className="px-4 py-2 rounded-xl bg-[#0EA5FF] text-black font-semibold text-[12px]">Project Assessment</button>
                       <button onClick={()=>{ setShowProjectDetail(false); setActiveTab('tickets'); }} className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-[12px]">View Tickets</button>
                     </div>
@@ -1155,6 +1204,18 @@ h1,h2,h3,.font-display { font-family: Sora, sans-serif; }
               )}
             </div>
           )}
+
+          {showProjectReadiness && selectedProject ? (
+            <ProjectReadinessDrawer
+              projectName={selectedProject.name}
+              progress={selectedProject.progress}
+              color="#0EA5FF"
+              desc={selectedProject.scope}
+              tickets={selectedProject.tickets}
+              billing={`${selectedProject.start} → ${selectedProject.golive}`}
+              onClose={() => setShowProjectReadiness(false)}
+            />
+          ) : null}
 
           {/* PROJECT ASSESSMENT REQUEST — in-dashboard AVA Q&A */}
           {activeTab==='assessment' && (
