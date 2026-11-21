@@ -116,6 +116,82 @@ td.hl{color:var(--neon);font-weight:800}
 .modal-card{width:min(720px,100%);background:var(--bg2);border:1px solid var(--border);border-radius:18px;overflow:hidden}
 .modal-media{aspect-ratio:16/8;background-size:cover;background-position:center}
 .modal-body{padding:1.2rem}
+
+.feat-grid{display:grid;gap:1rem;grid-template-columns:1fr}
+@media(min-width:900px){.feat-grid{grid-template-columns:1.15fr 1fr}}
+.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+.feat-card .shot{background:#EEF1F5;min-height:220px;display:grid;place-items:center;padding:1rem;position:relative}
+.feat-card .shot img{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
+.feat-card .meta{padding:1.1rem 1.15rem 1.25rem}
+.feat-card .meta h3{margin:.35rem 0;font-size:1.15rem}
+.feat-card .meta p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.45}
+.el-showcase{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));margin-top:1.2rem}
+.el-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;transition:border-color .2s,transform .2s}
+.el-card:hover{border-color:rgba(14,165,255,.4);transform:translateY(-2px)}
+.el-card .preview{background:linear-gradient(180deg,#F4F6F9,#E8ECF2);min-height:148px;padding:1rem;display:grid;place-items:center;position:relative}
+.el-card .preview .badge-n{position:absolute;left:.75rem;top:.75rem;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.1em;color:var(--blue);background:rgba(5,7,13,.85);border:1px solid rgba(14,165,255,.35);padding:.2rem .45rem;border-radius:999px}
+.el-card .copy{padding:1rem}
+.el-card .copy h3{margin:0;font-size:1rem;font-family:Space Grotesk,Sora,sans-serif}
+.el-card .copy p{margin:.35rem 0 0;color:var(--muted);font-size:.85rem;line-height:1.4}
+/* Mini UI mockups */
+.m-logo{display:flex;align-items:center;gap:.55rem;background:#fff;border-radius:12px;padding:.7rem 1rem;box-shadow:0 10px 30px rgba(15,23,42,.1);width:min(220px,100%)}
+.m-logo .mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0EA5FF,#2563EB);color:#fff;display:grid;place-items:center;font-weight:800;font-family:Sora,sans-serif}
+.m-logo .txt b{display:block;font-size:13px;color:#0B1220}.m-logo .txt span{font-size:9px;letter-spacing:.14em;color:#64748B;font-family:ui-monospace,monospace}
+.m-menu{background:#fff;border-radius:12px;padding:.65rem .8rem;box-shadow:0 10px 30px rgba(15,23,42,.1);width:min(240px,100%)}
+.m-menu .row{display:flex;gap:.7rem;font-size:11px;font-weight:700;color:#0B1220;flex-wrap:wrap}
+.m-menu .mega{margin-top:.55rem;display:grid;grid-template-columns:1fr 1fr;gap:.35rem}
+.m-menu .mega i{display:block;height:28px;border-radius:8px;background:#E2E8F0}
+.m-util{display:flex;gap:.45rem}
+.m-util span{background:#fff;border-radius:999px;padding:.35rem .65rem;font-size:10px;font-weight:700;color:#334155;box-shadow:0 6px 16px rgba(15,23,42,.08)}
+.m-mobile{width:120px;height:150px;border-radius:18px;background:#0B1220;border:3px solid #1E293B;padding:.55rem;box-shadow:0 14px 30px rgba(0,0,0,.25);position:relative}
+.m-mobile .panel{background:#fff;border-radius:10px;height:100%;padding:.45rem;font-size:9px;color:#0B1220}
+.m-mobile .panel div{height:8px;background:#E2E8F0;border-radius:4px;margin:.35rem 0}
+.m-cart{background:#fff;border-radius:14px;padding:.75rem;width:min(210px,100%);box-shadow:0 12px 28px rgba(15,23,42,.12)}
+.m-cart .top{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:800;color:#0B1220}
+.m-cart .dot{background:#84FF3D;color:#052e16;font-size:9px;font-weight:900;border-radius:999px;padding:.1rem .35rem}
+.m-cart .line{display:flex;gap:.45rem;margin-top:.55rem;align-items:center}
+.m-cart .thumb{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,#CBD5E1,#94A3B8)}
+.m-cart .btn{margin-top:.55rem;background:#0EA5FF;color:#fff;border:0;border-radius:999px;width:100%;padding:.4rem;font-size:10px;font-weight:800}
+.m-wish{background:#fff;border-radius:14px;padding:.7rem;width:min(220px,100%);box-shadow:0 12px 28px rgba(15,23,42,.12)}
+.m-wish .hdr{display:flex;justify-content:space-between;align-items:center;font-size:10px;font-weight:800;color:#0B1220;margin-bottom:.5rem}
+.m-wish .create{background:#F97316;color:#fff;border-radius:8px;padding:.25rem .45rem;font-size:9px}
+.m-wish .items{display:grid;grid-template-columns:repeat(4,1fr);gap:.3rem}
+.m-wish .items i{display:block;aspect-ratio:1;border-radius:8px;background:#E2E8F0}
+.m-compare{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;width:min(210px,100%)}
+.m-compare .col{background:#fff;border-radius:12px;padding:.5rem;box-shadow:0 10px 24px rgba(15,23,42,.1)}
+.m-compare .ph{height:48px;border-radius:8px;background:#E2E8F0;margin-bottom:.35rem}
+.m-compare .bar{height:6px;border-radius:99px;background:#E2E8F0;margin:.25rem 0}
+.m-search{background:#fff;border-radius:14px;padding:.65rem;width:min(230px,100%);box-shadow:0 12px 28px rgba(15,23,42,.12)}
+.m-search .box{display:flex;align-items:center;gap:.4rem;border:1px solid #CBD5E1;border-radius:999px;padding:.4rem .65rem;font-size:10px;color:#64748B}
+.m-search .hit{display:flex;gap:.4rem;align-items:center;margin-top:.45rem;font-size:10px;color:#0B1220;font-weight:600}
+.m-search .hit b{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#0EA5FF,#84FF3D);display:block}
+.m-account{background:#fff;border-radius:14px;padding:.7rem;width:min(200px,100%);box-shadow:0 12px 28px rgba(15,23,42,.12);text-align:center}
+.m-account .av{width:42px;height:42px;border-radius:999px;margin:0 auto .45rem;background:linear-gradient(135deg,#2563EB,#0EA5FF)}
+.m-account .btn{background:#0B1220;color:#fff;border:0;border-radius:999px;padding:.4rem .8rem;font-size:10px;font-weight:800;width:100%}
+.m-nav{background:#fff;border-radius:999px;padding:.45rem .7rem;display:flex;gap:.85rem;box-shadow:0 10px 24px rgba(15,23,42,.12);font-size:9px;font-weight:700;color:#334155}
+.m-nav span{display:flex;flex-direction:column;align-items:center;gap:.15rem}
+.m-nav i{width:16px;height:16px;border-radius:5px;background:#CBD5E1;display:block}
+.m-cat{background:#fff;border-radius:14px;padding:.6rem;width:min(210px,100%);box-shadow:0 10px 24px rgba(15,23,42,.1);display:grid;gap:.3rem}
+.m-cat div{display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#0B1220;padding:.3rem .4rem;border-radius:8px;background:#F1F5F9}
+.m-btn{background:#0EA5FF;color:#fff;border-radius:999px;padding:.55rem 1.1rem;font-size:11px;font-weight:800;box-shadow:0 10px 24px rgba(14,165,255,.35)}
+.m-info{background:#fff;border-radius:14px;padding:.7rem;width:min(210px,100%);box-shadow:0 10px 24px rgba(15,23,42,.1);display:flex;gap:.5rem;align-items:center}
+.m-info .ic{width:32px;height:32px;border-radius:10px;background:rgba(132,255,61,.25);display:grid;place-items:center;font-size:14px}
+.m-info b{display:block;font-size:11px;color:#0B1220}.m-info span{font-size:9px;color:#64748B}
+.m-social{display:flex;gap:.4rem}
+.m-social i{width:28px;height:28px;border-radius:999px;background:#fff;box-shadow:0 6px 16px rgba(15,23,42,.1);display:block}
+.m-html{background:#fff;border-radius:12px;padding:.55rem;width:min(210px,100%);box-shadow:0 10px 24px rgba(15,23,42,.1)}
+.m-html .b{height:36px;border-radius:8px;background:linear-gradient(90deg,#0EA5FF33,#84FF3D33);margin-bottom:.35rem}
+.m-html .l{height:6px;border-radius:99px;background:#E2E8F0;margin:.25rem 0}
+.m-lang{background:#fff;border-radius:999px;padding:.4rem .7rem;display:flex;gap:.35rem;align-items:center;box-shadow:0 8px 20px rgba(15,23,42,.1);font-size:10px;font-weight:800;color:#0B1220}
+.m-lang em{width:14px;height:14px;border-radius:999px;background:linear-gradient(90deg,#0EA5FF,#84FF3D);display:inline-block}
+.showcase-split{display:grid;gap:1.2rem;align-items:center;margin-top:1.5rem}
+@media(min-width:960px){.showcase-split{grid-template-columns:1fr 1fr}}
+.showcase-split .copy h2{margin:.4rem 0;font-size:clamp(1.5rem,3vw,2.1rem)}
+.showcase-split .copy ul{list-style:none;padding:0;margin:1rem 0}
+.showcase-split .copy li{padding:.7rem 0;border-top:1px solid var(--border);font-weight:600;font-size:.95rem}
+.showcase-split .visual{border-radius:18px;overflow:hidden;border:1px solid var(--border);background:var(--bg2)}
+.showcase-split .visual img{width:100%;display:block;height:auto}
+
 </style>
 </head>
 <body>
@@ -126,6 +202,7 @@ td.hl{color:var(--neon);font-weight:800}
     <a href="#demos">Demos</a>
     <a href="#builder">Builder</a>
     <a href="#elements">Elements</a>
+    <a href="#conversion">Conversion</a>
     <a href="#variations">Variations</a>
     <a href="#filters">Filters</a>
     <a href="#plugins">Plugins</a>
@@ -181,14 +258,151 @@ td.hl{color:var(--neon);font-weight:800}
   </div>
 </div></section>
 
+
 <section class="section" id="elements"><div class="wrap">
-  <div class="section-h"><div class="kicker">HEADER + BUILDER ELEMENTS</div><h2>All builder elements onboard</h2><p>Scanned from WoodMart header/layout builders — Logo to Languages, plus 15 layout templates for product, shop, cart, checkout and content.</p></div>
-  <div class="grid el-grid">
-    <div class="card el"><div class="ico">01</div><strong>Logo</strong><p>Brand mark + sticky variants</p></div><div class="card el"><div class="ico">02</div><strong>Main menu</strong><p>Desktop mega / dropdown</p></div><div class="card el"><div class="ico">03</div><strong>Secondary menu</strong><p>Utility links</p></div><div class="card el"><div class="ico">04</div><strong>Mobile menu</strong><p>Full-screen / off-canvas</p></div><div class="card el"><div class="ico">05</div><strong>Cart</strong><p>Counter + mini cart</p></div><div class="card el"><div class="ico">06</div><strong>Wishlist</strong><p>Saved products</p></div><div class="card el"><div class="ico">07</div><strong>Compare</strong><p>Side-by-side tray</p></div><div class="card el"><div class="ico">08</div><strong>Search</strong><p>AJAX live results</p></div><div class="card el"><div class="ico">09</div><strong>Account</strong><p>Login / My Account</p></div><div class="card el"><div class="ico">10</div><strong>Categories</strong><p>Catalog hub</p></div><div class="card el"><div class="ico">11</div><strong>Button</strong><p>CTA element</p></div><div class="card el"><div class="ico">12</div><strong>Info box</strong><p>Shipping / trust</p></div><div class="card el"><div class="ico">13</div><strong>Social</strong><p>Network links</p></div><div class="card el"><div class="ico">14</div><strong>HTML Block</strong><p>Builder content</p></div><div class="card el"><div class="ico">15</div><strong>Languages</strong><p>WPML ready</p></div>
+  <div class="section-h">
+    <div class="kicker">HEADER + BUILDER ELEMENTS</div>
+    <h2>All builder elements onboard</h2>
+    <p>Scanned from WoodMart header/layout builders — Logo to Languages. Each element ships with a live-style graphic mockup (icons + UI previews), plus 15 layout templates for product, shop, cart, checkout and content.</p>
   </div>
-  <div class="section-h" style="margin-top:2rem"><div class="kicker">LAYOUT TYPES</div><h2>Fifteen layout canvases</h2></div>
+
+  <div class="feat-grid" style="margin-bottom:1.25rem">
+    <article class="feat-card">
+      <div class="shot"><img src="/woocommerce/assets/woodmart-header-builder.png" alt="AiKOVA Header Builder — drag logo, menu, search, cart, account"/></div>
+      <div class="meta"><div class="kicker">HEADER BUILDER</div><h3>Drag elements into every row</h3><p>Logo, Main / Secondary / Mobile menus, Cart, Wishlist, Compare, Search, Account — arrange desktop and mobile separately like WoodMart.</p></div>
+    </article>
+    <article class="feat-card">
+      <div class="shot"><img src="/woocommerce/assets/woodmart-shop-features.jpg" alt="Powerful filters, wishlist and mobile navbar graphics"/></div>
+      <div class="meta"><div class="kicker">SHOP GRAPHICS</div><h3>Filters · Wishlist · Mobile navbar</h3><p>AJAX filters with price + color swatches, wishlist boards, and app-like bottom navigation — visual cards, not text-only tiles.</p></div>
+    </article>
+  </div>
+
+  <div class="el-showcase">
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">01</span>
+        <div class="m-logo"><div class="mark">A</div><div class="txt"><b>AiKOVA</b><span>VAULT // OL8</span></div></div>
+      </div>
+      <div class="copy"><h3>Logo</h3><p>Brand mark + sticky / transparent / retina variants.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">02</span>
+        <div class="m-menu"><div class="row"><span>Shop ▾</span><span>Demos</span><span>Builder</span><span>Sale</span></div><div class="mega"><i></i><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="copy"><h3>Main menu</h3><p>Desktop mega / dropdown with banners and columns.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">03</span>
+        <div class="m-util"><span>Help</span><span>Stores</span><span>Track order</span></div>
+      </div>
+      <div class="copy"><h3>Secondary menu</h3><p>Utility links for support, locations and tracking.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">04</span>
+        <div class="m-mobile"><div class="panel"><strong>Menu</strong><div></div><div></div><div></div><div style="width:60%"></div></div></div>
+      </div>
+      <div class="copy"><h3>Mobile menu</h3><p>Full-screen / off-canvas with nested categories.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">05</span>
+        <div class="m-cart"><div class="top"><span>Mini cart</span><span class="dot">2</span></div><div class="line"><span class="thumb"></span><span style="font-size:10px;color:#0B1220;font-weight:700">Fringe Muse · $298</span></div><button class="btn" type="button">Checkout</button></div>
+      </div>
+      <div class="copy"><h3>Cart</h3><p>Counter + mini cart drawer with AJAX updates.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">06</span>
+        <div class="m-wish"><div class="hdr"><span>YOUR WISHLISTS</span><span class="create">Create</span></div><div class="items"><i></i><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="copy"><h3>Wishlist</h3><p>Saved products, lists and share — keep shoppers returning.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">07</span>
+        <div class="m-compare"><div class="col"><div class="ph"></div><div class="bar"></div><div class="bar" style="width:70%"></div></div><div class="col"><div class="ph" style="background:#CBD5E1"></div><div class="bar"></div><div class="bar" style="width:55%"></div></div></div>
+      </div>
+      <div class="copy"><h3>Compare</h3><p>Side-by-side attribute tray for considered purchases.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">08</span>
+        <div class="m-search"><div class="box">⌕ Search products…</div><div class="hit"><b></b>Fringe Muse Hobo</div><div class="hit"><b style="background:linear-gradient(135deg,#2563EB,#0EA5FF)"></b>Noir Structured Tote</div></div>
+      </div>
+      <div class="copy"><h3>Search</h3><p>AJAX live results with imagery as people type.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">09</span>
+        <div class="m-account"><div class="av"></div><div style="font-size:10px;font-weight:800;color:#0B1220;margin-bottom:.45rem">My Account</div><button class="btn" type="button">Login / Register</button></div>
+      </div>
+      <div class="copy"><h3>Account</h3><p>Login / My Account — desktop header + mobile navbar.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">10</span>
+        <div class="m-cat"><div>Fashion <span style="color:#64748B">24</span></div><div>Furniture <span style="color:#64748B">19</span></div><div>Electronics <span style="color:#64748B">18</span></div></div>
+      </div>
+      <div class="copy"><h3>Categories</h3><p>Catalog hub with counts and accordion toggles.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">11</span><div class="m-btn">Shop now →</div></div>
+      <div class="copy"><h3>Button</h3><p>CTA element — solid, outline, sticky header actions.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">12</span>
+        <div class="m-info"><div class="ic">✓</div><div><b>Free shipping</b><span>Orders over $100</span></div></div>
+      </div>
+      <div class="copy"><h3>Information box</h3><p>Shipping, trust and promo cues in the header.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">13</span><div class="m-social"><i></i><i></i><i></i><i></i></div></div>
+      <div class="copy"><h3>Social buttons</h3><p>Network links for brand and wishlist sharing.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">14</span>
+        <div class="m-html"><div class="b"></div><div class="l"></div><div class="l" style="width:70%"></div></div>
+      </div>
+      <div class="copy"><h3>HTML Block</h3><p>Drop builder content / banners into header rows.</p></div>
+    </article>
+    <article class="el-card">
+      <div class="preview"><span class="badge-n">15</span><div class="m-lang"><em></em> EN ▾</div></div>
+      <div class="copy"><h3>Languages</h3><p>WPML-ready language switcher element.</p></div>
+    </article>
+  </div>
+
+  <div class="section-h" style="margin-top:2.2rem"><div class="kicker">LAYOUT TYPES</div><h2>Fifteen layout canvases</h2><p>Product, shop, cart, checkout, account, blog and portfolio templates with display conditions.</p></div>
   <div class="grid layout-grid">
-    <div class="card layout">Single product</div><div class="card layout">Products archive</div><div class="card layout">Product loop card</div><div class="card layout">Cart</div><div class="card layout">Empty cart</div><div class="card layout">Checkout form</div><div class="card layout">Checkout top</div><div class="card layout">Thank you</div><div class="card layout">My Account</div><div class="card layout">Login / Register</div><div class="card layout">Lost password</div><div class="card layout">Single post</div><div class="card layout">Blog</div><div class="card layout">Portfolio</div><div class="card layout">Single project</div>
+    <div class="card layout">Single product</div><div class="card layout">Products archive</div><div class="card layout">Product loop card</div>
+    <div class="card layout">Cart</div><div class="card layout">Empty cart</div><div class="card layout">Checkout form</div>
+    <div class="card layout">Checkout top</div><div class="card layout">Thank you</div><div class="card layout">My Account</div>
+    <div class="card layout">Login / Register</div><div class="card layout">Lost password</div><div class="card layout">Single post</div>
+    <div class="card layout">Blog</div><div class="card layout">Portfolio</div><div class="card layout">Single project</div>
+  </div>
+
+  <div class="showcase-split" id="conversion">
+    <div class="copy">
+      <div class="kicker">SALES &amp; CONVERSION</div>
+      <h2>Remove friction between “I want it” and “order placed”</h2>
+      <p style="color:var(--muted);line-height:1.55">Sticky add to cart, frequently bought together, free-shipping progress, size guide &amp; stock cues — commerce patterns that keep momentum.</p>
+      <ul>
+        <li>Sticky add to cart</li>
+        <li>Frequently bought together</li>
+        <li>Free-shipping progress</li>
+        <li>Size guide &amp; stock cues</li>
+      </ul>
+      <a class="btn neon" href="#plugins">Explore conversion tools →</a>
+    </div>
+    <div class="visual"><img src="/woocommerce/assets/woodmart-conversion.jpg" alt="Sales and conversion product page graphics"/></div>
+  </div>
+
+  <div class="showcase-split" id="retention" style="margin-top:1.5rem">
+    <div class="visual"><img src="/woocommerce/assets/woodmart-retention.jpg" alt="Retention tools — abandoned cart, waitlist, reminders"/></div>
+    <div class="copy">
+      <div class="kicker">RETENTION</div>
+      <h2>Give customers a reason to come back</h2>
+      <p style="color:var(--muted);line-height:1.55">Abandoned cart recovery, back-in-stock waitlists, review reminders and price trackers — save, revisit, repurchase.</p>
+      <ul>
+        <li>Abandoned cart</li>
+        <li>Back-in-stock waitlist</li>
+        <li>Review reminder</li>
+        <li>Price tracker</li>
+      </ul>
+      <a class="btn blue" href="#plugins">Explore retention tools →</a>
+    </div>
   </div>
 </div></section>
 
@@ -420,7 +634,8 @@ td.hl{color:var(--neon);font-weight:800}
 
 <footer class="foot"><div class="wrap" style="display:grid;gap:1.2rem">
   <div><strong style="color:var(--text)">AiKOVA</strong> · Engineered Intelligence. Delivered.<div class="mono" style="margin-top:.35rem;font-size:11px;color:var(--dim)">VOID #05070D · SIGNAL #0EA5FF · LIVE #84FF3D</div></div>
-  <div style="display:flex;flex-wrap:wrap;gap:1rem;font-size:13px"><a href="#demos">Demos</a><a href="#elements">Elements</a><a href="#filters">Filters</a><a href="#plugins">Plugins</a><a href="https://aikova.co.uk/">aikova.co.uk</a></div>
+  <div style="display:flex;flex-wrap:wrap;gap:1rem;font-size:13px"><a href="#demos">Demos</a><a href="#elements">Elements</a>
+    <a href="#conversion">Conversion</a><a href="#filters">Filters</a><a href="#plugins">Plugins</a><a href="https://aikova.co.uk/">aikova.co.uk</a></div>
   <div style="border-top:1px solid var(--border);padding-top:1rem;font-size:12px;display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap"><span>© AiKOVA Multipurpose WooCommerce Theme</span><span class="mono">100+ DEMOS · BUILDER · FILTERS · VARIATIONS</span></div>
 </div></footer>
 
