@@ -41,6 +41,8 @@ Error generating stack: `+u.message+`
     'Industrial Map': '/industries',
     'View Industrial Portfolio': '/portfolio',
     'Industrial Portfolio': '/portfolio',
+    'WooCommerce': '/woocommerce',
+    'Multipurpose WooCommerce Theme': '/woocommerce',
     'CONTACT': '/contact',
     'Contact': '/contact',
     'OS \u2022 Engineering Vault': '/os',
@@ -71,7 +73,7 @@ Error generating stack: `+u.message+`
     if (!href) return;
     if (href.indexOf('mailto:') === 0) return;
     if (href.charAt(0) === '#') return;
-    var allowed = ['/portfolio', '/solutions', '/industries', '/contact', '/os', '/os/login'];
+    var allowed = ['/portfolio', '/solutions', '/industries', '/woocommerce', '/contact', '/os', '/os/login'];
     if (allowed.indexOf(href) !== -1 || href.indexOf('/os/') === 0) {
       e.preventDefault();
       go(href);
@@ -79,5 +81,16 @@ Error generating stack: `+u.message+`
   }, true);
 })();
 </script>
+
+<div id="aikova-woo-promo-banner" style="position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;max-width:720px;margin:0 auto;background:linear-gradient(135deg,#0B2A22,#134033 55%,#3A2E12);border:1px solid rgba(201,162,39,.45);border-radius:18px;padding:14px 16px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#F6F0DF;font-family:system-ui,sans-serif;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+  <div style="min-width:220px;flex:1">
+    <div style="font-size:10px;letter-spacing:.16em;font-weight:800;color:#C9A227;text-transform:uppercase">New · WooCommerce Theme</div>
+    <div style="font-size:15px;font-weight:700;margin-top:4px">AiKOVA Multipurpose WooCommerce Theme</div>
+    <div style="font-size:12px;opacity:.75;margin-top:2px">100+ demos · Builder · banners · cards · infographics</div>
+  </div>
+  <a href="/woocommerce" style="background:#C9A227;color:#0B2A22;font-weight:800;font-size:12px;padding:10px 14px;border-radius:999px;text-decoration:none;white-space:nowrap">Explore WooCommerce</a>
+  <button type="button" aria-label="Dismiss" onclick="this.parentElement.remove()" style="position:absolute;top:8px;right:10px;background:transparent;border:0;color:#F6F0DF;font-size:16px;cursor:pointer;opacity:.7">×</button>
+</div>
+
 </body>
 </html>

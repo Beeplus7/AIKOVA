@@ -14,6 +14,7 @@ FinOps, evidence vault / DOS7, AWS, multilingual voice where required.
 ## Marketing pages (all public, crawlable)
 - Home: https://aikova.co.uk/
 - Portfolio: https://aikova.co.uk/portfolio
+- WooCommerce Theme: https://aikova.co.uk/woocommerce — AiKOVA Multipurpose WooCommerce Theme (100+ demos, Builder, banners/cards/infographics)
 - Services: https://aikova.co.uk/services
 - Solutions: https://aikova.co.uk/solutions
 - Industries: https://aikova.co.uk/industries

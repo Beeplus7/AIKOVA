@@ -5,6 +5,7 @@ export const marketingRoutes = [
   { href: '/solutions', label: 'Solutions' },
   { href: '/industries', label: 'Industries' },
   { href: '/portfolio', label: 'Portfolio' },
+  { href: '/woocommerce', label: 'WooCommerce' },
   { href: '/contact', label: 'Contact' },
 ] as const;
 

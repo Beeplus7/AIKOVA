@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AiKOVA Multipurpose WooCommerce Theme — 100+ Demos + Builder</title>
+<meta name="description" content="AiKOVA Multipurpose WooCommerce Theme: 100+ prebuilt websites, visual theme builder, banners, cards and infographics. Engineered Intelligence. Delivered."/>
+<meta property="og:title" content="AiKOVA Multipurpose WooCommerce Theme"/>
+<meta property="og:description" content="100+ demos. One theme. Every store. Builder, plugins and commerce tools included."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--emerald:#0B2A22;--emerald-2:#0E3A2E;--gold:#C9A227;--gold-soft:#E8D48A;--cream:#F6F0DF;--cream-2:#FFFDF4;--ink:#102019;--muted:#66766E;--line:#D9D0B6;--black:#0A0A0A}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:Manrope,system-ui,sans-serif;background:var(--emerald);color:var(--ink)}
+.font-display,.demo-body h3,h1,h2{font-family:Fraunces,Georgia,serif}
+a{color:inherit;text-decoration:none}
+.eyebrow{letter-spacing:.22em;text-transform:uppercase;font-size:11px;font-weight:800;color:var(--gold-soft)}
+.wrap{max-width:1440px;margin:0 auto;padding:0 1.1rem}
+.topbar{background:var(--gold);color:#0B2A22;text-align:center;padding:.55rem 1rem;font-size:13px;font-weight:800}
+header{position:sticky;top:0;z-index:40;backdrop-filter:blur(16px);background:rgba(11,42,34,.95);border-bottom:1px solid rgba(255,255,255,.1)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:72px}
+.brand{display:flex;align-items:center;gap:.75rem}
+.mark{width:40px;height:40px;border-radius:4px;background:var(--gold);color:#0B2A22;display:grid;place-items:center;font-family:Fraunces,serif;font-weight:700;font-size:1.25rem}
+.brand strong{display:block;color:var(--cream);font-size:1.25rem;line-height:1}
+.brand small{display:block;color:var(--gold-soft);font-size:9px;letter-spacing:.25em;font-weight:800}
+.links{display:none;gap:1.25rem;color:#D8DFDB;font-size:.9rem;font-weight:700}
+@media(min-width:1024px){.links{display:flex}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border-radius:999px;border:0;font-weight:800;cursor:pointer;padding:.7rem 1.15rem;font-size:.875rem}
+.btn.solid{background:var(--gold);color:#0B2A22}
+.btn.ghost{background:transparent;color:var(--cream);border:1px solid rgba(255,255,255,.28)}
+.btn.dark{background:var(--emerald);color:#fff}
+.hero{position:relative;overflow:hidden;color:var(--cream);background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:44px 44px}
+.hero-grid{display:grid;gap:2.5rem;padding:3rem 0 2.5rem;align-items:center}
+@media(min-width:960px){.hero-grid{grid-template-columns:1.05fr .95fr}}
+.hero h1{font-size:clamp(2.6rem,7vw,5.4rem);line-height:.92;letter-spacing:-.04em;margin:.9rem 0 .6rem}
+.hero h1 em{color:var(--gold-soft);font-style:italic;font-weight:600}
+.lead{font-size:clamp(1.15rem,2.4vw,1.55rem);font-weight:700;margin:0}
+.sub{color:#BEC9C2;font-size:1.05rem;line-height:1.55;max-width:34rem;margin:1rem 0 0}
+.cta-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1.6rem}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;max-width:34rem;margin-top:1.8rem}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{border-top:1px solid rgba(255,255,255,.2);padding-top:.7rem}
+.stat b{display:block;font-family:Fraunces,serif;font-size:clamp(1.5rem,3vw,1.9rem);color:var(--gold-soft)}
+.stat span{font-size:11px;color:#B9C5BE}
+.mosaic{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;position:relative}
+.mosaic img{width:100%;object-fit:cover;border-radius:1.1rem;display:block}
+.badge-float{position:absolute;top:-.6rem;right:-.2rem;z-index:2;background:var(--cream);color:#0B2A22;padding:.45rem .7rem;border-radius:999px;font-size:12px;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.25);transform:rotate(2deg)}
+.cats{background:var(--cream);border-block:1px solid var(--line);padding:1rem 0}
+.cat-row{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}
+.cat-row span{background:#fff;border:1px solid var(--line);padding:.4rem .8rem;border-radius:999px;font-size:12px;font-weight:800;color:var(--emerald)}
+.section{padding:3.5rem 0}
+.cream{background:var(--cream-2)}
+.cream-soft{background:var(--cream)}
+.white{background:#fff}
+.section-head{max-width:42rem}
+.section-head h2{font-size:clamp(2rem,5vw,3.4rem);line-height:.98;letter-spacing:-.03em;color:var(--emerald);margin:.6rem 0}
+.section-head p{color:var(--muted);font-size:1.05rem;line-height:1.55}
+.toolbar{margin-top:1.8rem;background:#fff;border:1px solid var(--line);border-radius:1.1rem;padding:.85rem}
+.search{display:flex;gap:.6rem;flex-wrap:wrap}
+.search label{flex:1;min-width:220px;display:flex;align-items:center;gap:.5rem;border:1px solid var(--line);border-radius:999px;padding:.7rem 1rem;background:var(--cream)}
+.search input{border:0;outline:0;width:100%;background:transparent;font:inherit}
+.chips{display:flex;gap:.45rem;overflow:auto;padding:.7rem 0 .2rem}
+.chips button{white-space:nowrap;border-radius:999px;border:1px solid var(--line);background:var(--cream);color:var(--emerald);padding:.45rem .9rem;font-weight:800;font-size:.85rem;cursor:pointer}
+.chips button.active{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+.grid{display:grid;gap:1rem;margin-top:1.25rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.demo-card{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 18px 45px rgba(11,42,34,.10)}
+.demo-media{aspect-ratio:4/3;background-size:cover;background-position:center;position:relative}
+.demo-media .num,.demo-media .pill{position:absolute;top:.7rem;font-size:11px;font-weight:900;padding:.25rem .55rem;border-radius:999px}
+.demo-media .num{left:.7rem;background:var(--emerald);color:#fff}
+.demo-media .pill{right:.7rem;background:rgba(255,255,255,.95)}
+.demo-body{padding:1rem}
+.demo-body h3{margin:0;font-size:1.3rem;color:var(--emerald)}
+.demo-body p{margin:.4rem 0 0;color:var(--muted);font-size:.9rem;line-height:1.45;min-height:2.6em}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.7rem}
+.tags span{background:var(--cream);font-size:11px;font-weight:800;padding:.2rem .5rem;border-radius:999px}
+.actions{display:flex;gap:.45rem;margin-top:.9rem}
+.actions .btn{flex:1;padding:.65rem .5rem}
+.builder{background:var(--emerald);color:var(--cream)}
+.builder .section-head h2,.builder .section-head .eyebrow{color:var(--cream)}
+.builder .section-head p{color:#C9D1CB}
+.builder-grid{display:grid;gap:2rem;align-items:center}
+@media(min-width:960px){.builder-grid{grid-template-columns:.9fr 1.1fr}}
+.feat-mini{display:grid;gap:.7rem;margin-top:1.5rem}
+@media(min-width:640px){.feat-mini{grid-template-columns:1fr 1fr}}
+.feat-mini div{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:1rem;padding:1rem}
+.canvas{background:var(--cream);color:#0B2A22;border-radius:24px;padding:1rem;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.infograph{display:grid;gap:1rem;margin-top:1.8rem}
+@media(min-width:800px){.infograph{grid-template-columns:repeat(4,1fr)}}
+.step{border:1px solid rgba(201,162,39,.25);background:rgba(255,255,255,.04);border-radius:1.1rem;padding:1.1rem}
+.step b{color:var(--gold-soft)}
+.plugin-grid,.feature-grid{display:grid;gap:.75rem;margin-top:1.8rem}
+@media(min-width:700px){.plugin-grid{grid-template-columns:1fr 1fr}.feature-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1100px){.plugin-grid{grid-template-columns:1fr 1fr 1fr}.feature-grid{grid-template-columns:repeat(4,1fr)}}
+.plugin,.feature{background:#fff;border:1px solid var(--line);border-radius:1.1rem;padding:1rem}
+.builder .feature{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:var(--cream)}
+.builder .feature p{color:#BCC8C1}
+.price-grid{display:grid;gap:1rem;margin-top:1.8rem}
+@media(min-width:900px){.price-grid{grid-template-columns:repeat(3,1fr);align-items:stretch}}
+.price{border-radius:24px;padding:1.4rem;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line)}
+.price.hot{background:var(--emerald);color:#fff;border:0;box-shadow:0 20px 50px rgba(11,42,34,.25);transform:translateY(-4px)}
+.price .amt{font-family:Fraunces,serif;font-size:3rem;margin:.7rem 0 .2rem}
+.compare{overflow:auto;border:1px solid var(--line);border-radius:1.1rem;margin-top:1.5rem}
+table{width:100%;border-collapse:collapse;min-width:680px;background:#fff}
+th,td{padding:.9rem 1rem;text-align:left;font-size:.9rem;border-top:1px solid #eee}
+th{background:var(--cream);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+td.hl{background:#F8F5E8;font-weight:800;color:var(--emerald)}
+.banner-card{background:linear-gradient(135deg,#0B2A22 0%,#134033 55%,#3A2E12 100%);color:var(--cream);border-radius:28px;padding:clamp(1.4rem,4vw,2.4rem);display:grid;gap:1.2rem;border:1px solid rgba(201,162,39,.35);box-shadow:0 24px 60px rgba(10,10,10,.25)}
+@media(min-width:900px){.banner-card{grid-template-columns:1.3fr .7fr;align-items:center}}
+.banner-card h2{margin:.4rem 0;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.05}
+.foot{background:#071D18;color:#C9D1CB;padding:3rem 0 1.2rem}
+.foot-grid{display:grid;gap:1.5rem}
+@media(min-width:800px){.foot-grid{grid-template-columns:2fr 1fr 1fr}}
+.toast{position:fixed;bottom:1rem;right:1rem;background:var(--emerald);color:var(--cream);border:1px solid var(--gold);padding:.75rem 1rem;border-radius:12px;display:none;z-index:60;font-weight:700}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;padding:1rem;z-index:70}
+.modal.open{display:flex}
+.modal-card{background:#fff;border-radius:24px;overflow:hidden;max-width:720px;width:100%}
+.modal-media{aspect-ratio:16/8;background-size:cover;background-position:center}
+.modal-body{padding:1.3rem}
+</style>
+</head>
+<body>
+<div class="topbar">Engineered Intelligence. Delivered. — 100+ prebuilt websites in one Multipurpose WooCommerce Theme</div>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top"><span class="mark">A</span><span><strong>AiKOVA</strong><small>ENGINEERED INTELLIGENCE</small></span></a>
+    <nav class="links">
+      <a href="#demos">Demos (100+)</a>
+      <a href="#builder">Theme Builder</a>
+      <a href="#features">Features</a>
+      <a href="#plugins">Plugins</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#compare">Compare</a>
+    </nav>
+    <div style="display:flex;gap:.5rem">
+      <a class="btn ghost" href="#demos">Live Preview</a>
+      <a class="btn solid" href="#pricing">Buy AiKOVA $59</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">Multipurpose WooCommerce Theme + Builder</div>
+      <h1>AIKOVA <em>—</em><br/>Every store.<br/>One theme.</h1>
+      <p class="lead">100+ Prebuilt Websites. One Theme. Every Store.</p>
+      <p class="sub">Build any store in minutes — Fashion, Electronics, Furniture, Beauty, Grocery, Jewelry, Litt Luxury. Start finished, then shape it with AiKOVA Builder. WoodMart-class commerce depth, AiKOVA design intelligence.</p>
+      <div class="cta-row">
+        <a class="btn solid" href="#demos">Explore 100+ Demos</a>
+        <a class="btn ghost" href="#builder">Try Theme Builder</a>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat"><b data-count="100">0</b><span>Prebuilt demos</span></div>
+        <div class="stat"><b data-count="120">0</b><span>Sales goal (K)</span></div>
+        <div class="stat"><b data-count="49">0</b><span>Rating ×10</span></div>
+        <div class="stat"><b data-count="90">0</b><span>PageSpeed+</span></div>
+      </div>
+      <p style="margin-top:1rem;font-size:12px;color:#91A19A">1-Click Import · Lifetime updates · aikova.co.uk/woocommerce</p>
+    </div>
+    <div>
+      <div class="mosaic">
+        <span class="badge-float">★ 4.9 · Builder ready</span>
+        <div style="display:grid;gap:.85rem;margin-top:1.6rem">
+          <img src="assets/215e2da68a52ccc8-image_20261121_013137_1.webp" alt="Maison Fashion demo" style="aspect-ratio:4/5"/>
+          <img src="assets/3fbec96f0358014b-image_20261121_013139.webp" alt="Lumiere Beauty demo" style="aspect-ratio:1"/>
+        </div>
+        <div style="display:grid;gap:.85rem">
+          <img src="assets/30ea58778a1b3519-image_20261121_013136.webp" alt="Volt Electronics demo" style="aspect-ratio:1"/>
+          <img src="assets/aaf0c0135de55feb-image_20261121_013137.webp" alt="Nordic Furniture demo" style="aspect-ratio:4/5"/>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem;margin-top:.85rem">
+        <img src="assets/a4c981640c78ac5b-image_20261121_013138.webp" alt="Grocery demo" style="height:120px;width:100%;object-fit:cover;border-radius:1.1rem"/>
+        <img src="assets/1c4af187d0fca36d-image_20261121_013136_1.webp" alt="Jewelry demo" style="height:120px;width:100%;object-fit:cover;border-radius:1.1rem"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cats"><div class="wrap cat-row">
+<span>Fashion</span> <span>Electronics</span> <span>Furniture</span> <span>Beauty</span> <span>Grocery</span> <span>Jewelry</span> <span>Luxury</span> <span>Food</span> <span>Sport</span> <span>Books</span> <span>Digital</span> <span>Home</span>
+</div></section>
+
+<section class="section cream" id="demos">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow" style="color:#9A7B18">Demo showcase · banners + cards</div>
+      <h2>Start finished. Finish faster.</h2>
+      <p>Twelve featured starting points from a library of 100+. Search, filter, preview, import — WoodMart-style demo velocity with AiKOVA polish.</p>
+    </div>
+    <div class="toolbar">
+      <div class="search">
+        <label><span aria-hidden="true">⌕</span><input id="q" placeholder="Search demos — try beauty or furniture" /></label>
+        <button type="button" class="btn dark" onclick="document.getElementById('builder').scrollIntoView({behavior:'smooth'})">Open Theme Builder</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div id="importNote" style="display:none;margin-top:1rem;background:#E8F3E9;border:1px solid #b7dcc0;border-radius:12px;padding:.8rem 1rem;font-weight:700;color:#14532d"></div>
+    <div class="grid" id="demoGrid">
+<article class="demo-card" data-cat="Fashion" data-name="maison fashion fashion elementor">
+  <div class="demo-media" style="background-image:url('assets/215e2da68a52ccc8-image_20261121_013137_1.webp')"><span class="num">01</span><span class="pill">Fashion</span></div>
+  <div class="demo-body">
+    <h3>Maison Fashion</h3>
+    <p>Editorial fashion storefront with lookbook collections and refined product storytelling.</p>
+    <div class="tags"><span>Elementor</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Maison Fashion">Import Demo</button><button type="button" class="btn ghost" data-preview="Maison Fashion">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Electronics" data-name="volt electronics electronics elementor">
+  <div class="demo-media" style="background-image:url('assets/30ea58778a1b3519-image_20261121_013136.webp')"><span class="num">02</span><span class="pill">Electronics</span></div>
+  <div class="demo-body">
+    <h3>Volt Electronics</h3>
+    <p>High-energy tech store with comparison-ready layouts and specification-led product pages.</p>
+    <div class="tags"><span>Elementor</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Volt Electronics">Import Demo</button><button type="button" class="btn ghost" data-preview="Volt Electronics">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Furniture" data-name="nordic furniture furniture wpbakery">
+  <div class="demo-media" style="background-image:url('assets/aaf0c0135de55feb-image_20261121_013137.webp')"><span class="num">03</span><span class="pill">Furniture</span></div>
+  <div class="demo-body">
+    <h3>Nordic Furniture</h3>
+    <p>Calm, material-first furniture shopping with room stories and considered proportions.</p>
+    <div class="tags"><span>WPBakery</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Nordic Furniture">Import Demo</button><button type="button" class="btn ghost" data-preview="Nordic Furniture">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Beauty" data-name="lumiere beauty beauty gutenberg">
+  <div class="demo-media" style="background-image:url('assets/3fbec96f0358014b-image_20261121_013139.webp')"><span class="num">04</span><span class="pill">Beauty</span></div>
+  <div class="demo-body">
+    <h3>Lumiere Beauty</h3>
+    <p>Luminous beauty boutique with shade stories, rituals and gentle product discovery.</p>
+    <div class="tags"><span>Gutenberg</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Lumiere Beauty">Import Demo</button><button type="button" class="btn ghost" data-preview="Lumiere Beauty">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Grocery" data-name="greenharvest grocery grocery elementor">
+  <div class="demo-media" style="background-image:url('assets/a4c981640c78ac5b-image_20261121_013138.webp')"><span class="num">05</span><span class="pill">Grocery</span></div>
+  <div class="demo-body">
+    <h3>GreenHarvest Grocery</h3>
+    <p>Fresh-market grocery with fast category browsing and everyday essentials at a glance.</p>
+    <div class="tags"><span>Elementor</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="GreenHarvest Grocery">Import Demo</button><button type="button" class="btn ghost" data-preview="GreenHarvest Grocery">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Jewelry" data-name="aurum jewelry jewelry wpbakery">
+  <div class="demo-media" style="background-image:url('assets/1c4af187d0fca36d-image_20261121_013136_1.webp')"><span class="num">06</span><span class="pill">Jewelry</span></div>
+  <div class="demo-body">
+    <h3>Aurum Jewelry</h3>
+    <p>Fine jewelry experience built around craft, detail and quiet luxury.</p>
+    <div class="tags"><span>WPBakery</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Aurum Jewelry">Import Demo</button><button type="button" class="btn ghost" data-preview="Aurum Jewelry">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Luxury" data-name="litt luxury luxury elementor">
+  <div class="demo-media" style="background-image:url('assets/1c4af187d0fca36d-image_20261121_013136_1.webp')"><span class="num">07</span><span class="pill">Luxury</span></div>
+  <div class="demo-body">
+    <h3>Litt Luxury</h3>
+    <p>A curated luxury edit where imagery, pacing and restraint do the selling.</p>
+    <div class="tags"><span>Elementor</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Litt Luxury">Import Demo</button><button type="button" class="btn ghost" data-preview="Litt Luxury">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Sport" data-name="atlas sport sport gutenberg">
+  <div class="demo-media" style="background-image:url('assets/30ea58778a1b3519-image_20261121_013136.webp')"><span class="num">08</span><span class="pill">Sport</span></div>
+  <div class="demo-body">
+    <h3>Atlas Sport</h3>
+    <p>Performance-led sport store with bold category rails and gear-focused merchandising.</p>
+    <div class="tags"><span>Gutenberg</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Atlas Sport">Import Demo</button><button type="button" class="btn ghost" data-preview="Atlas Sport">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Food" data-name="saffron food food elementor">
+  <div class="demo-media" style="background-image:url('assets/a4c981640c78ac5b-image_20261121_013138.webp')"><span class="num">09</span><span class="pill">Food</span></div>
+  <div class="demo-body">
+    <h3>Saffron Food</h3>
+    <p>Warm food-market demo with seasonal collections and appetite-first product cards.</p>
+    <div class="tags"><span>Elementor</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Saffron Food">Import Demo</button><button type="button" class="btn ghost" data-preview="Saffron Food">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Books" data-name="ink books books wpbakery">
+  <div class="demo-media" style="background-image:url('assets/215e2da68a52ccc8-image_20261121_013137_1.webp')"><span class="num">10</span><span class="pill">Books</span></div>
+  <div class="demo-body">
+    <h3>Ink Books</h3>
+    <p>A bookshop with author collections, reading lists and calm editorial rhythm.</p>
+    <div class="tags"><span>WPBakery</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Ink Books">Import Demo</button><button type="button" class="btn ghost" data-preview="Ink Books">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Digital" data-name="nova digital digital gutenberg">
+  <div class="demo-media" style="background-image:url('assets/30ea58778a1b3519-image_20261121_013136.webp')"><span class="num">11</span><span class="pill">Digital</span></div>
+  <div class="demo-body">
+    <h3>Nova Digital</h3>
+    <p>Digital products and downloads with clear licensing, previews and feature highlights.</p>
+    <div class="tags"><span>Gutenberg</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Nova Digital">Import Demo</button><button type="button" class="btn ghost" data-preview="Nova Digital">Preview</button></div>
+  </div>
+</article>
+
+<article class="demo-card" data-cat="Furniture" data-name="atelier home furniture elementor">
+  <div class="demo-media" style="background-image:url('assets/aaf0c0135de55feb-image_20261121_013137.webp')"><span class="num">12</span><span class="pill">Furniture</span></div>
+  <div class="demo-body">
+    <h3>Atelier Home</h3>
+    <p>A home atelier where collections, craftsmanship and room inspiration lead the journey.</p>
+    <div class="tags"><span>Elementor</span><span>WooCommerce</span><span>1-Click Import</span></div>
+    <div class="actions"><button type="button" class="btn solid" data-import="Atelier Home">Import Demo</button><button type="button" class="btn ghost" data-preview="Atelier Home">Preview</button></div>
+  </div>
+</article></div>
+  </div>
+</section>
+
+<section class="section builder" id="builder">
+  <div class="wrap builder-grid">
+    <div>
+      <div class="section-head">
+        <div class="eyebrow">AiKOVA Builder</div>
+        <h2>No code. Total control.</h2>
+        <p>Header, shop, product page and footer as one connected system — like WoodMart’s builders, engineered for AiKOVA demos.</p>
+      </div>
+      <div class="feat-mini">
+        <div><strong>Drag & Drop</strong><p style="margin:.35rem 0 0;color:#BCC8C1;font-size:.9rem">Build visually without touching code.</p></div>
+        <div><strong>60+ Widgets</strong><p style="margin:.35rem 0 0;color:#BCC8C1;font-size:.9rem">Grids, filters, banners, stories.</p></div>
+        <div><strong>Global Colors / Fonts</strong><p style="margin:.35rem 0 0;color:#BCC8C1;font-size:.9rem">One change updates every template.</p></div>
+        <div><strong>AJAX Filters</strong><p style="margin:.35rem 0 0;color:#BCC8C1;font-size:.9rem">Instant refinement without reloads.</p></div>
+      </div>
+      <div class="infograph" style="margin-top:1.6rem">
+        <div class="step"><b>01</b><h3>Pick Demo</h3><p style="color:#BCC8C1;font-size:.9rem">Choose from 100+ niche storefronts.</p></div>
+        <div class="step"><b>02</b><h3>Import</h3><p style="color:#BCC8C1;font-size:.9rem">One-click pages, products, settings.</p></div>
+        <div class="step"><b>03</b><h3>Customise</h3><p style="color:#BCC8C1;font-size:.9rem">Builder + banners + cards.</p></div>
+        <div class="step"><b>04</b><h3>Launch</h3><p style="color:#BCC8C1;font-size:.9rem">PageSpeed-minded storefront.</p></div>
+      </div>
+    </div>
+    <div class="canvas">
+      <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:900">
+        <span>● ● ●</span><span>AIKOVA BUILDER · MAISON FASHION</span><span style="color:#166534">● Live</span>
+      </div>
+      <div style="margin-top:.8rem;background:#0B2A22;color:#fff;border-radius:12px;padding:.7rem .8rem;font-size:11px;font-weight:800;display:flex;justify-content:space-between"><span>LOGO · MENU · SEARCH · CART</span><span style="color:var(--gold-soft)">HEADER</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.55rem;margin-top:.55rem">
+        <div style="background:#F0DF9F;border-radius:12px;padding:.8rem;min-height:110px"><strong>Shop Layout</strong><div style="font-size:11px;margin-top:.35rem">Grid · Filters · Cards</div></div>
+        <div style="background:#D8E8D5;border-radius:12px;padding:.8rem"><strong>Product Page</strong><div style="font-size:11px;margin-top:.35rem">Gallery · Swatches</div></div>
+        <div style="background:#F6D8C8;border-radius:12px;padding:.8rem"><strong>Mega Menu</strong><div style="font-size:11px;margin-top:.35rem">Columns · Imagery</div></div>
+      </div>
+      <div style="margin-top:.55rem;background:var(--gold);border-radius:12px;padding:.7rem .8rem;font-size:11px;font-weight:900;display:flex;justify-content:space-between"><span>ACTIVE BLOCK: HEADER BUILDER</span><span>DRAG TO REORDER</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section cream-soft" id="plugins">
+  <div class="wrap">
+    <div class="section-head"><div class="eyebrow" style="color:#9A7B18">Toolkit</div><h2>One purchase. A complete toolkit.</h2><p>Builders, commerce tools and conversion features included — no patchwork of paid add-ons to start selling.</p></div>
+    <div class="plugin-grid">
+      <div class="plugin"><strong>AiKOVA Core</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Theme engine, demo importer and global design controls.</p></div><div class="plugin"><strong>AiKOVA Builder</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Visual header, shop, product and footer building.</p></div><div class="plugin"><strong>WooCommerce</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Free</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Products, orders and checkout-ready layouts.</p></div><div class="plugin"><strong>Elementor</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Free</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Drag-and-drop with AiKOVA widgets.</p></div><div class="plugin"><strong>WPBakery</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Premium</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Alternative visual builder workflows.</p></div><div class="plugin"><strong>Wishlist + Compare</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Save-for-later and side-by-side decisions.</p></div><div class="plugin"><strong>Quick View</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Essentials without leaving the grid.</p></div><div class="plugin"><strong>AJAX Search + Filters</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Instant discovery and faceted refinement.</p></div><div class="plugin"><strong>Variation Swatches</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Colour, size and image choice, visual.</p></div><div class="plugin"><strong>Mega Menu</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Rich multi-column navigation.</p></div><div class="plugin"><strong>AI Receptionist</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Guided store assistance.</p></div><div class="plugin"><strong>GTM Agent</strong> <span style="font-size:10px;font-weight:900;background:var(--cream);padding:.15rem .45rem;border-radius:999px;margin-left:.35rem">Included</span><p style="margin:.45rem 0 0;color:var(--muted);font-size:.9rem">Measurement-ready campaign structure.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section builder" id="features">
+  <div class="wrap">
+    <div class="section-head"><div class="eyebrow">Performance + features</div><h2>Fast where it counts.</h2><p>Commerce interactions stay instant — discovery to cart — ready for global audiences.</p></div>
+    <div class="feature-grid">
+      <div class="feature"><strong>AJAX Add to Cart</strong><p style="margin:.4rem 0 0;font-size:.9rem">Add without leaving the page.</p></div><div class="feature"><strong>AJAX Filters</strong><p style="margin:.4rem 0 0;font-size:.9rem">Refine instantly by attribute.</p></div><div class="feature"><strong>Quick View</strong><p style="margin:.4rem 0 0;font-size:.9rem">Preview without a detour.</p></div><div class="feature"><strong>Wishlist</strong><p style="margin:.4rem 0 0;font-size:.9rem">Keep the maybe-list close.</p></div><div class="feature"><strong>Compare</strong><p style="margin:.4rem 0 0;font-size:.9rem">Decide side by side.</p></div><div class="feature"><strong>Variation Swatches</strong><p style="margin:.4rem 0 0;font-size:.9rem">Choose colour & size visually.</p></div><div class="feature"><strong>Sticky Cart</strong><p style="margin:.4rem 0 0;font-size:.9rem">Checkout stays in reach.</p></div><div class="feature"><strong>RTL Ready</strong><p style="margin:.4rem 0 0;font-size:.9rem">Right-to-left layouts included.</p></div><div class="feature"><strong>37 Languages</strong><p style="margin:.4rem 0 0;font-size:.9rem">Translation-ready structure.</p></div><div class="feature"><strong>SEO Ready</strong><p style="margin:.4rem 0 0;font-size:.9rem">Clean structure for discovery.</p></div><div class="feature"><strong>Mega Menu</strong><p style="margin:.4rem 0 0;font-size:.9rem">Rich navigation, done well.</p></div><div class="feature"><strong>AI Receptionist</strong><p style="margin:.4rem 0 0;font-size:.9rem">Guided help across the store.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section white" id="compare">
+  <div class="wrap">
+    <div class="section-head"><div class="eyebrow" style="color:#9A7B18">Why AiKOVA</div><h2>Built for the next generation of stores.</h2><p>WoodMart-class multipurpose foundation, with AiKOVA Builder and AI-ready tooling.</p></div>
+    <div class="compare"><table>
+      <thead><tr><th>Capability</th><th>AiKOVA</th><th>WoodMart</th><th>Flatsome</th></tr></thead>
+      <tbody>
+        <tr><td>Prebuilt demos</td><td class="hl">100+</td><td>100+</td><td>20+</td></tr>
+        <tr><td>Visual theme builder</td><td class="hl">AiKOVA Builder</td><td>Theme builder</td><td>UX Builder</td></tr>
+        <tr><td>AI store assistance</td><td class="hl">AI Receptionist + GTM Agent</td><td>—</td><td>—</td></tr>
+        <tr><td>1-Click demo import</td><td class="hl">Yes</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Design formats</td><td class="hl">WP · HTML · App · Figma</td><td>WordPress</td><td>WordPress</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="section cream" id="pricing">
+  <div class="wrap">
+    <div class="section-head"><div class="eyebrow" style="color:#9A7B18">Pricing</div><h2>Choose how far you want to go.</h2><p>Every plan starts with a finished demo, a powerful builder and lifetime design updates.</p></div>
+    <div class="price-grid">
+      <article class="price"><h3 class="font-display" style="margin:0;font-size:1.5rem">Regular</h3><div class="amt">$59</div><div style="color:var(--muted);font-weight:700">1 site</div><p style="color:var(--muted)">For one storefront, beautifully launched.</p><ul style="padding-left:1.1rem;line-height:1.7;flex:1"><li>Theme + Builder</li><li>100+ demos</li><li>1-Click import</li><li>Lifetime updates</li></ul><a class="btn dark" href="#demos" style="margin-top:1rem">Choose Regular</a></article>
+      <article class="price hot"><div style="display:flex;justify-content:space-between;align-items:center"><h3 class="font-display" style="margin:0;font-size:1.5rem">AiKOVA Bundle</h3><span style="background:var(--gold);color:#0B2A22;font-size:11px;font-weight:900;padding:.25rem .55rem;border-radius:999px">MOST COMPLETE</span></div><div class="amt">$149</div><div style="opacity:.75;font-weight:700">All 9 OS + 1,600 demos</div><p style="opacity:.8">The full design ecosystem for agencies and brands.</p><ul style="padding-left:1.1rem;line-height:1.7;flex:1"><li>Everything in Regular</li><li>All AiKOVA operating systems</li><li>WP · HTML · App · Figma</li><li>Priority support</li></ul><a class="btn solid" href="#demos" style="margin-top:1rem">Choose Bundle</a></article>
+      <article class="price"><h3 class="font-display" style="margin:0;font-size:1.5rem">Extended</h3><div class="amt">$3,999</div><div style="color:var(--muted);font-weight:700">Extended use</div><p style="color:var(--muted)">For client work and broader commercial use.</p><ul style="padding-left:1.1rem;line-height:1.7;flex:1"><li>Everything in Regular</li><li>Extended licence terms</li><li>End-client projects</li><li>Priority support</li></ul><a class="btn dark" href="#demos" style="margin-top:1rem">Choose Extended</a></article>
+    </div>
+  </div>
+</section>
+
+<section class="section cream-soft">
+  <div class="wrap">
+    <div class="banner-card">
+      <div>
+        <div class="eyebrow">Category intro pattern</div>
+        <h2>This landing page is the template.</h2>
+        <p style="color:#C0CCC6;max-width:36rem;line-height:1.55">Every category gets its own intro — same hero rhythm, builder story, tools and formats — with imagery and merchandising tuned to Fashion, Electronics, Furniture, Beauty and more.</p>
+        <div class="cta-row"><a class="btn solid" href="https://aikova.co.uk/">Back to AiKOVA</a><a class="btn ghost" href="#demos">Browse demos</a></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-size:.85rem;font-weight:800">
+        <span style="background:rgba(255,255,255,.1);border-radius:12px;padding:.8rem">Fashion intro</span>
+        <span style="background:rgba(255,255,255,.1);border-radius:12px;padding:.8rem">Electronics intro</span>
+        <span style="background:rgba(255,255,255,.1);border-radius:12px;padding:.8rem">Furniture intro</span>
+        <span style="background:rgba(255,255,255,.1);border-radius:12px;padding:.8rem">Beauty intro</span>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot"><div class="wrap foot-grid">
+  <div><div class="brand"><span class="mark">A</span><strong style="color:#fff">AiKOVA</strong></div><p style="margin-top:.8rem;max-width:28rem;line-height:1.55;font-size:.9rem">Engineered Intelligence. Delivered. Multipurpose WooCommerce theme + builder for stores that launch beautifully — and keep evolving.</p></div>
+  <div><strong style="color:#fff">Explore</strong><div style="margin-top:.6rem;display:grid;gap:.35rem;font-size:.9rem"><a href="#demos">100+ Demos</a><a href="#builder">Theme Builder</a><a href="#plugins">Plugins</a><a href="#pricing">Pricing</a></div></div>
+  <div><strong style="color:#fff">Categories</strong><div style="margin-top:.6rem;font-size:.9rem;line-height:1.7">Fashion · Beauty<br/>Electronics · Digital<br/>Furniture · Home<br/>Grocery · Food</div></div>
+</div>
+<div class="wrap" style="border-top:1px solid rgba(255,255,255,.1);margin-top:2rem;padding-top:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem;font-size:12px"><span>© AiKOVA · Multipurpose WooCommerce Theme</span><span>★ 4.9 · 100+ demos · 1-Click Import</span></div>
+</footer>
+
+<div class="toast" id="toast">Demo selected</div>
+<div class="modal" id="modal"><div class="modal-card"><div class="modal-media" id="modalMedia"></div><div class="modal-body"><div id="modalTags"></div><h3 class="font-display" id="modalTitle" style="font-size:1.8rem;margin:.8rem 0 .4rem"></h3><p id="modalDesc" style="color:var(--muted)"></p><div style="display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap"><button class="btn dark" type="button" id="modalImport">Import Demo</button><button class="btn ghost" type="button" style="color:var(--emerald);border-color:var(--line)" id="modalClose">Back</button></div></div></div></div>
+
+<script>
+(function(){
+  var cats=['All','Fashion','Electronics','Furniture','Beauty','Grocery','Jewelry','Luxury','Food','Sport','Books','Digital'];
+  var chips=document.getElementById('chips');
+  var active='All';
+  function renderChips(){
+    chips.innerHTML=cats.map(function(c){return '<button type="button" data-cat="'+c+'" class="'+(c===active?'active':'')+'">'+c+'</button>';}).join('');
+  }
+  renderChips();
+  chips.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-cat]'); if(!b) return; active=b.getAttribute('data-cat'); renderChips(); filter();
+  });
+  var q=document.getElementById('q');
+  q.addEventListener('input',filter);
+  function filter(){
+    var term=(q.value||'').toLowerCase();
+    document.querySelectorAll('.demo-card').forEach(function(card){
+      var okCat=active==='All'||card.getAttribute('data-cat')===active;
+      var okQ=!term||(card.getAttribute('data-name')||'').indexOf(term)>=0;
+      card.style.display=(okCat&&okQ)?'':'none';
+    });
+  }
+  var note=document.getElementById('importNote');
+  var toast=document.getElementById('toast');
+  function flash(msg){toast.textContent=msg;toast.style.display='block';setTimeout(function(){toast.style.display='none';},1600);}
+  document.addEventListener('click',function(e){
+    var imp=e.target.closest('[data-import]');
+    if(imp){note.style.display='block';note.textContent=imp.getAttribute('data-import')+' is selected as your demo starting point in this preview.';flash('Imported · '+imp.getAttribute('data-import'));}
+    var prev=e.target.closest('[data-preview]');
+    if(prev){
+      var card=prev.closest('.demo-card');
+      document.getElementById('modal').classList.add('open');
+      document.getElementById('modalTitle').textContent=prev.getAttribute('data-preview');
+      document.getElementById('modalDesc').textContent=card.querySelector('p').textContent;
+      document.getElementById('modalMedia').style.backgroundImage=card.querySelector('.demo-media').style.backgroundImage;
+      document.getElementById('modalTags').innerHTML=card.querySelector('.tags').innerHTML;
+      document.getElementById('modalImport').onclick=function(){note.style.display='block';note.textContent=prev.getAttribute('data-preview')+' is selected as your demo starting point in this preview.';document.getElementById('modal').classList.remove('open');flash('Imported · '+prev.getAttribute('data-preview'));};
+    }
+  });
+  document.getElementById('modalClose').onclick=function(){document.getElementById('modal').classList.remove('open');};
+  document.getElementById('modal').addEventListener('click',function(e){if(e.target.id==='modal') e.currentTarget.classList.remove('open');});
+  document.querySelectorAll('[data-count]').forEach(function(el){
+    var target=Number(el.getAttribute('data-count')); var start=performance.now();
+    function tick(now){var p=Math.min(1,(now-start)/1400); var v=Math.floor(target*(1-Math.pow(1-p,3)));
+      if(el.parentElement && el.parentElement.textContent.indexOf('Rating')>=0) el.textContent=(v/10).toFixed(1);
+      else el.textContent=String(v)+(target>=90?'+':'');
+      if(p<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+})();
+</script>
+</body>
+</html>

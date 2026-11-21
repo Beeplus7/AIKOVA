@@ -13,14 +13,24 @@ import { MCLBotWidget } from '../../marketing/MCLBotWidget.web';
 
 const BAR_HEIGHT = 56;
 
+export type ArtefactPromo = {
+  eyebrow: string;
+  title: string;
+  body: string;
+  href: string;
+  cta: string;
+};
+
 export function ArtefactFrame({
   activeHref,
   title,
   src,
+  promo,
 }: {
   activeHref: string;
   title: string;
   src: string;
+  promo?: ArtefactPromo;
 }) {
   const { width } = useWindowDimensions();
   const compact = width < 820;
@@ -67,6 +77,21 @@ export function ArtefactFrame({
           </Link>
         </View>
       </View>
+
+      {promo ? (
+        <View style={[styles.promo, compact && styles.promoCompact]}>
+          <View style={styles.promoCopy}>
+            <Text style={styles.promoEyebrow}>{promo.eyebrow}</Text>
+            <Text style={styles.promoTitle}>{promo.title}</Text>
+            <Text style={styles.promoBody}>{promo.body}</Text>
+          </View>
+          <Link href={promo.href as '/'} asChild>
+            <Pressable style={styles.promoCta}>
+              <Text style={styles.promoCtaText}>{promo.cta}</Text>
+            </Pressable>
+          </Link>
+        </View>
+      ) : null}
 
       <View style={styles.frame}>
         <iframe title={title} src={src} style={iframeStyle} allow="fullscreen" />
@@ -177,5 +202,55 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     minHeight: 0,
+  },
+  promo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(201, 162, 39, 0.35)',
+    backgroundColor: 'rgba(11, 42, 34, 0.96)',
+    zIndex: 18,
+  },
+  promoCompact: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  promoCopy: {
+    flex: 1,
+    gap: 4,
+    maxWidth: 760,
+  },
+  promoEyebrow: {
+    fontFamily: fonts.mono,
+    fontSize: 10,
+    letterSpacing: 1.4,
+    color: '#C9A227',
+  },
+  promoTitle: {
+    fontFamily: fonts.displaySemi,
+    fontSize: 16,
+    letterSpacing: -0.2,
+    color: '#F6F0DF',
+  },
+  promoBody: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    lineHeight: 19,
+    color: 'rgba(246, 240, 223, 0.72)',
+  },
+  promoCta: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
+    backgroundColor: '#C9A227',
+  },
+  promoCtaText: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 12,
+    color: '#0B2A22',
   },
 });

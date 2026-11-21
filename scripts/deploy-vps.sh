@@ -31,11 +31,13 @@ echo "==> Exporting web"
 npx expo export --platform web
 
 # Ensure marketing artefact bundles from public/ survive export
-mkdir -p dist/portfolio-os dist/solutions-playbook dist/industries-serve
+mkdir -p dist/portfolio-os dist/solutions-playbook dist/industries-serve dist/woocommerce/assets
 cp -f public/aikova-flowless-tech-hero.html dist/aikova-flowless-tech-hero.html
 cp -f public/portfolio-os/app.js public/portfolio-os/index.html dist/portfolio-os/ 2>/dev/null || true
 cp -f public/solutions-playbook/app.js dist/solutions-playbook/ 2>/dev/null || true
 [[ -f public/solutions-playbook/index.html ]] && cp -f public/solutions-playbook/index.html dist/solutions-playbook/ || true
+cp -f public/woocommerce/index.html dist/woocommerce/ 2>/dev/null || true
+cp -f public/woocommerce/assets/* dist/woocommerce/assets/ 2>/dev/null || true
 
 # Ensure AI-readable surfaces always ship even if expo export omits them
 cp -f public/llms.txt public/robots.txt public/sitemap.xml dist/ 2>/dev/null || true

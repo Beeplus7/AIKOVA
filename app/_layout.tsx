@@ -68,6 +68,7 @@ export default function RootLayout() {
         <Stack.Screen name="solutions" />
         <Stack.Screen name="industries" />
         <Stack.Screen name="portfolio" />
+        <Stack.Screen name="woocommerce" />
         <Stack.Screen name="contact" />
         <Stack.Screen name="os" options={{ headerShown: false }} />
       </Stack>
