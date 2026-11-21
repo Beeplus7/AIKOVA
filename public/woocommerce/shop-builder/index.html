@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>AiKOVA AI WooCommerce Shop Builder — Canvas Proposal</title>
+<meta name="description" content="Proposal artefact: build AiKOVA AI Shop Builder + Canvas first, then Multipurpose WooCommerce theme demos. REA synthesis of WoodMart, Flatsome, Hema."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://aikova.co.uk/woocommerce/shop-builder/"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#05070D;--bg2:#0B1020;--surface:rgba(255,255,255,.05);--border:rgba(255,255,255,.1);
+  --text:#fff;--muted:#8B9BB4;--dim:#64748B;--blue:#0EA5FF;--deep:#2563EB;--neon:#84FF3D;
+  --panel:#0E1424;--canvas:#121826;--warn:#F59E0B;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+h1,h2,h3{font-family:Sora,system-ui,sans-serif;letter-spacing:-.02em;margin:0}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1280px;margin:0 auto;padding:0 1.15rem}
+.top{background:linear-gradient(90deg,rgba(14,165,255,.18),rgba(132,255,61,.12));border-bottom:1px solid var(--border);text-align:center;padding:.55rem 1rem;font-size:12px;font-weight:700}
+.top b{color:var(--neon)}
+header{position:sticky;top:0;z-index:40;backdrop-filter:blur(16px);background:rgba(5,7,13,.92);border-bottom:1px solid var(--border)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:58px}
+.brand strong{font-family:Sora,sans-serif;font-weight:800}
+.brand small{display:block;font-family:"JetBrains Mono",monospace;font-size:9px;letter-spacing:.16em;color:var(--dim)}
+.nav a.btn,.btn{display:inline-flex;align-items:center;gap:.4rem;border-radius:999px;border:1px solid transparent;font-weight:700;font-size:12px;padding:.7rem 1.05rem;cursor:pointer}
+.btn.neon{background:rgba(132,255,61,.12);border-color:rgba(132,255,61,.35);color:var(--neon)}
+.btn.blue{background:linear-gradient(135deg,var(--blue),var(--deep));border:0;color:#fff}
+.btn.ghost{background:transparent;border-color:var(--border);color:#F8FAFC}
+.hero{padding:2.8rem 0 2rem;background:radial-gradient(900px 420px at 10% -10%,rgba(14,165,255,.22),transparent 60%),radial-gradient(700px 380px at 90% 0,rgba(132,255,61,.1),transparent 55%)}
+.kicker{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--blue);font-weight:500}
+.hero h1{font-size:clamp(2rem,4.5vw,3.4rem);line-height:1.05;margin:.55rem 0}
+.hero h1 span{color:var(--neon)}
+.lead{color:var(--muted);line-height:1.6;max-width:46rem;margin:.8rem 0 0}
+.cta{display:flex;flex-wrap:wrap;gap:.55rem;margin-top:1.3rem}
+.section{padding:2.8rem 0;border-top:1px solid var(--border)}
+.section-h{max-width:48rem;margin-bottom:1.3rem}
+.section-h h2{font-size:clamp(1.5rem,3vw,2.2rem);margin:.4rem 0}
+.section-h p{color:var(--muted);line-height:1.55;margin:0}
+.grid{display:grid;gap:.85rem}
+.g4{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.g3{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.g2{grid-template-columns:1fr}@media(min-width:960px){.g2{grid-template-columns:1.05fr .95fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1rem}
+.card h3{font-size:1rem;margin:0 0 .4rem}
+.card p,.card li{color:var(--muted);font-size:.88rem;line-height:1.45}
+.card ul{margin:.5rem 0 0;padding-left:1.1rem}
+.pill{display:inline-flex;align-items:center;border-radius:999px;border:1px solid var(--border);padding:.2rem .55rem;font-size:10px;font-weight:700;color:var(--muted);font-family:"JetBrains Mono",monospace;letter-spacing:.06em}
+.pill.on{border-color:rgba(132,255,61,.4);color:var(--neon);background:rgba(132,255,61,.08)}
+.pill.blue{border-color:rgba(14,165,255,.4);color:var(--blue);background:rgba(14,165,255,.08)}
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:16px}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{padding:.75rem 1rem;text-align:left;font-size:.86rem;border-top:1px solid var(--border);vertical-align:top}
+th{background:var(--bg2);font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue)}
+td.ok{color:var(--neon);font-weight:700}
+.steps{counter-reset:s;display:grid;gap:.7rem}
+.step{display:grid;grid-template-columns:42px 1fr;gap:.85rem;align-items:start;padding:1rem;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.step::before{counter-increment:s;content:counter(s, decimal-leading-zero);font-family:Sora,sans-serif;font-weight:800;color:var(--neon);font-size:1.1rem;padding-top:.1rem}
+.builder-shell{border:1px solid var(--border);border-radius:18px;overflow:hidden;background:var(--panel);min-height:620px;display:grid;grid-template-rows:48px 1fr}
+.builder-top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:0 .9rem;border-bottom:1px solid var(--border);background:#0A0F1A}
+.builder-top .tabs{display:flex;gap:.25rem;flex-wrap:wrap}
+.builder-top .tabs button{background:transparent;border:0;color:var(--muted);font-weight:700;font-size:12px;padding:.45rem .7rem;border-radius:8px;cursor:pointer}
+.builder-top .tabs button.active{background:rgba(14,165,255,.12);color:var(--blue)}
+.builder-body{display:grid;grid-template-columns:220px 1fr 260px;min-height:0}
+@media(max-width:980px){.builder-body{grid-template-columns:1fr;grid-template-rows:auto 420px auto}}
+.rail{border-right:1px solid var(--border);background:#0A0F1A;padding:.75rem;overflow:auto}
+.rail:last-child{border-right:0;border-left:1px solid var(--border)}
+@media(max-width:980px){.rail{border:0;border-bottom:1px solid var(--border)}.rail:last-child{border-left:0;border-top:1px solid var(--border);border-bottom:0}}
+.rail h4{font-size:10px;letter-spacing:.14em;color:var(--dim);font-family:"JetBrains Mono",monospace;margin:0 0 .6rem}
+.block{display:flex;align-items:center;gap:.55rem;padding:.55rem .6rem;border:1px solid var(--border);border-radius:10px;margin-bottom:.45rem;cursor:grab;background:rgba(255,255,255,.03);font-size:12px;font-weight:700}
+.block:hover{border-color:rgba(14,165,255,.45);background:rgba(14,165,255,.08)}
+.block i{width:22px;height:22px;border-radius:6px;background:rgba(14,165,255,.2);display:grid;place-items:center;font-size:10px;color:var(--blue);font-style:normal;font-weight:800}
+.canvas-wrap{background:var(--canvas);padding:1rem;overflow:auto;position:relative}
+.canvas{max-width:920px;margin:0 auto;background:#fff;color:#0B1220;border-radius:14px;min-height:520px;box-shadow:0 20px 50px rgba(0,0,0,.35);overflow:hidden;position:relative}
+.canvas .c-header{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;border-bottom:1px solid #E2E8F0;gap:.5rem;flex-wrap:wrap}
+.canvas .c-brand{font-family:Sora,sans-serif;font-weight:800;font-size:15px}
+.canvas .c-nav{display:flex;gap:.7rem;font-size:11px;font-weight:700;color:#475569;flex-wrap:wrap}
+.canvas .c-hero{display:grid;gap:1rem;padding:1.1rem;background:linear-gradient(135deg,#F8FAFC,#EEF2FF)}
+@media(min-width:700px){.canvas .c-hero{grid-template-columns:1.1fr .9fr;align-items:center}}
+.canvas .c-hero h2{font-size:clamp(1.3rem,3vw,1.8rem);margin:.3rem 0}
+.canvas .c-hero p{font-size:12px;color:#64748B;line-height:1.45;margin:0}
+.canvas .c-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.55rem;padding:0 1.1rem 1.1rem}
+@media(max-width:640px){.canvas .c-grid{grid-template-columns:1fr 1fr}}
+.canvas .prod{border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;background:#fff}
+.canvas .prod .ph{aspect-ratio:1;background:linear-gradient(135deg,#CBD5E1,#94A3B8)}
+.canvas .prod .ph.a{background:linear-gradient(135deg,#0EA5FF55,#84FF3D55)}
+.canvas .prod .ph.b{background:linear-gradient(135deg,#1A1A1A,#334155)}
+.canvas .prod .ph.c{background:linear-gradient(135deg,#F8FAFC,#C9A22755)}
+.canvas .prod .meta{padding:.55rem;font-size:11px}
+.canvas .prod .meta b{display:block;margin-bottom:.2rem}
+.canvas .prod .meta span{color:#64748B}
+.canvas .slot{outline:2px dashed transparent;transition:outline-color .15s,background .15s;border-radius:10px;min-height:40px}
+.canvas .slot.over{outline-color:var(--blue);background:rgba(14,165,255,.08)}
+.canvas .node{position:relative;border:1px solid transparent;border-radius:10px}
+.canvas .node.selected{border-color:#0EA5FF;box-shadow:0 0 0 2px rgba(14,165,255,.2)}
+.prop label{display:block;font-size:10px;letter-spacing:.1em;color:var(--dim);font-family:"JetBrains Mono",monospace;margin:.55rem 0 .25rem}
+.prop input,.prop select,.prop textarea{width:100%;border:1px solid var(--border);background:#0A0F1A;color:var(--text);border-radius:10px;padding:.55rem .65rem;font:inherit;font-size:12px}
+.prop textarea{min-height:72px;resize:vertical}
+.ai-box{margin-top:.75rem;padding:.75rem;border-radius:12px;border:1px solid rgba(132,255,61,.3);background:rgba(132,255,61,.06)}
+.ai-box strong{display:block;font-size:12px;color:var(--neon);margin-bottom:.35rem}
+.ai-box p{margin:0;font-size:11px;color:var(--muted);line-height:1.45}
+.toast{position:fixed;right:1rem;bottom:1rem;z-index:80;display:none;background:var(--bg2);border:1px solid rgba(132,255,61,.4);color:var(--neon);padding:.7rem 1rem;border-radius:12px;font-weight:700;font-size:13px}
+.foot{border-top:1px solid var(--border);padding:2rem 0 1.2rem;color:var(--muted);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem}
+</style>
+</head>
+<body>
+<div class="top">PROPOSAL · Build <b>Shop Builder + Canvas</b> first · then Multipurpose theme demos · REA: WoodMart · Flatsome · Hema</div>
+<header><div class="wrap nav">
+  <a class="brand" href="https://aikova.co.uk/woocommerce/"><strong>AiKOVA</strong><small>SHOP BUILDER // PROPOSAL</small></a>
+  <div style="display:flex;gap:.45rem;flex-wrap:wrap">
+    <a class="btn ghost" href="https://aikova.co.uk/woocommerce/">Theme landing</a>
+    <a class="btn neon" href="#canvas">Open canvas</a>
+    <a class="btn blue" href="#approve">Approve phase 1</a>
+  </div>
+</div></header>
+
+<main>
+<section class="hero"><div class="wrap">
+  <div class="kicker">PHASE 0 · PROPOSAL ARTEFACT</div>
+  <h1>Don’t design 100 demos first.<br/><span>Build the shop that builds shops.</span></h1>
+  <p class="lead">REA of ThemeForest’s sellable Woo leaders (WoodMart Vegetables, Flatsome Classic Shop, Hema Fashion ×2) shows the same pattern: mega menu + AJAX commerce chrome + promo rails + builder. AiKOVA wins by shipping an <b>AI Shop Builder + live canvas</b> before theme skins — then every demo is a saved canvas preset.</p>
+  <div class="cta">
+    <a class="btn blue" href="#canvas">Try canvas prototype →</a>
+    <a class="btn ghost" href="#rea">See REA synthesis</a>
+    <a class="btn neon" href="#matrix">Compatibility matrix</a>
+  </div>
+  <div class="chips">
+    <span class="pill on">PHASE 1 · BUILDER</span>
+    <span class="pill blue">PHASE 2 · DEMOS</span>
+    <span class="pill">WORDPRESS / WOO FIRST</span>
+    <span class="pill">SHOPIFY COMPAT MODE</span>
+  </div>
+</div></section>
+
+<section class="section" id="rea"><div class="wrap">
+  <div class="section-h">
+    <div class="kicker">REA · 4 LEADERS COMBINED</div>
+    <h2>What ThemeForest’s bestsellers actually sell</h2>
+    <p>Not pretty screenshots — a repeatable commerce operating system. AiKOVA absorbs all four patterns into one builder vocabulary.</p>
+  </div>
+  <div class="grid g4">
+    <article class="card">
+      <span class="pill blue">WOODMART · VEG</span>
+      <h3 style="margin-top:.55rem">Grocery velocity</h3>
+      <ul>
+        <li>Mega category menu with product embeds</li>
+        <li>Qty steppers on cards + wishlist</li>
+        <li>Promo codes, free-delivery thresholds</li>
+        <li>AJAX search + popular requests</li>
+        <li>Infobox / cover promo rails</li>
+      </ul>
+    </article>
+    <article class="card">
+      <span class="pill blue">FLATSOME · CLASSIC</span>
+      <h3 style="margin-top:.55rem">Editorial fashion UX</h3>
+      <ul>
+        <li>UX Builder page composition</li>
+        <li>Hero → product grid rhythm</li>
+        <li>Trust strips + testimonials</li>
+        <li>Clean classic shop IA</li>
+        <li>Fast “edit in builder” promise</li>
+      </ul>
+    </article>
+    <article class="card">
+      <span class="pill blue">HEMA · FASHION</span>
+      <h3 style="margin-top:.55rem">Campaign storefront</h3>
+      <ul>
+        <li>Lookbook heroes + category tiles</li>
+        <li>Clearance countdown / scarcity</li>
+        <li>Pickup / returns / payment trust</li>
+        <li>Team / story blocks</li>
+        <li>Multipurpose niche switching</li>
+      </ul>
+    </article>
+    <article class="card">
+      <span class="pill on">AIKOVA COMBINE</span>
+      <h3 style="margin-top:.55rem">Builder-first OS</h3>
+      <ul>
+        <li>Header / Mega / Shop / Product / Footer canvas</li>
+        <li>WoodMart commerce depth</li>
+        <li>Flatsome editability</li>
+        <li>Hema campaign blocks</li>
+        <li>AI Receptionist + GTM + Image Engine</li>
+      </ul>
+    </article>
+  </div>
+</div></section>
+
+<section class="section" id="plan"><div class="wrap g2 grid" style="align-items:start">
+  <div>
+    <div class="section-h">
+      <div class="kicker">BUILD ORDER</div>
+      <h2>Shop Builder first. Themes second.</h2>
+      <p>Captain proposal: lock the canvas + block schema + AI assist before painting 100 demo skins.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div><strong>AiKOVA Shop Builder + Canvas</strong><p style="margin:.35rem 0 0;color:var(--muted);font-size:.9rem">Drag blocks, live preview, save presets, export WP / HTML / Figma JSON.</p></div></div>
+      <div class="step"><div><strong>AiKOVA Core Plugin</strong><p style="margin:.35rem 0 0;color:var(--muted);font-size:.9rem">Wishlist, compare, filters, swatches, FBT, sticky ATC — built-in commerce kit.</p></div></div>
+      <div class="step"><div><strong>Builder presets = demos</strong><p style="margin:.35rem 0 0;color:var(--muted);font-size:.9rem">Fashion / Grocery / Electronics / Litt Luxury as canvas templates, not one-off HTML.</p></div></div>
+      <div class="step"><div><strong>Bundle exports</strong><p style="margin:.35rem 0 0;color:var(--muted);font-size:.9rem">WP theme zip · HTML · React · Figma · Shopify Liquid section (Bundle).</p></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="kicker">WHY THIS ORDER</div>
+    <h3 style="margin-top:.45rem">Themes without a builder become ThemeForest clones.</h3>
+    <p style="margin:.55rem 0 0">WoodMart/Flatsome/Hema win because merchants can rearrange commerce chrome. AiKOVA’s differentiator is an AI-native canvas that also wires Image Engine, GTM Agent, and AI Receptionist into the same surface.</p>
+    <div class="chips">
+      <span class="pill on">NO LCM FINALS</span>
+      <span class="pill blue">VAULT UI</span>
+      <span class="pill">100+ PRESETS LATER</span>
+    </div>
+  </div>
+</div></section>
+
+<section class="section" id="canvas"><div class="wrap">
+  <div class="section-h">
+    <div class="kicker">INTERACTIVE PROTOTYPE</div>
+    <h2>AiKOVA AI Shop Builder — canvas</h2>
+    <p>Drag blocks from the left rail onto the live storefront canvas. Select a node to edit props. This is the Phase 1 surface we build before main theme skins.</p>
+  </div>
+
+  <div class="builder-shell" id="builder">
+    <div class="builder-top">
+      <div class="tabs" id="surfaceTabs">
+        <button type="button" class="active" data-surface="home">Home</button>
+        <button type="button" data-surface="header">Header</button>
+        <button type="button" data-surface="shop">Shop</button>
+        <button type="button" data-surface="product">Product</button>
+        <button type="button" data-surface="footer">Footer</button>
+      </div>
+      <div style="display:flex;gap:.4rem;align-items:center">
+        <span class="pill blue" id="surfaceLabel">SURFACE · HOME</span>
+        <button class="btn neon" type="button" id="aiFill" style="padding:.45rem .8rem">AI compose</button>
+        <button class="btn ghost" type="button" id="exportJson" style="padding:.45rem .8rem">Export JSON</button>
+      </div>
+    </div>
+    <div class="builder-body">
+      <aside class="rail" id="palette">
+        <h4>BLOCKS</h4>
+        <div class="block" draggable="true" data-type="hero"><i>H</i>Hero / Campaign</div>
+        <div class="block" draggable="true" data-type="categories"><i>C</i>Category tiles</div>
+        <div class="block" draggable="true" data-type="products"><i>P</i>Product grid</div>
+        <div class="block" draggable="true" data-type="promo"><i>%</i>Promo / Countdown</div>
+        <div class="block" draggable="true" data-type="trust"><i>T</i>Trust strip</div>
+        <div class="block" draggable="true" data-type="newsletter"><i>N</i>Newsletter</div>
+        <h4 style="margin-top:1rem">COMMERCE CHROME</h4>
+        <div class="block" draggable="true" data-type="megamenu"><i>M</i>Mega menu</div>
+        <div class="block" draggable="true" data-type="filters"><i>F</i>AJAX filters</div>
+        <div class="block" draggable="true" data-type="wishlist"><i>W</i>Wishlist bar</div>
+      </aside>
+
+      <div class="canvas-wrap">
+        <div class="canvas" id="canvasRoot">
+          <div class="c-header node selected" data-node="header" id="nodeHeader">
+            <div class="c-brand">Litt Luxury</div>
+            <div class="c-nav"><span>Shop</span><span>Lookbook</span><span>Sale</span><span>Bag</span><span>♡ 0</span><span>Cart 0</span></div>
+          </div>
+          <div class="c-hero slot" data-slot="hero" id="slotHero">
+            <div class="node" data-node="hero">
+              <div class="kicker" style="color:#2563EB">CAMPAIGN</div>
+              <h2 id="heroTitle">Every store. One vault theme.</h2>
+              <p id="heroSub">WoodMart depth · Flatsome editability · Hema campaigns — AiKOVA canvas.</p>
+              <div style="margin-top:.8rem;display:flex;gap:.4rem">
+                <span style="background:#0EA5FF;color:#fff;border-radius:999px;padding:.4rem .75rem;font-size:11px;font-weight:800">Shop now</span>
+                <span style="border:1px solid #CBD5E1;border-radius:999px;padding:.4rem .75rem;font-size:11px;font-weight:800">Open builder</span>
+              </div>
+            </div>
+            <div class="node" data-node="heroMedia" style="min-height:140px;border-radius:12px;background:linear-gradient(135deg,#0B1220,#0EA5FF55);border:1px solid #E2E8F0"></div>
+          </div>
+          <div class="slot" data-slot="products" id="slotProducts" style="padding:0 1.1rem 1.1rem">
+            <div class="c-grid" style="padding:0">
+              <div class="prod node" data-node="p1"><div class="ph a"></div><div class="meta"><b>Fringe Muse · Noir</b><span>$298</span></div></div>
+              <div class="prod node" data-node="p2"><div class="ph b"></div><div class="meta"><b>Fringe Muse · Blanc</b><span>$298</span></div></div>
+              <div class="prod node" data-node="p3"><div class="ph c"></div><div class="meta"><b>Rosso Bucket</b><span>$410</span></div></div>
+            </div>
+          </div>
+          <div class="slot" data-slot="trust" id="slotTrust" style="padding:0 1.1rem 1.2rem">
+            <div class="node" data-node="trust" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;font-size:10px;font-weight:700;color:#334155">
+              <div style="border:1px solid #E2E8F0;border-radius:10px;padding:.55rem">Free delivery £30+</div>
+              <div style="border:1px solid #E2E8F0;border-radius:10px;padding:.55rem">Secure pay</div>
+              <div style="border:1px solid #E2E8F0;border-radius:10px;padding:.55rem">30-day returns</div>
+              <div style="border:1px solid #E2E8F0;border-radius:10px;padding:.55rem">24/7 AI desk</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="rail prop" id="props">
+        <h4>INSPECTOR</h4>
+        <label>Selected</label>
+        <input id="propId" value="header" readonly/>
+        <label>Brand / Title</label>
+        <input id="propTitle" value="Litt Luxury"/>
+        <label>Subtitle / Body</label>
+        <textarea id="propBody">WoodMart depth · Flatsome editability · Hema campaigns — AiKOVA canvas.</textarea>
+        <label>Accent</label>
+        <select id="propAccent">
+          <option value="vault">Vault blue / neon</option>
+          <option value="luxury">Quiet luxury gold</option>
+          <option value="grocery">Fresh grocery green</option>
+        </select>
+        <div class="ai-box">
+          <strong>AI assist</strong>
+          <p>Image Engine fills hero stills. GTM Agent suggests promo copy. Receptionist binds contact CTA. No LCM for finals.</p>
+        </div>
+        <button class="btn blue" type="button" id="applyProps" style="width:100%;margin-top:.85rem">Apply to canvas</button>
+      </aside>
+    </div>
+  </div>
+</div></section>
+
+<section class="section" id="matrix"><div class="wrap">
+  <div class="section-h">
+    <div class="kicker">COMPATIBILITY · THEMEFOREST-CLASS + AIKOVA OS</div>
+    <h2>Platforms the Multipurpose theme must clear</h2>
+    <p>Full sell sheet for the theme package. Builder Phase 1 exposes these as capability flags on the canvas export.</p>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Layer</th><th>AiKOVA support</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>WordPress 6.5–6.8 · Multisite · VIP</td><td class="ok">Yes</td><td>Gutenberg blocks + Classic Editor</td></tr>
+        <tr><td>WooCommerce 8+/9+ · HPOS · Blocks</td><td class="ok">Native</td><td>Subscriptions, Bookings, Memberships, Bundles, Composite</td></tr>
+        <tr><td>Shopify</td><td class="ok">Compat mode</td><td>CSV/API migrate · Storefront API headless · Buy Button · Liquid export in Bundle</td></tr>
+        <tr><td>EDD · SureCart · BigCommerce headless</td><td class="ok">Yes</td><td>+ Magento / Presta / Wix / Squarespace CSV import</td></tr>
+        <tr><td>Builders</td><td class="ok">AiKOVA Builder free</td><td>Elementor 60+ · WPBakery · Gutenberg 40+ · Bricks · Oxygen · Divi HTML · Beaver</td></tr>
+        <tr><td>Woo extensions</td><td class="ok">Built-in</td><td>Wishlist, Compare, Quick View, AJAX Search/Filters, Swatches, Sticky ATC, Size Guide, Video, 360, FBT, Countdown, FX</td></tr>
+        <tr><td>Payments</td><td class="ok">Global + Africa</td><td>Stripe · PayPal · Klarna · Afterpay · Paystack · Flutterwave · M-Pesa · COD · BACS · Crypto plugins</td></tr>
+        <tr><td>Multi-vendor</td><td class="ok">Yes</td><td>Dokan · WCFM · MultiVendorX · WC Vendors</td></tr>
+        <tr><td>Marketing / pixels</td><td class="ok">Yes</td><td>Klaviyo · GA4/GTM · Meta · TikTok · Pinterest · AiKOVA GTM Agent</td></tr>
+        <tr><td>AI stack</td><td class="ok">Built-in</td><td>Receptionist OS · GTM Agent · Design Agent · Image Engine (Nano Banana / FLUX.2 / Ideogram / Recraft)</td></tr>
+        <tr><td>i18n / FX</td><td class="ok">Yes</td><td>WPML · Polylang · RTL · multi-currency USD/GBP/EUR/NGN/KES/INR/AED</td></tr>
+        <tr><td>Deliverables</td><td class="ok">Bundle</td><td>WP zip · HTML · React/Next · Figma · Shopify Liquid · XML/CSV/JSON · REST API</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></section>
+
+<section class="section" id="approve"><div class="wrap grid g2" style="align-items:center">
+  <div>
+    <div class="kicker">CAPTAIN DECISION</div>
+    <h2 style="margin:.45rem 0;font-size:clamp(1.5rem,3vw,2.2rem)">Approve Phase 1?</h2>
+    <p style="color:var(--muted);line-height:1.55;margin:0">Next engineering sprint: production Shop Builder (block schema, undo/redo, preset save, WP export stub) + Core Plugin commerce kit — then Fashion / Grocery / Electronics / Litt Luxury as canvas presets.</p>
+    <div class="cta">
+      <a class="btn blue" href="mailto:info@aikova.co.uk?subject=Approve%20AiKOVA%20Shop%20Builder%20Phase%201">Approve Phase 1</a>
+      <a class="btn neon" href="#canvas">Keep exploring canvas</a>
+      <a class="btn ghost" href="https://aikova.co.uk/woocommerce/">Back to theme landing</a>
+    </div>
+  </div>
+  <div class="card">
+    <div class="kicker">OUT OF SCOPE FOR PHASE 1</div>
+    <ul>
+      <li>Painting all 100+ demo skins</li>
+      <li>Full ThemeForest submission pack</li>
+      <li>Shopify Liquid parity (Bundle track)</li>
+      <li>LCM / draft models as final art</li>
+    </ul>
+    <p style="margin:.8rem 0 0;font-size:.85rem;color:var(--dim)" class="mono">ARTEFACT · /woocommerce/shop-builder/ · VAULT UI</p>
+  </div>
+</div></section>
+</main>
+
+<footer class="foot"><div class="wrap" style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+  <span>© AiKOVA · Shop Builder proposal</span>
+  <span class="mono" style="font-size:11px;color:var(--dim)">REA · WOODMART · FLATSOME · HEMA → AIKOVA CANVAS</span>
+</div></footer>
+<div class="toast" id="toast">Saved</div>
+
+<script>
+(function(){
+  var toast=document.getElementById('toast');
+  function flash(m){toast.textContent=m;toast.style.display='block';setTimeout(function(){toast.style.display='none'},1400)}
+  var selected=document.querySelector('.node.selected');
+  var canvas=document.getElementById('canvasRoot');
+  var propId=document.getElementById('propId');
+  var propTitle=document.getElementById('propTitle');
+  var propBody=document.getElementById('propBody');
+
+  function selectNode(node){
+    document.querySelectorAll('.node.selected').forEach(function(n){n.classList.remove('selected')});
+    if(!node) return;
+    node.classList.add('selected');
+    selected=node;
+    propId.value=node.getAttribute('data-node')||'node';
+    var h=node.querySelector('h2');
+    var brand=node.querySelector('.c-brand');
+    var p=node.querySelector('p');
+    if(brand) propTitle.value=brand.textContent;
+    else if(h) propTitle.value=h.textContent;
+    if(p) propBody.value=p.textContent;
+  }
+
+  canvas.addEventListener('click',function(e){
+    var node=e.target.closest('.node');
+    if(node) selectNode(node);
+  });
+
+  document.getElementById('applyProps').onclick=function(){
+    if(!selected) return;
+    var brand=selected.querySelector('.c-brand');
+    var h=selected.querySelector('h2');
+    var p=selected.querySelector('p');
+    if(brand) brand.textContent=propTitle.value;
+    if(h) h.textContent=propTitle.value;
+    if(p) p.textContent=propBody.value;
+    var accent=document.getElementById('propAccent').value;
+    var hero=document.getElementById('slotHero');
+    if(accent==='luxury') hero.style.background='linear-gradient(135deg,#F9F6EF,#E8D5A3)';
+    else if(accent==='grocery') hero.style.background='linear-gradient(135deg,#ECFDF5,#D1FAE5)';
+    else hero.style.background='linear-gradient(135deg,#F8FAFC,#EEF2FF)';
+    flash('Canvas updated');
+  };
+
+  document.querySelectorAll('#palette .block').forEach(function(b){
+    b.addEventListener('dragstart',function(e){
+      e.dataTransfer.setData('text/plain', b.getAttribute('data-type'));
+    });
+  });
+  document.querySelectorAll('.slot').forEach(function(slot){
+    slot.addEventListener('dragover',function(e){e.preventDefault();slot.classList.add('over')});
+    slot.addEventListener('dragleave',function(){slot.classList.remove('over')});
+    slot.addEventListener('drop',function(e){
+      e.preventDefault();slot.classList.remove('over');
+      var type=e.dataTransfer.getData('text/plain');
+      var el=document.createElement('div');
+      el.className='node';
+      el.setAttribute('data-node', type+'-'+Date.now().toString(36));
+      el.style.cssText='margin-top:.55rem;padding:.7rem;border:1px dashed #94A3B8;border-radius:10px;background:#fff;font-size:12px;font-weight:700;color:#0B1220';
+      el.textContent='Dropped · '+type+' block (wire to schema in Phase 1)';
+      slot.appendChild(el);
+      selectNode(el);
+      flash('Block added · '+type);
+    });
+  });
+
+  document.getElementById('surfaceTabs').addEventListener('click',function(e){
+    var b=e.target.closest('button[data-surface]');
+    if(!b) return;
+    document.querySelectorAll('#surfaceTabs button').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    document.getElementById('surfaceLabel').textContent='SURFACE · '+b.getAttribute('data-surface').toUpperCase();
+    flash('Switched to '+b.getAttribute('data-surface')+' canvas');
+  });
+
+  document.getElementById('aiFill').onclick=function(){
+    propTitle.value='Fringe Muse — Quiet luxury edit';
+    propBody.value='AI compose: hero from Image Engine · promo from GTM · CTA bound to Receptionist.';
+    document.getElementById('heroTitle').textContent=propTitle.value;
+    document.getElementById('heroSub').textContent=propBody.value;
+    flash('AI compose applied (proposal stub)');
+  };
+
+  document.getElementById('exportJson').onclick=function(){
+    var payload={
+      artefact:'aikova-shop-builder',
+      surface:document.querySelector('#surfaceTabs button.active').getAttribute('data-surface'),
+      brand:document.querySelector('.c-brand').textContent,
+      hero:{title:document.getElementById('heroTitle').textContent, body:document.getElementById('heroSub').textContent},
+      ts:new Date().toISOString()
+    };
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='aikova-shop-builder-preset.json';
+    a.click();
+    flash('Exported preset JSON');
+  };
+})();
+</script>
+</body>
+</html>
