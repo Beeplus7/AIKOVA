@@ -17,6 +17,7 @@ FinOps, evidence vault / DOS7, AWS, multilingual voice where required.
 - WooCommerce Theme: https://aikova.co.uk/woocommerce/ — AiKOVA Multipurpose WooCommerce Theme (100+ demos, Builder, banners/cards/infographics)
 - WooCommerce AI-readable (Meta / crawlers, no JS): https://aikova.co.uk/woocommerce-ai-readable.html · https://aikova.co.uk/woocommerce/#top
 - WooCommerce AI Shop Builder proposal (canvas first): https://aikova.co.uk/woocommerce/shop-builder/
+- WooCommerce Multipurpose Shops live demo: https://aikova.co.uk/woocommerce/shops/
 - Services: https://aikova.co.uk/services
 - Solutions: https://aikova.co.uk/solutions
 - Industries: https://aikova.co.uk/industries
