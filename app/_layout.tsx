@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -60,7 +61,9 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: colors.bg },
+          contentStyle: { backgroundColor: colors.bg, flex: 1 },
+          animation: Platform.OS === 'web' ? 'none' : 'default',
+          freezeOnBlur: true,
         }}
       >
         <Stack.Screen name="index" />
