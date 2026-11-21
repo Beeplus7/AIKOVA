@@ -6,11 +6,11 @@ export default function HomeScreen() {
     <ArtefactFrame
       activeHref="/"
       title="AiKOVA — Engineered Intelligence. Delivered."
-      src="/aikova-flowless-tech-hero.html?v=woo-banner-1"
+      src="/aikova-flowless-tech-hero.html?v=woo-vault-2"
       promo={{
         eyebrow: 'NEW · MULTIPURPOSE WOOCOMMERCE THEME',
-        title: 'AiKOVA Multipurpose WooCommerce Theme — 100+ demos + Builder',
-        body: 'Banners, cards, infographics and a WoodMart-class commerce toolkit. Explore demos, import in one click, customise with AiKOVA Builder.',
+        title: 'AiKOVA Multipurpose WooCommerce Theme — Builder · Filters · Variations',
+        body: 'Template cards, banner images, header/layout elements, AJAX filters and swatches — WoodMart-class depth in AiKOVA vault colors.',
         href: '/woocommerce',
         cta: 'Open WooCommerce',
       }}
