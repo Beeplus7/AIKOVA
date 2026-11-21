@@ -32,6 +32,27 @@ header{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:rg
 .links{display:none;gap:1rem;font-size:13px;font-weight:600;color:var(--muted)}
 .links a:hover{color:var(--text)}
 @media(min-width:980px){.links{display:flex}}
+.nav-actions{display:flex;gap:.45rem;align-items:center}
+.burger{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);padding:0 11px;cursor:pointer}
+.burger span{display:block;height:2px;border-radius:2px;background:var(--text);transition:transform .28s cubic-bezier(.16,1,.3,1),opacity .2s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media(min-width:980px){.burger{display:none}}
+.nav-scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;opacity:0;pointer-events:none;transition:opacity .28s ease;backdrop-filter:blur(2px)}
+.nav-scrim.open{opacity:1;pointer-events:auto}
+.nav-drawer{position:fixed;top:0;right:0;bottom:0;width:min(320px,88vw);z-index:70;background:#0B1020;border-left:1px solid var(--border);padding:1.1rem 1.15rem 1.5rem;display:flex;flex-direction:column;gap:.15rem;transform:translateX(105%);transition:transform .34s cubic-bezier(.16,1,.3,1);box-shadow:-20px 0 50px rgba(0,0,0,.35)}
+.nav-drawer.open{transform:translateX(0)}
+.nav-drawer .drawer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.nav-drawer .drawer-kicker{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.16em;color:var(--blue)}
+.nav-drawer a{display:flex;align-items:center;justify-content:space-between;padding:.95rem 0;border-bottom:1px solid rgba(255,255,255,.06);font-weight:700;font-size:15px;color:var(--muted)}
+.nav-drawer a:hover,.nav-drawer a:focus{color:var(--text)}
+.nav-drawer .drawer-cta{margin-top:1.1rem;display:flex;flex-direction:column;gap:.5rem}
+body.nav-lock{overflow:hidden}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.08s}.reveal-delay-2{transition-delay:.16s}.reveal-delay-3{transition-delay:.24s}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.nav-drawer,.nav-scrim,.burger span{transition:none}}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;border-radius:999px;border:1px solid transparent;font-weight:700;font-size:12px;padding:.7rem 1.05rem;cursor:pointer}
 .btn.neon{background:rgba(132,255,61,.12);border-color:rgba(132,255,61,.35);color:var(--neon)}
 .btn.blue{background:linear-gradient(135deg,var(--blue),var(--deep));border:0;color:#fff}
@@ -198,7 +219,7 @@ td.hl{color:var(--neon);font-weight:800}
 <div class="top">AiKOVA Vault · <b>Multipurpose WooCommerce Theme</b> · 100+ demos · Builder · Filters · Variations · Plugins included</div>
 <header><div class="wrap nav">
   <a class="brand" href="#top"><span><strong>AiKOVA</strong><small>ENGINEERING VAULT // OL8</small></span></a>
-  <nav class="links">
+  <nav class="links" aria-label="Primary">
     <a href="#demos">Demos</a>
     <a href="#builder">Builder</a>
     <a href="#elements">Elements</a>
@@ -208,14 +229,36 @@ td.hl{color:var(--neon);font-weight:800}
     <a href="#plugins">Plugins</a>
     <a href="#pricing">Pricing</a>
   </nav>
-  <div style="display:flex;gap:.45rem">
+  <div class="nav-actions">
     <a class="btn ghost" href="#demos">Preview</a>
     <a class="btn blue" href="#pricing">Buy $59</a>
+    <button type="button" class="burger" id="navBurger" aria-label="Open menu" aria-controls="navDrawer" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </div></header>
+<div class="nav-scrim" id="navScrim" hidden></div>
+<aside class="nav-drawer" id="navDrawer" aria-hidden="true" aria-label="Mobile navigation">
+  <div class="drawer-top">
+    <span class="drawer-kicker">THEME NAV</span>
+    <button type="button" class="burger open" id="navClose" aria-label="Close menu"><span></span><span></span><span></span></button>
+  </div>
+  <a href="#demos">Demos</a>
+  <a href="#builder">Builder</a>
+  <a href="#elements">Elements</a>
+  <a href="#conversion">Conversion</a>
+  <a href="#variations">Variations</a>
+  <a href="#filters">Filters</a>
+  <a href="#plugins">Plugins</a>
+  <a href="#pricing">Pricing</a>
+  <div class="drawer-cta">
+    <a class="btn ghost" href="#demos">Preview demos</a>
+    <a class="btn blue" href="#pricing">Buy $59</a>
+  </div>
+</aside>
 
 <main id="top">
-<section class="hero"><div class="wrap hero-grid">
+<section class="hero reveal in"><div class="wrap hero-grid">
   <div>
     <div class="kicker">MULTIPURPOSE WOOCOMMERCE THEME + BUILDER</div>
     <h1>Every store.<br/><span>One vault theme.</span></h1>
@@ -251,7 +294,7 @@ td.hl{color:var(--neon);font-weight:800}
   </div>
 </div></section>
 
-<section class="section" id="builder"><div class="wrap">
+<section class="reveal section" id="builder"><div class="wrap">
   <div class="section-h"><div class="kicker">THEME BUILDER</div><h2>Design every storefront moment</h2><p>Visual website builder · Theme settings · Import prebuilt websites · Header builder · Megamenu builder — the WoodMart stack, AiKOVA branded.</p></div>
   <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
     <div class="card"><div class="kicker" style="color:var(--neon)">01</div><strong style="display:block;margin-top:.45rem">Visual website builder</strong><p style="margin:.4rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Elementor · Gutenberg · WPBakery — pick one and ship.</p></div><div class="card"><div class="kicker" style="color:var(--neon)">02</div><strong style="display:block;margin-top:.45rem">Theme settings</strong><p style="margin:.4rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Global colors, layouts, shop tools, presets in one panel.</p></div><div class="card"><div class="kicker" style="color:var(--neon)">03</div><strong style="display:block;margin-top:.45rem">Import prebuilt website</strong><p style="margin:.4rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Full or partial import with pages, products, headers.</p></div><div class="card"><div class="kicker" style="color:var(--neon)">04</div><strong style="display:block;margin-top:.45rem">Header builder</strong><p style="margin:.4rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">3-row drag & drop, sticky/overlap, dedicated mobile.</p></div><div class="card"><div class="kicker" style="color:var(--neon)">05</div><strong style="display:block;margin-top:.45rem">Megamenu builder</strong><p style="margin:.4rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Multi-column grids, banners, badges, HTML blocks.</p></div><div class="card"><div class="kicker" style="color:var(--neon)">06</div><strong style="display:block;margin-top:.45rem">Layout builder</strong><p style="margin:.4rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">15 layout types with display conditions.</p></div>
@@ -259,7 +302,7 @@ td.hl{color:var(--neon);font-weight:800}
 </div></section>
 
 
-<section class="section" id="elements"><div class="wrap">
+<section class="reveal section" id="elements"><div class="wrap">
   <div class="section-h">
     <div class="kicker">HEADER + BUILDER ELEMENTS</div>
     <h2>All builder elements onboard</h2>
@@ -373,7 +416,7 @@ td.hl{color:var(--neon);font-weight:800}
     <div class="card layout">Blog</div><div class="card layout">Portfolio</div><div class="card layout">Single project</div>
   </div>
 
-  <div class="showcase-split" id="conversion">
+  <div class="showcase-split reveal" id="conversion">
     <div class="copy">
       <div class="kicker">SALES &amp; CONVERSION</div>
       <h2>Remove friction between “I want it” and “order placed”</h2>
@@ -389,7 +432,7 @@ td.hl{color:var(--neon);font-weight:800}
     <div class="visual"><img src="/woocommerce/assets/woodmart-conversion.jpg" alt="Sales and conversion product page graphics"/></div>
   </div>
 
-  <div class="showcase-split" id="retention" style="margin-top:1.5rem">
+  <div class="showcase-split reveal" id="retention" style="margin-top:1.5rem">
     <div class="visual"><img src="/woocommerce/assets/woodmart-retention.jpg" alt="Retention tools — abandoned cart, waitlist, reminders"/></div>
     <div class="copy">
       <div class="kicker">RETENTION</div>
@@ -406,7 +449,7 @@ td.hl{color:var(--neon);font-weight:800}
   </div>
 </div></section>
 
-<section class="section" id="variations"><div class="wrap panel split">
+<section class="reveal section" id="variations"><div class="wrap panel split">
   <div>
     <div class="section-h"><div class="kicker">VARIATION DESIGNS</div><h2>Swatches that sell</h2><p>Color, image, button and label swatches. Linked variations, size guides, quick shop and galleries — variable products without dropdown friction.</p></div>
     <div class="card">
@@ -436,7 +479,7 @@ td.hl{color:var(--neon);font-weight:800}
   </div>
 </div></section>
 
-<section class="section" id="filters"><div class="wrap panel split">
+<section class="reveal section" id="filters"><div class="wrap panel split">
   <div>
     <div class="section-h"><div class="kicker">POWERFUL FILTERS</div><h2>AJAX discovery, no reloads</h2><p>Layered nav, price, stock, sort-by, category accordion, scrollable filter widgets, clear chips — WoodMart shop filters, AiKOVA UI.</p></div>
     <div class="filter-ui">
@@ -470,14 +513,14 @@ td.hl{color:var(--neon);font-weight:800}
   </div>
 </div></section>
 
-<section class="section" id="plugins"><div class="wrap">
+<section class="reveal section" id="plugins"><div class="wrap">
   <div class="section-h"><div class="kicker">PLUGINS + COMMERCE TOOLKIT</div><h2>Replace a stack of paid plugins</h2><p>WoodMart-class inclusions plus AiKOVA AI Receptionist and GTM Agent — one purchase, vault delivery.</p></div>
   <div class="grid plugin-grid">
     <div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">AJAX Filters</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Faceted price, color, size, brand, stock — no reload.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Variation Swatches</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Color / image / button / label swatches.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Wishlist</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Save-for-later across devices.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Compare</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Attribute matrix for considered buys.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Quick View</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Variation pick without leaving the grid.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">AJAX Live Search</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Predictive results with imagery.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Mega Menu</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Columns, banners, featured collections.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Frequently Bought Together</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Bundle upsells on product pages.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Abandoned Cart</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Recovery flows for return visits.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Back-in-stock / Waitlist</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Alerts when inventory returns.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Size Guides</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Popup tables per product/category.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Free Gifts</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Threshold gifts and promotions.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Header Builder</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">3-row drag & drop · mobile layouts.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Layout Builder</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Built-in</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">15 layout types · conditions.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Elementor Widgets</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">40+</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Product grids, banners, filters, carts.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">WPBakery Elements</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">40+</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Classic backend visual build.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Gutenberg Blocks</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Native</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Speed-first block demos.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">AI Receptionist</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">AiKOVA</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Guided store assistance.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">GTM Agent</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">AiKOVA</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">Measurement-ready campaign structure.</p></div><div class="card"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center"><strong style="font-size:13px">Image Optimizer</strong><span class="chip" style="color:var(--neon);border-color:rgba(132,255,61,.35)">Included</span></div><p style="margin:.45rem 0 0;color:var(--muted);font-size:.88rem;line-height:1.45">WebP / compression controls.</p></div>
   </div>
 </div></section>
 
-<section class="section" id="demos"><div class="wrap">
+<section class="reveal section" id="demos"><div class="wrap">
   <div class="section-h"><div class="kicker">TEMPLATE CARDS · BANNER IMAGES</div><h2>Start finished. Finish faster.</h2><p>Twelve featured template cards from 100+ demos — banner imagery included. Search, filter, preview, import.</p></div>
   <div class="toolbar">
     <label><span class="mono" style="color:var(--dim)">⌕</span><input id="q" placeholder="Search demos — beauty, furniture, litt…" /></label>
@@ -596,7 +639,7 @@ td.hl{color:var(--neon);font-weight:800}
 </article></div>
 </div></section>
 
-<section class="section" id="compare"><div class="wrap">
+<section class="reveal section" id="compare"><div class="wrap">
   <div class="section-h"><div class="kicker">WHY AIKOVA</div><h2>WoodMart depth. Vault identity.</h2></div>
   <div class="compare"><table>
     <thead><tr><th>Capability</th><th>AiKOVA</th><th>WoodMart</th><th>Flatsome</th></tr></thead>
@@ -610,7 +653,7 @@ td.hl{color:var(--neon);font-weight:800}
   </table></div>
 </div></section>
 
-<section class="section" id="pricing"><div class="wrap">
+<section class="reveal section" id="pricing"><div class="wrap">
   <div class="section-h"><div class="kicker">PRICING</div><h2>Choose how far you ship</h2></div>
   <div class="price-grid">
     <article class="card price"><h3 style="margin:0">Regular</h3><div class="amt">$59</div><p style="color:var(--muted)">1 site · theme + builder · 100+ demos</p><ul style="color:var(--muted);line-height:1.7;padding-left:1.1rem;flex:1"><li>Header + Layout builders</li><li>Filters · swatches · wishlist</li><li>Lifetime updates</li></ul><a class="btn blue" href="#demos" style="margin-top:1rem">Choose Regular</a></article>
@@ -644,6 +687,43 @@ td.hl{color:var(--neon);font-weight:800}
 
 <script>
 (function(){
+  /* Slide-in / slide-out mobile nav */
+  var burger=document.getElementById('navBurger');
+  var drawer=document.getElementById('navDrawer');
+  var scrim=document.getElementById('navScrim');
+  var closeBtn=document.getElementById('navClose');
+  function setNav(open){
+    drawer.classList.toggle('open', open);
+    scrim.classList.toggle('open', open);
+    burger.classList.toggle('open', open);
+    document.body.classList.toggle('nav-lock', open);
+    burger.setAttribute('aria-expanded', open?'true':'false');
+    drawer.setAttribute('aria-hidden', open?'false':'true');
+    scrim.hidden=!open;
+  }
+  function openNav(){setNav(true)}
+  function closeNav(){setNav(false)}
+  burger&&burger.addEventListener('click',function(){drawer.classList.contains('open')?closeNav():openNav();});
+  closeBtn&&closeBtn.addEventListener('click',closeNav);
+  scrim&&scrim.addEventListener('click',closeNav);
+  drawer&&drawer.querySelectorAll('a').forEach(function(a){a.addEventListener('click',closeNav);});
+  window.addEventListener('keydown',function(e){if(e.key==='Escape')closeNav();});
+  window.addEventListener('resize',function(){if(window.innerWidth>=980)closeNav();});
+
+  /* Scroll reveal — slide in / slide out */
+  var reveals=document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){en.target.classList.add('in');}
+        else{en.target.classList.remove('in');}
+      });
+    },{threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+    reveals.forEach(function(el){io.observe(el);});
+  } else {
+    reveals.forEach(function(el){el.classList.add('in');});
+  }
+
   var cats=['All','Fashion','Electronics','Furniture','Beauty','Grocery','Jewelry','Luxury','Food','Sport','Books','Digital'];
   var active='All', chips=document.getElementById('catChips');
   function render(){chips.innerHTML=cats.map(function(c){return '<button type="button" data-cat="'+c+'" class="'+(c===active?'active':'')+'">'+c+'</button>';}).join('');}

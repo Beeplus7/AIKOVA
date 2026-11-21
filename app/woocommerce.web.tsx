@@ -6,7 +6,7 @@ export default function WooCommerceScreen() {
     <ArtefactFrame
       activeHref="/woocommerce"
       title="AiKOVA Multipurpose WooCommerce Theme — 100+ Demos + Builder"
-      src="/woocommerce/index.html"
+      src="/woocommerce/index.html?v=slide-nav-1"
     />
   );
 }

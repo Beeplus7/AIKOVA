@@ -1,5 +1,5 @@
 import { Link } from 'expo-router';
-import { useEffect, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -34,6 +34,7 @@ export function ArtefactFrame({
 }) {
   const { width } = useWindowDimensions();
   const compact = width < 820;
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -44,39 +45,97 @@ export function ArtefactFrame({
     };
   }, []);
 
+  useEffect(() => {
+    if (!compact) setMenuOpen(false);
+  }, [compact]);
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <View style={styles.root}>
       <View style={[styles.bar, compact && styles.barCompact]}>
-        <Link href="/" asChild>
-          <Pressable style={styles.brand}>
-            <Text style={styles.logo}>AiKOVA</Text>
-            {!compact ? (
-              <Text style={styles.brandMeta}>ENGINEERING VAULT // OL8</Text>
-            ) : null}
-          </Pressable>
-        </Link>
-
-        <View style={[styles.links, compact && styles.linksCompact]}>
-          {marketingRoutes.map((route) => {
-            const active = route.href === activeHref;
-            return (
-              <Link key={route.href} href={route.href as '/'} asChild>
-                <Pressable style={styles.linkItem}>
-                  <Text style={[styles.linkLabel, active && styles.linkActive]}>
-                    {route.label}
-                  </Text>
-                  {active ? <View style={styles.linkUnderline} /> : null}
-                </Pressable>
-              </Link>
-            );
-          })}
-          <Link href="/os/portal" asChild>
-            <Pressable style={styles.cta}>
-              <Text style={styles.ctaText}>Open Portal</Text>
+        <View style={styles.barRow}>
+          <Link href="/" asChild>
+            <Pressable style={styles.brand} onPress={closeMenu}>
+              <Text style={styles.logo}>AiKOVA</Text>
+              {!compact ? (
+                <Text style={styles.brandMeta}>ENGINEERING VAULT // OL8</Text>
+              ) : null}
             </Pressable>
           </Link>
+
+          {compact ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={menuOpen ? 'Close menu' : 'Open menu'}
+              onPress={() => setMenuOpen((v) => !v)}
+              style={[styles.burger, menuOpen && styles.burgerOpen]}
+            >
+              <View style={[styles.burgerLine, menuOpen && styles.burgerLineTop]} />
+              <View style={[styles.burgerLine, menuOpen && styles.burgerLineMid]} />
+              <View style={[styles.burgerLine, menuOpen && styles.burgerLineBot]} />
+            </Pressable>
+          ) : (
+            <View style={styles.links}>
+              {marketingRoutes.map((route) => {
+                const active = route.href === activeHref;
+                return (
+                  <Link key={route.href} href={route.href as '/'} asChild>
+                    <Pressable style={styles.linkItem}>
+                      <Text style={[styles.linkLabel, active && styles.linkActive]}>
+                        {route.label}
+                      </Text>
+                      {active ? <View style={styles.linkUnderline} /> : null}
+                    </Pressable>
+                  </Link>
+                );
+              })}
+              <Link href="/os/portal" asChild>
+                <Pressable style={styles.cta}>
+                  <Text style={styles.ctaText}>Open Portal</Text>
+                </Pressable>
+              </Link>
+            </View>
+          )}
         </View>
       </View>
+
+      {/* Slide-in / slide-out mobile drawer */}
+      {compact ? (
+        <>
+          <Pressable
+            style={[styles.scrim, menuOpen ? styles.scrimShow : styles.scrimHide]}
+            onPress={closeMenu}
+            accessibilityLabel="Close menu overlay"
+          />
+          <View
+            style={[styles.drawer, menuOpen ? styles.drawerOpen : styles.drawerClosed]}
+            accessibilityViewIsModal={menuOpen}
+          >
+            <Text style={styles.drawerKicker}>NAVIGATE</Text>
+            {marketingRoutes.map((route) => {
+              const active = route.href === activeHref;
+              return (
+                <Link key={route.href} href={route.href as '/'} asChild>
+                  <Pressable style={styles.drawerItem} onPress={closeMenu}>
+                    <Text
+                      style={[styles.drawerLabel, active && styles.drawerLabelActive]}
+                    >
+                      {route.label}
+                    </Text>
+                    {active ? <View style={styles.drawerDot} /> : null}
+                  </Pressable>
+                </Link>
+              );
+            })}
+            <Link href="/os/portal" asChild>
+              <Pressable style={[styles.cta, styles.drawerCta]} onPress={closeMenu}>
+                <Text style={styles.ctaText}>Open Portal</Text>
+              </Pressable>
+            </Link>
+          </View>
+        </>
+      ) : null}
 
       {promo ? (
         <View style={[styles.promo, compact && styles.promoCompact]}>
@@ -97,7 +156,6 @@ export function ArtefactFrame({
         <iframe title={title} src={src} style={iframeStyle} allow="fullscreen" />
       </View>
 
-      {/* MCL Marketing Capture Lead bot — floats above marketing artefacts */}
       <MCLBotWidget />
     </View>
   );
@@ -118,25 +176,27 @@ const styles = StyleSheet.create({
     height: '100%',
     minHeight: '100vh' as unknown as number,
     backgroundColor: colors.bg,
+    position: 'relative',
+    overflow: 'hidden',
   },
   bar: {
     height: BAR_HEIGHT,
     paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    backgroundColor: 'rgba(5, 7, 13, 0.92)',
+    zIndex: 40,
+  },
+  barCompact: {
+    height: BAR_HEIGHT,
+  },
+  barRow: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    backgroundColor: 'rgba(5, 7, 13, 0.92)',
-    zIndex: 20,
-  },
-  barCompact: {
-    height: 'auto' as unknown as number,
     minHeight: BAR_HEIGHT,
-    paddingVertical: 10,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
   },
   brand: {
     flexDirection: 'row',
@@ -160,9 +220,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap',
     gap: 4,
-  },
-  linksCompact: {
-    width: '100%',
   },
   linkItem: {
     paddingHorizontal: 10,
@@ -197,6 +254,112 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodySemi,
     fontSize: 12,
     color: colors.green,
+  },
+  burger: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  burgerOpen: {
+    borderColor: 'rgba(14, 165, 255, 0.45)',
+    backgroundColor: 'rgba(14, 165, 255, 0.1)',
+  },
+  burgerLine: {
+    width: 18,
+    height: 2,
+    borderRadius: 2,
+    backgroundColor: colors.text,
+  },
+  burgerLineTop: {
+    transform: [{ translateY: 7 }, { rotate: '45deg' }],
+  },
+  burgerLineMid: {
+    opacity: 0,
+  },
+  burgerLineBot: {
+    transform: [{ translateY: -7 }, { rotate: '-45deg' }],
+  },
+  scrim: {
+    position: 'absolute',
+    top: BAR_HEIGHT,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    zIndex: 35,
+    ...( { transition: 'opacity 0.28s ease' } as object),
+  },
+  scrimShow: {
+    opacity: 1,
+    ...( { pointerEvents: 'auto' } as object),
+  },
+  scrimHide: {
+    opacity: 0,
+    ...( { pointerEvents: 'none' } as object),
+  },
+  drawer: {
+    position: 'absolute',
+    top: BAR_HEIGHT,
+    right: 0,
+    bottom: 0,
+    width: 300,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 28,
+    backgroundColor: '#0B1020',
+    borderLeftWidth: 1,
+    borderLeftColor: colors.border,
+    zIndex: 36,
+    gap: 4,
+    ...( {
+      transition: 'transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)',
+    } as object),
+  },
+  drawerOpen: {
+    transform: [{ translateX: 0 }],
+  },
+  drawerClosed: {
+    transform: [{ translateX: 320 }],
+  },
+  drawerKicker: {
+    fontFamily: fonts.mono,
+    fontSize: 10,
+    letterSpacing: 1.6,
+    color: colors.blue,
+    marginBottom: 12,
+  },
+  drawerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.06)',
+  },
+  drawerLabel: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 16,
+    color: colors.muted,
+  },
+  drawerLabelActive: {
+    color: colors.text,
+  },
+  drawerDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 8,
+    backgroundColor: colors.green,
+  },
+  drawerCta: {
+    marginLeft: 0,
+    marginTop: 18,
+    alignSelf: 'flex-start',
   },
   frame: {
     flex: 1,
